@@ -23,3 +23,25 @@ media/
 
 apps/*/migrations/*.py
 !apps/*/migrations/__init__.py
+
+# Flutter / Dart
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/build/
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/key.properties
+mobile/android/.idea/
+mobile/android/app/debug/
+mobile/android/app/profile/
+mobile/android/app/release/
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+mobile/ios/Flutter/flutter_export_environment.sh
+mobile/coverage/
+mobile/*.iml
+mobile/.idea/
+mobile/*.g.dart
+mobile/pubspec.lock
