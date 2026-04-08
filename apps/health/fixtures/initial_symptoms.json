@@ -1,0 +1,10 @@
+[
+  {"model": "health.symptom", "pk": 1, "fields": {"name": "Baş ağrısı", "description": "", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.symptom", "pk": 2, "fields": {"name": "Ateş", "description": "", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.symptom", "pk": 3, "fields": {"name": "Öksürük", "description": "", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.symptom", "pk": 4, "fields": {"name": "Yorgunluk", "description": "", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.symptom", "pk": 5, "fields": {"name": "Bulantı", "description": "", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.symptom", "pk": 6, "fields": {"name": "Karın ağrısı", "description": "", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.symptom", "pk": 7, "fields": {"name": "Nefes darlığı", "description": "", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.symptom", "pk": 8, "fields": {"name": "Baş dönmesi", "description": "", "created_at": "2026-01-01T00:00:00Z"}}
+]

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
 import 'features/health/screens/daily_log_screen.dart';
+import 'features/health/screens/symptom_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const DailyLogScreen(),
+        '/symptoms': (context) => const SymptomScreen(),
       },
     );
   }

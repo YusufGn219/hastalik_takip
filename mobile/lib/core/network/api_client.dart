@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import '../storage/token_storage.dart';
 
 class ApiClient {
-  static const String baseUrl = 'http://192.168.1.105:8000/api/v1';
+  static const String baseUrl = 'http://192.168.1.103:8000/api/v1';
 
   static Dio createDio() {
     final dio = Dio(BaseOptions(
@@ -14,9 +14,12 @@ class ApiClient {
 
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final token = await TokenStorage.getAccessToken();
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token'; 
+        final isAuthEndpoint = options.path.contains('/auth/');
+        if (!isAuthEndpoint) {
+          final token = await TokenStorage.getAccessToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
         }
         return handler.next(options);
       },

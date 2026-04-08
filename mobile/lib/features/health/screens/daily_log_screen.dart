@@ -67,7 +67,15 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Günlük Kayıt')),
+      appBar: AppBar(
+        title: const Text('Günlük Kayıt'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.medical_services),
+            tooltip: 'semptom ekle',
+            onPressed: () => Navigator.pushNamed(context, '/symptoms'),
+          )
+        ],),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: SingleChildScrollView(

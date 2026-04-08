@@ -23,3 +23,37 @@ class DailyLog(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.date}"
+
+class Symptom(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+class SymptomEntry(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='symptom_entries'
+    )
+    symptom = models.ForeignKey(
+        Symptom,
+        on_delete=models.CASCADE,
+        related_name='entries'
+    )
+    severity = models.IntegerField()
+    timestamp = models.DateTimeField()
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta: 
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.user.email} - {self.symptom.name} at {self.timestamp}"

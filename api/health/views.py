@@ -1,8 +1,9 @@
 from rest_framework.permissions import IsAuthenticated
-from api.health.serializers import DailyLogSerializer
+from api.health.serializers import DailyLogSerializer, SymptomSerializer, SymptomEntrySerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from apps.health.models import DailyLog
+from apps.health.models import DailyLog, Symptom, SymptomEntry
+from rest_framework import generics
 from rest_framework import status
 
 class DailyLogListCreateView(APIView):
@@ -93,3 +94,31 @@ class DailyLogDetailView(APIView):
             'message': 'Kayıt silindi',
             'data': {}
         }, status=status.HTTP_204_NO_CONTENT)
+
+class SymptomListView(generics.ListCreateAPIView):
+    serializer_class = SymptomSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Symptom.objects.all()
+    
+class SymptomDetailView(generics.RetrieveAPIView):
+    serializer_class = SymptomSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Symptom.objects.all()
+
+class SymptomEntryListCreateView(generics.ListCreateAPIView):
+    serializer_class = SymptomEntrySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return SymptomEntry.objects.filter(user=self.request.user)
+
+class SymptomEntryDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = SymptomEntrySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return SymptomEntry.objects.filter(user=self.request.user)

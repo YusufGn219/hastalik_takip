@@ -1,4 +1,4 @@
-from apps.health.models import DailyLog
+from apps.health.models import DailyLog, Symptom, SymptomEntry
 from rest_framework import serializers
 
 class DailyLogSerializer(serializers.ModelSerializer):
@@ -28,3 +28,24 @@ class DailyLogSerializer(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError("Su tüketimi negatif olamaz.")
         return value
+
+class SymptomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Symptom
+        fields = ['id', 'name', 'description']
+
+class SymptomEntrySerializer(serializers.ModelSerializer):
+    severity = serializers.IntegerField(min_value=1, max_value=10)
+    symptom_name = serializers.CharField(source='symptom.name', read_only=True)
+
+    class Meta:
+        model = SymptomEntry
+        fields = [
+            'id', 'symptom', 'symptom_name', 'severity',
+            'timestamp', 'notes', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
