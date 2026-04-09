@@ -49,3 +49,24 @@ class SymptomEntrySerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+class DailyLogTimelineSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = DailyLog
+        fileds = [
+            'sleep_hours', 'water_intake', 'mood', 'energy_level', 'notes'
+        ]
+
+class SymptomEntryTimelineSerializer(serializers.ModelSerializer):
+    symptom_name = serializers.CharField(source='symptom.name', read_only=True)
+
+    class Meta:
+        model = SymptomEntry
+        fields = [
+           'id', 'symptom_name', 'severity', 'timestamp', 'notes'
+        ]
+
+class TimelineSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    daily_log = DailyLogTimelineSerializer(allow_null=True)
+    symptom_entries = SymptomEntryTimelineSerializer(many=True)

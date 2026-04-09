@@ -29,7 +29,7 @@ class _SymptomScreenState extends State<SymptomScreen> {
       final token = await TokenStorage.getAccessToken();
       final dio = Dio();
       final response = await dio.get(
-        'http://192.168.1.103:8000/api/v1/health/symptoms/',
+        'http://192.168.200.60:8000/api/v1/health/symptoms/',
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
         ),
@@ -56,7 +56,7 @@ class _SymptomScreenState extends State<SymptomScreen> {
       final token = await TokenStorage.getAccessToken();
       final dio = Dio();
       await dio.post(
-        'http://192.168.1.103:8000/api/v1/health/symptom-entries/',
+        'http://192.168.200.60:8000/api/v1/health/symptom-entries/',
         data: {
           'symptom': _selectedSymptomId,
           'severity': _severity.round(),

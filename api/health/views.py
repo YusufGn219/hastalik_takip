@@ -5,6 +5,10 @@ from rest_framework.views import APIView
 from apps.health.models import DailyLog, Symptom, SymptomEntry
 from rest_framework import generics
 from rest_framework import status
+from datetime import date as date_type
+from services.health.timeline import get_timeline
+from .serializers import TimelineSerializer
+from datetime import datetime
 
 class DailyLogListCreateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -122,3 +126,37 @@ class SymptomEntryDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return SymptomEntry.objects.filter(user=self.request.user)
+
+class TimelineView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        date_str = request.query_params.get('date')
+
+        if date_str:
+            try:
+                selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            except ValueError:
+                return Response({
+                    'success': False,
+                    'data': None,
+                    'message': 'Geçersiz tarih formatı. YYYY-MM-DD formatında olmalıdır.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            selected_date = date_type.today()
+
+        daily_log, symptom_entries = get_timeline(request.user, selected_date)
+
+        serializer = TimelineSerializer({
+            'date': selected_date,
+            'daily_log': daily_log,
+            'symptom_entries': symptom_entries
+        })
+        
+        return Response({
+            'success': True,
+            'data': serializer.data,
+            'message': 'Zaman çizelgesi getirildi'
+        }, status=status.HTTP_200_OK)
+       
+            

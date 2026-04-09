@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import '../storage/token_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiClient {
-  static const String baseUrl = 'http://192.168.1.103:8000/api/v1';
+  static String baseUrl =  dotenv.env['BASE_URL'] ?? 'http://localhost:8000/api/v1';
 
   static Dio createDio() {
     final dio = Dio(BaseOptions(

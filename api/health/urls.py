@@ -1,4 +1,11 @@
-from api.health.views import DailyLogListCreateView, DailyLogDetailView, SymptomListView, SymptomDetailView, SymptomEntryListCreateView, SymptomEntryDetailView
+from api.health.views import (
+    DailyLogListCreateView, 
+    DailyLogDetailView, 
+    SymptomListView, 
+    SymptomDetailView, 
+    SymptomEntryListCreateView, 
+    SymptomEntryDetailView, 
+    TimelineView)
 from django.urls import path
 
 urlpatterns = [
@@ -8,4 +15,5 @@ urlpatterns = [
     path('symptoms/<int:pk>/', SymptomDetailView.as_view(), name='symptom-detail'),
     path('symptom-entries/', SymptomEntryListCreateView.as_view(), name='symptom-entry-list'),
     path('symptom-entries/<int:pk>/', SymptomEntryDetailView.as_view(), name='symptom-entry-detail'),
+    path('timeline/', TimelineView.as_view(), name='timeline'),
 ]
