@@ -1,14 +1,28 @@
 from rest_framework.permissions import IsAuthenticated
-from api.health.serializers import DailyLogSerializer, SymptomSerializer, SymptomEntrySerializer
+from api.health.serializers import (
+    DailyLogSerializer,
+    SymptomSerializer,
+    SymptomEntrySerializer,
+    EpisodeSerializer,
+    EpisodeCloseSerializer,
+    ActiveEpisodeSerializer
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from apps.health.models import DailyLog, Symptom, SymptomEntry
+from apps.health.models import DailyLog, Symptom, SymptomEntry, Episode
 from rest_framework import generics
 from rest_framework import status
 from datetime import date as date_type
 from services.health.timeline import get_timeline
+from services.health.episode import (
+    get_active_episode,
+    start_episode,
+    add_to_episode,
+    close_episode
+)
 from .serializers import TimelineSerializer
 from datetime import datetime
+
 
 class DailyLogListCreateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -99,19 +113,22 @@ class DailyLogDetailView(APIView):
             'data': {}
         }, status=status.HTTP_204_NO_CONTENT)
 
+
 class SymptomListView(generics.ListCreateAPIView):
     serializer_class = SymptomSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Symptom.objects.all()
-    
+
+
 class SymptomDetailView(generics.RetrieveAPIView):
     serializer_class = SymptomSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Symptom.objects.all()
+
 
 class SymptomEntryListCreateView(generics.ListCreateAPIView):
     serializer_class = SymptomEntrySerializer
@@ -120,12 +137,14 @@ class SymptomEntryListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return SymptomEntry.objects.filter(user=self.request.user)
 
+
 class SymptomEntryDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SymptomEntrySerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return SymptomEntry.objects.filter(user=self.request.user)
+
 
 class TimelineView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
@@ -152,11 +171,207 @@ class TimelineView(generics.GenericAPIView):
             'daily_log': daily_log,
             'symptom_entries': symptom_entries
         })
-        
+
         return Response({
             'success': True,
             'data': serializer.data,
             'message': 'Zaman çizelgesi getirildi'
         }, status=status.HTTP_200_OK)
-       
-            
+
+
+class EpisodeListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        episodes = Episode.objects.filter(user=request.user)
+        serializer = EpisodeSerializer(episodes, many=True)
+        return Response({
+            'success': True,
+            'message': 'Episodlar getirildi',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        symptom_entry_id = request.data.get('symptom_entry_id')
+        action = request.data.get('action')
+
+        if not symptom_entry_id or not action:
+            return Response({
+                'success': False,
+                'message': 'symptom_entry_id ve action zorunludur.',
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            symptom_entry = SymptomEntry.objects.get(
+                pk=symptom_entry_id,
+                user=request.user
+            )
+        except SymptomEntry.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Semptom kaydı bulunamadı.',
+                'data': {}
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        if action == 'start':
+            existing = get_active_episode(request.user, symptom_entry.symptom)
+            if existing:
+                return Response({
+                    'success': False,
+                    'message': 'Bu semptom için zaten aktif bir atak var.',
+                    'data': ActiveEpisodeSerializer(existing).data
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            episode = start_episode(request.user, symptom_entry)
+            return Response({
+                'success': True,
+                'message': 'Atak başlatıldı.',
+                'data': EpisodeSerializer(episode).data
+            }, status=status.HTTP_201_CREATED)
+
+        elif action == 'add':
+            episode_id = request.data.get('episode_id')
+            is_new_location = request.data.get('is_new_location', False)
+
+            if not episode_id:
+                return Response({
+                    'success': False,
+                    'message': 'episode_id zorunludur.',
+                    'data': {}
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                episode = Episode.objects.get(pk=episode_id, user=request.user)
+            except Episode.DoesNotExist:
+                return Response({
+                    'success': False,
+                    'message': 'Atak bulunamadı.',
+                    'data': {}
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            add_to_episode(episode, symptom_entry, is_new_location=is_new_location)
+            return Response({
+                'success': True,
+                'message': 'Kayıt atağa eklendi.',
+                'data': EpisodeSerializer(episode).data
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            'success': False,
+            'message': 'Geçersiz action. "start" veya "add" olmalıdır.',
+            'data': {}
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EpisodeActiveView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        episodes = Episode.objects.filter(
+            user=request.user,
+            status=Episode.Status.ONGOING
+        )
+        serializer = EpisodeSerializer(episodes, many=True)
+        return Response({
+            'success': True,
+            'message': 'Aktif ataklar getirildi',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+class EpisodeHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        episodes = Episode.objects.filter(
+            user=request.user,
+            status=Episode.Status.RESOLVED
+        )
+        serializer = EpisodeSerializer(episodes, many=True)
+        return Response({
+            'success': True,
+            'message': 'Geçmiş ataklar getirildi',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+class EpisodeDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk, user):
+        try:
+            return Episode.objects.get(pk=pk, user=user)
+        except Episode.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        episode = self.get_object(pk, request.user)
+        if not episode:
+            return Response({
+                'success': False,
+                'message': 'Atak bulunamadı',
+                'data': {}
+            }, status=status.HTTP_404_NOT_FOUND)
+        serializer = EpisodeSerializer(episode)
+        return Response({
+            'success': True,
+            'message': 'Atak getirildi',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+    def delete(self, request, pk):
+        episode = self.get_object(pk, request.user)
+        if not episode:
+            return Response({
+                'success': False,
+                'message': 'Atak bulunamadı',
+                'data': {}
+            }, status=status.HTTP_404_NOT_FOUND)
+        episode.delete()
+        return Response({
+            'success': True,
+            'message': 'Atak silindi',
+            'data': {}
+        }, status=status.HTTP_204_NO_CONTENT)
+
+
+class EpisodeCloseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        try:
+            episode = Episode.objects.get(pk=pk, user=request.user)
+        except Episode.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Atak bulunamadı',
+                'data': {}
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = EpisodeCloseSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                'success': False,
+                'message': 'Geçersiz veri',
+                'data': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            closed = close_episode(
+                episode,
+                ended_at=serializer.validated_data.get('ended_at'),
+                resolution_notes=serializer.validated_data.get('resolution_notes', '')
+            )
+        except ValueError as e:
+            return Response({
+                'success': False,
+                'message': str(e),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'success': True,
+            'message': 'Atak kapatıldı',
+            'data': EpisodeSerializer(closed).data
+        }, status=status.HTTP_200_OK)
