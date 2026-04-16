@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import '../../../core/storage/token_storage.dart';
+import '../../../core/network/api_client.dart';
+import '../../episode/episode_service.dart';
 
 class SymptomScreen extends StatefulWidget {
   const SymptomScreen({super.key});
@@ -11,6 +11,8 @@ class SymptomScreen extends StatefulWidget {
 
 class _SymptomScreenState extends State<SymptomScreen> {
   final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final EpisodeService _episodeService = EpisodeService();
 
   List<dynamic> _symptoms = [];
   int? _selectedSymptomId;
@@ -26,21 +28,10 @@ class _SymptomScreenState extends State<SymptomScreen> {
 
   Future<void> _loadSymptoms() async {
     try {
-      final token = await TokenStorage.getAccessToken();
-      final dio = Dio();
-      final response = await dio.get(
-        'http://192.168.200.60:8000/api/v1/health/symptoms/',
-        options: Options(
-          headers: {'Authorization': 'Bearer $token'},
-        ),
-      );
-      setState(() {
-        _symptoms = response.data;
-      });
+      final response = await ApiClient.dio.get('/health/symptoms/');
+      setState(() => _symptoms = response.data);
     } catch (e) {
-      setState(() {
-        _message = 'Semptomlar yüklenemedi';
-      });
+      setState(() => _message = 'Semptomlar yüklenemedi');
     }
   }
 
@@ -53,30 +44,125 @@ class _SymptomScreenState extends State<SymptomScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final token = await TokenStorage.getAccessToken();
-      final dio = Dio();
-      await dio.post(
-        'http://192.168.200.60:8000/api/v1/health/symptom-entries/',
+      final response = await ApiClient.dio.post(
+        '/health/symptom-entries/',
         data: {
           'symptom': _selectedSymptomId,
           'severity': _severity.round(),
           'timestamp': DateTime.now().toIso8601String(),
           'notes': _notesController.text,
+          'location': _locationController.text,
         },
-        options: Options(
-          headers: {'Authorization': 'Bearer $token'},
-        ),
       );
+
+      final entryId = response.data['id'];
+      final activeEpisode = response.data['active_episode'];
+
       setState(() {
-        _message = 'Semptom kaydedildi';
         _selectedSymptomId = null;
         _severity = 5;
         _notesController.clear();
+        _locationController.clear();
+        _message = '';
       });
+
+      if (activeEpisode != null && mounted) {
+        await _showEpisodeDialog(entryId, activeEpisode);
+      } else {
+        if (mounted) {
+          await _showStartEpisodeDialog(entryId);
+        }
+      }
     } catch (e) {
       setState(() => _message = 'Kayıt oluşturulamadı');
     } finally {
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _showStartEpisodeDialog(int entryId) async {
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Atak Takibi'),
+        content: const Text('Bu semptomu takip etmek ister misin?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Hayır, sadece kaydet'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Evet, atak başlat'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await _startEpisode(entryId);
+    } else {
+      setState(() => _message = 'Semptom kaydedildi');
+    }
+  }
+
+  Future<void> _showEpisodeDialog(int entryId, Map<String, dynamic> activeEpisode) async {
+    final symptomName = activeEpisode['symptom_name'];
+
+    final result = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text('Devam eden $symptomName atağın var'),
+        content: const Text('Bu kayıt nasıl eklensin?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'independent'),
+            child: const Text('Bağımsız kayıt'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'add'),
+            child: const Text('Atağa ekle'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, 'new_location'),
+            child: const Text('Yeni lokasyon'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == 'add') {
+      await _addToEpisode(entryId, activeEpisode['id'], false);
+    } else if (result == 'new_location') {
+      await _addToEpisode(entryId, activeEpisode['id'], true);
+    } else {
+      setState(() => _message = 'Semptom kaydedildi');
+    }
+  }
+
+  Future<void> _startEpisode(int entryId) async {
+    try {
+      await _episodeService.startEpisode(entryId);
+      setState(() => _message = 'Semptom kaydedildi ve atak başlatıldı');
+    } catch (e) {
+      setState(() => _message = 'Atak başlatılamadı');
+    }
+  }
+
+  Future<void> _addToEpisode(int entryId, int episodeId, bool isNewLocation) async {
+    try {
+      await _episodeService.addToEpisode(
+        symptomEntryId: entryId,
+        episodeId: episodeId,
+        isNewLocation: isNewLocation,
+      );
+      setState(() => _message = isNewLocation
+          ? 'Yeni lokasyon ile atağa eklendi'
+          : 'Atağa eklendi');
+    } catch (e) {
+      setState(() => _message = 'Atağa eklenemedi');
     }
   }
 
@@ -115,7 +201,17 @@ class _SymptomScreenState extends State<SymptomScreen> {
               label: _severity.round().toString(),
               onChanged: (val) => setState(() => _severity = val),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            const Text('Lokasyon', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _locationController,
+              decoration: const InputDecoration(
+                hintText: 'Opsiyonel (örn: Şakaklarda, Göz arkasında)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
             const Text('Notlar', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             TextField(
@@ -142,7 +238,9 @@ class _SymptomScreenState extends State<SymptomScreen> {
                 child: Text(
                   _message,
                   style: TextStyle(
-                    color: _message.contains('kaydedildi')
+                    color: _message.contains('kaydedildi') ||
+                            _message.contains('eklendi') ||
+                            _message.contains('başlatıldı')
                         ? Colors.green
                         : Colors.red,
                   ),

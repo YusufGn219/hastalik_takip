@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../timeline/timeline_service.dart';
+import '../../episode/episode_service.dart';
+import '../../episode/screens/episode_list_screen.dart';
 
 class TimelineScreen extends StatefulWidget {
   const TimelineScreen({super.key});
@@ -10,8 +12,10 @@ class TimelineScreen extends StatefulWidget {
 
 class _TimelineScreenState extends State<TimelineScreen> {
   final TimelineService _timelineService = TimelineService();
+  final EpisodeService _episodeService = EpisodeService();
   DateTime _selectedDate = DateTime.now();
   Map<String, dynamic>? _timelineData;
+  List<dynamic> _activeEpisodes = [];
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -19,6 +23,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
   void initState() {
     super.initState();
     _fetchTimeline();
+    _fetchActiveEpisodes();
   }
 
   Future<void> _fetchTimeline() async {
@@ -42,6 +47,15 @@ class _TimelineScreenState extends State<TimelineScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _fetchActiveEpisodes() async {
+    try {
+      final episodes = await _episodeService.getActiveEpisodes();
+      setState(() => _activeEpisodes = episodes);
+    } catch (e) {
+      // Sessizce geç — timeline'ı bloklamamalı
     }
   }
 
@@ -84,6 +98,11 @@ class _TimelineScreenState extends State<TimelineScreen> {
     return '${_selectedDate.day} ${months[_selectedDate.month]} ${_selectedDate.year}';
   }
 
+  String _formatTime(String isoString) {
+    final dt = DateTime.parse(isoString).toLocal();
+    return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +117,18 @@ class _TimelineScreenState extends State<TimelineScreen> {
           IconButton(
             icon: const Icon(Icons.medical_services),
             tooltip: 'Semptom Ekle',
-            onPressed: () => Navigator.pushNamed(context, '/symptoms'),
+            onPressed: () async {
+              await Navigator.pushNamed(context, '/symptoms');
+              _fetchActiveEpisodes();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.crisis_alert),
+            tooltip: 'Ataklar',
+            onPressed: () async {
+              await Navigator.pushNamed(context, '/episodes');
+              _fetchActiveEpisodes();
+            },
           ),
         ],
       ),
@@ -114,7 +144,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
   Widget _buildDateBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-      color: Theme.of(context).colorScheme.surfaceVariant,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -153,14 +183,90 @@ class _TimelineScreenState extends State<TimelineScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: _fetchTimeline,
+      onRefresh: () async {
+        await _fetchTimeline();
+        await _fetchActiveEpisodes();
+      },
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (_activeEpisodes.isNotEmpty) ...[
+            _buildActiveEpisodesSection(),
+            const SizedBox(height: 16),
+          ],
           _buildDailyLogCard(),
           const SizedBox(height: 16),
           _buildSymptomEntries(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActiveEpisodesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(bottom: 8),
+          child: Text(
+            'Aktif Ataklar',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.red),
+          ),
+        ),
+        ..._activeEpisodes.map((episode) => _buildActiveEpisodeCard(episode)),
+      ],
+    );
+  }
+
+  Widget _buildActiveEpisodeCard(Map<String, dynamic> episode) {
+    final startTime = _formatTime(episode['start_time']);
+    final locations = (episode['locations'] as List<dynamic>? ?? [])
+        .map((l) => l['location'] as String)
+        .join(', ');
+
+    return Card(
+      color: Colors.red.shade50,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            const Text('🔴', style: TextStyle(fontSize: 16)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    episode['symptom_name'],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    '$startTime\'den beri devam ediyor',
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  if (locations.isNotEmpty)
+                    Text(
+                      locations,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EpisodeListScreen(),
+                  ),
+                );
+                _fetchActiveEpisodes();
+              },
+              child: const Text('Kapat'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -195,8 +301,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                 Icon(Icons.assignment, color: Colors.blue),
                 SizedBox(width: 8),
                 Text('Günlük Özet',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ],
             ),
             const Divider(),

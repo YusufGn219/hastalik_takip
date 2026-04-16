@@ -4,9 +4,10 @@ import 'features/auth/screens/register_screen.dart';
 import 'features/health/screens/daily_log_screen.dart';
 import 'features/health/screens/symptom_screen.dart';
 import 'features/timeline/screens/timeline_screen.dart';
+import 'features/episode/screens/episode_list_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main()  async {
+void main() async {
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const TimelineScreen(),
         '/daily-log': (context) => const DailyLogScreen(),
         '/symptoms': (context) => const SymptomScreen(),
+        '/episodes': (context) => const EpisodeListScreen(),
       },
     );
   }
