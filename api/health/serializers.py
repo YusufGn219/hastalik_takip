@@ -109,11 +109,11 @@ class SymptomEntryTimelineSerializer(serializers.ModelSerializer):
 
 class MedicationLogTimelineSerializer(serializers.ModelSerializer):
     medication_name = serializers.CharField(source='medication.name', read_only=True)
+    medication_type = serializers.CharField(source='medication.type', read_only=True)
 
     class Meta:
         model = MedicationLog
-        fields = ['id', 'medication_name', 'dose_amount', 'dose_unit', 'taken_at', 'notes']
-
+        fields = ['id', 'medication_name', 'medication_type', 'dose_amount', 'dose_unit', 'taken_at', 'notes']
 
 class TimelineSerializer(serializers.Serializer):
     date = serializers.DateField()

@@ -166,6 +166,7 @@ class MedicationLog(models.Model):
         ML = "ml", "ml"
         DROP = "drop", "damla"
         CAPSULE = "capsule", "kapsül"
+        TABLET = "tablet", "tablet"
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

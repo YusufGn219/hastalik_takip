@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../timeline/timeline_service.dart';
 import '../../episode/episode_service.dart';
 import '../../episode/screens/episode_list_screen.dart';
+import 'package:mobile/features/medication/medication_service.dart';
 
 class TimelineScreen extends StatefulWidget {
   const TimelineScreen({super.key});
@@ -55,7 +56,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
       final episodes = await _episodeService.getActiveEpisodes();
       setState(() => _activeEpisodes = episodes);
     } catch (e) {
-      // Sessizce geç — timeline'ı bloklamamalı
+      // Sessizce geç
     }
   }
 
@@ -67,7 +68,8 @@ class _TimelineScreenState extends State<TimelineScreen> {
   }
 
   void _nextDay() {
-    if (_selectedDate.isBefore(DateTime.now().subtract(const Duration(days: 1)))) {
+    if (_selectedDate
+        .isBefore(DateTime.now().subtract(const Duration(days: 1)))) {
       setState(() {
         _selectedDate = _selectedDate.add(const Duration(days: 1));
       });
@@ -92,8 +94,19 @@ class _TimelineScreenState extends State<TimelineScreen> {
 
   String _formatDisplayDate() {
     const months = [
-      '', 'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      '',
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık'
     ];
     return '${_selectedDate.day} ${months[_selectedDate.month]} ${_selectedDate.year}';
   }
@@ -129,6 +142,39 @@ class _TimelineScreenState extends State<TimelineScreen> {
               await Navigator.pushNamed(context, '/episodes');
               _fetchActiveEpisodes();
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.medication),
+            tooltip: 'İlaç Al',
+            onPressed: () => Navigator.pushNamed(context, '/medication-log'),
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              Navigator.pushNamed(context, value);
+            },
+            itemBuilder: (ctx) => [
+              const PopupMenuItem(
+                value: '/chronic-conditions',
+                child: Row(
+                  children: [
+                    Icon(Icons.favorite, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Kronik Hastalıklar'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: '/recurring',
+                child: Row(
+                  children: [
+                    Icon(Icons.repeat, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text('Rutinler'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -196,7 +242,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
           ],
           _buildDailyLogCard(),
           const SizedBox(height: 16),
-          _buildSymptomEntries(),
+          _buildTimelineItems(),
         ],
       ),
     );
@@ -210,7 +256,8 @@ class _TimelineScreenState extends State<TimelineScreen> {
           padding: EdgeInsets.only(bottom: 8),
           child: Text(
             'Aktif Ataklar',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.red),
+            style: TextStyle(
+                fontSize: 14, fontWeight: FontWeight.bold, color: Colors.red),
           ),
         ),
         ..._activeEpisodes.map((episode) => _buildActiveEpisodeCard(episode)),
@@ -301,7 +348,8 @@ class _TimelineScreenState extends State<TimelineScreen> {
                 Icon(Icons.assignment, color: Colors.blue),
                 SizedBox(width: 8),
                 Text('Günlük Özet',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ],
             ),
             const Divider(),
@@ -330,18 +378,34 @@ class _TimelineScreenState extends State<TimelineScreen> {
     );
   }
 
-  Widget _buildSymptomEntries() {
-    final entries = _timelineData?['symptom_entries'] as List? ?? [];
+  Widget _buildTimelineItems() {
+    final symptomEntries = (_timelineData?['symptom_entries'] as List? ?? [])
+        .map((e) => {'type': 'symptom', 'time': e['timestamp'], 'data': e})
+        .toList();
 
-    if (entries.isEmpty) {
+    final medicationLogs = (_timelineData?['medication_logs'] as List? ?? [])
+        .map((e) => {'type': 'medication', 'time': e['taken_at'], 'data': e})
+        .toList();
+
+    final allItems = [...symptomEntries, ...medicationLogs];
+    allItems.sort((a, b) => DateTime.parse(a['time'] as String)
+        .compareTo(DateTime.parse(b['time'] as String)));
+
+    if (allItems.isEmpty) {
       return const Center(
-        child: Text('Bu gün için semptom kaydı yok',
+        child: Text('Bu gün için kayıt yok',
             style: TextStyle(color: Colors.grey)),
       );
     }
 
     return Column(
-      children: entries.map((entry) => _buildSymptomCard(entry)).toList(),
+      children: allItems.map((item) {
+        if (item['type'] == 'symptom') {
+          return _buildSymptomCard(item['data'] as Map<String, dynamic>);
+        } else {
+          return _buildMedicationCard(item['data'] as Map<String, dynamic>);
+        }
+      }).toList(),
     );
   }
 
@@ -384,6 +448,65 @@ class _TimelineScreenState extends State<TimelineScreen> {
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(entry['notes']),
                       ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMedicationCard(Map<String, dynamic> log) {
+    final timestamp = DateTime.parse(log['taken_at']).toLocal();
+    final timeStr =
+        '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
+    final dose = log['dose_amount'] != null
+        ? ' ${log['dose_amount']} ${log['dose_unit']}'
+        : '';
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 48,
+            child: Text(timeStr,
+                style: const TextStyle(color: Colors.grey, fontSize: 12)),
+          ),
+          Expanded(
+            child: Card(
+              color: Colors.blue.shade50,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    const Icon(Icons.medication, color: Colors.blue, size: 18),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${log['medication_name']}$dose',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            log['medication_type'] == 'chronic'
+                                ? 'Kronik'
+                                : 'Semptomatik',
+                            style: const TextStyle(
+                                color: Colors.blue, fontSize: 12),
+                          ),
+                          if (log['notes'] != null &&
+                              (log['notes'] as String).isNotEmpty)
+                            Text(log['notes'] as String,
+                                style: const TextStyle(color: Colors.grey)),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

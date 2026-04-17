@@ -5,6 +5,9 @@ import 'features/health/screens/daily_log_screen.dart';
 import 'features/health/screens/symptom_screen.dart';
 import 'features/timeline/screens/timeline_screen.dart';
 import 'features/episode/screens/episode_list_screen.dart';
+import 'features/medication/screens/medication_log_screen.dart';
+import 'features/medication/screens/chronic_condition_screen.dart';
+import 'features/medication/screens/recurring_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
@@ -32,6 +35,9 @@ class MyApp extends StatelessWidget {
         '/daily-log': (context) => const DailyLogScreen(),
         '/symptoms': (context) => const SymptomScreen(),
         '/episodes': (context) => const EpisodeListScreen(),
+        '/medication-log': (context) => const MedicationLogScreen(),
+        '/chronic-conditions': (context) => const ChronicConditionScreen(),
+        '/recurring': (context) => const RecurringScreen(),
       },
     );
   }
