@@ -5,7 +5,10 @@ from api.health.serializers import (
     SymptomEntrySerializer,
     EpisodeSerializer,
     EpisodeCloseSerializer,
-    ActiveEpisodeSerializer
+    ActiveEpisodeSerializer,
+    MedicationLogSerializer,
+    MedicationSerializer,
+    ChronicConditionSerializer
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,6 +25,11 @@ from services.health.episode import (
 )
 from .serializers import TimelineSerializer
 from datetime import datetime
+from apps.health.models import (
+    Medication,
+    ChronicCondition,
+    MedicationLog
+)
 
 
 class DailyLogListCreateView(APIView):
@@ -164,12 +172,12 @@ class TimelineView(generics.GenericAPIView):
         else:
             selected_date = date_type.today()
 
-        daily_log, symptom_entries = get_timeline(request.user, selected_date)
-
+        daily_log, symptom_entries, medication_logs = get_timeline(request.user, selected_date)
         serializer = TimelineSerializer({
             'date': selected_date,
             'daily_log': daily_log,
-            'symptom_entries': symptom_entries
+            'symptom_entries': symptom_entries,
+            'medication_logs': medication_logs
         })
 
         return Response({
@@ -375,3 +383,76 @@ class EpisodeCloseView(APIView):
             'message': 'Atak kapatıldı',
             'data': EpisodeSerializer(closed).data
         }, status=status.HTTP_200_OK)
+
+class MedicationListCreateView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = MedicationSerializer
+
+    def get_queryset(self):
+        from services.health.medication import get_medications
+        return get_medications(self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user, is_global=False)
+
+
+class MedicationDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = MedicationSerializer
+
+    def get_queryset(self):
+        from services.health.medication import get_medications
+        return get_medications(self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.is_global:
+            return Response(
+                {'success': False, 'data': None, 'message': 'Global ilaçlar güncellenemez.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.is_global:
+            return Response(
+                {'success': False, 'data': None, 'message': 'Global ilaçlar silinemez.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().destroy(request, *args, **kwargs)
+
+
+class ChronicConditionListCreateView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChronicConditionSerializer
+
+    def get_queryset(self):
+        return ChronicCondition.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class ChronicConditionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChronicConditionSerializer
+
+    def get_queryset(self):
+        return ChronicCondition.objects.filter(user=self.request.user)
+
+
+class MedicationLogListCreateView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = MedicationLogSerializer
+
+    def get_queryset(self):
+        return MedicationLog.objects.filter(user=self.request.user)
+
+
+class MedicationLogDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = MedicationLogSerializer
+
+    def get_queryset(self):
+        return MedicationLog.objects.filter(user=self.request.user)

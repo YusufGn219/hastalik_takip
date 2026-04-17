@@ -1,0 +1,12 @@
+[
+  {"model": "health.medication", "pk": 1, "fields": {"user": null, "name": "Parol", "type": "symptomatic", "is_global": true, "is_recurring": false, "recurring_time": null, "recurring_days": null, "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.medication", "pk": 2, "fields": {"user": null, "name": "Aspirin", "type": "symptomatic", "is_global": true, "is_recurring": false, "recurring_time": null, "recurring_days": null, "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.medication", "pk": 3, "fields": {"user": null, "name": "Majezik", "type": "symptomatic", "is_global": true, "is_recurring": false, "recurring_time": null, "recurring_days": null, "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.medication", "pk": 4, "fields": {"user": null, "name": "Nurofen", "type": "symptomatic", "is_global": true, "is_recurring": false, "recurring_time": null, "recurring_days": null, "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.medication", "pk": 5, "fields": {"user": null, "name": "Augmentin", "type": "symptomatic", "is_global": true, "is_recurring": false, "recurring_time": null, "recurring_days": null, "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.medication", "pk": 6, "fields": {"user": null, "name": "D Vitamini", "type": "chronic", "is_global": true, "is_recurring": false, "recurring_time": null, "recurring_days": null, "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.medication", "pk": 7, "fields": {"user": null, "name": "C Vitamini", "type": "chronic", "is_global": true, "is_recurring": false, "recurring_time": null, "recurring_days": null, "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.medication", "pk": 8, "fields": {"user": null, "name": "Omega-3", "type": "chronic", "is_global": true, "is_recurring": false, "recurring_time": null, "recurring_days": null, "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.medication", "pk": 9, "fields": {"user": null, "name": "Magnezyum", "type": "chronic", "is_global": true, "is_recurring": false, "recurring_time": null, "recurring_days": null, "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "health.medication", "pk": 10, "fields": {"user": null, "name": "B12 Vitamini", "type": "chronic", "is_global": true, "is_recurring": false, "recurring_time": null, "recurring_days": null, "created_at": "2026-01-01T00:00:00Z"}}
+]

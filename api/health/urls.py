@@ -10,7 +10,14 @@ from api.health.views import (
     EpisodeActiveView,
     EpisodeHistoryView,
     EpisodeDetailView,
-    EpisodeCloseView)
+    EpisodeCloseView,
+    MedicationListCreateView,
+    MedicationDetailView,
+    ChronicConditionListCreateView,
+    ChronicConditionDetailView,
+    MedicationLogListCreateView,
+    MedicationLogDetailView
+    )
 from django.urls import path
 
 urlpatterns = [
@@ -26,4 +33,10 @@ urlpatterns = [
     path('episodes/history/', EpisodeHistoryView.as_view(), name='episode-history'),
     path('episodes/<int:pk>/', EpisodeDetailView.as_view(), name='episode-detail'),
     path('episodes/<int:pk>/close/', EpisodeCloseView.as_view(), name='episode-close'),
+    path('medications/', MedicationListCreateView.as_view(), name='medication-list'),
+    path('medications/<int:pk>/', MedicationDetailView.as_view(), name='medication-detail'),
+    path('chronic-conditions/', ChronicConditionListCreateView.as_view(), name='chronic-condition-list'),
+    path('chronic-conditions/<int:pk>/', ChronicConditionDetailView.as_view(), name='chronic-condition-detail'),
+    path('medication-logs/', MedicationLogListCreateView.as_view(), name='medication-log-list'),
+    path('medication-logs/<int:pk>/', MedicationLogDetailView.as_view(), name='medication-log-detail'),
 ]
