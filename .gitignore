@@ -47,3 +47,4 @@ mobile/*.g.dart
 mobile/pubspec.lock
 .claude/
 start_server.bat
+.env.prod
