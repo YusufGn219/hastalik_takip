@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../medication_service.dart';
+import '../../../core/utils/parse_utils.dart';
 
 class MedicationLogScreen extends StatefulWidget {
   const MedicationLogScreen({super.key});
@@ -177,7 +178,7 @@ class _MedicationLogScreenState extends State<MedicationLogScreen> {
               items: _medications.map((m) {
                 final type = m['type'] == 'chronic' ? 'Kronik' : 'Semptomatik';
                 return DropdownMenuItem<int>(
-                  value: m['id'] as int,
+                  value: parseInt(m['id']),
                   child: Text('${m['name']} · $type'),
                 );
               }).toList(),

@@ -11,6 +11,24 @@ class ProfileService {
     }
   }
 
+  static Future<Map<String, dynamic>> updateProfile({
+    required String firstName,
+    required String lastName,
+  }) async {
+    try {
+      final response = await ApiClient.dio.patch(
+        '/users/me/',
+        data: {
+          'first_name': firstName,
+          'last_name': lastName,
+        },
+      );
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Profil güncellenemedi');
+    }
+  }
+
   static Future<Map<String, dynamic>> changePassword({
     required String oldPassword,
     required String newPassword,

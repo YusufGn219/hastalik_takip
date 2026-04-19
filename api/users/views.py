@@ -1,4 +1,4 @@
-from api.users.serializers import RegisterSerializer, UserSerializer
+from api.users.serializers import RegisterSerializer, UserSerializer, UpdateProfileSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
@@ -85,6 +85,22 @@ class MeView(generics.RetrieveAPIView):
             'data': serializer.data,
             'message': ''
         })
+
+    def patch(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = UpdateProfileSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'success': True,
+                'data': UserSerializer(user).data,
+                'message': 'Profil güncellendi'
+            })
+        return Response({
+            'success': False,
+            'data': serializer.errors,
+            'message': 'Güncelleme başarısız'
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 class ChangePasswordView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]

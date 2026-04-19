@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/network/api_client.dart';
+import '../../../core/utils/parse_utils.dart';
 import '../../episode/episode_service.dart';
 
 class SymptomScreen extends StatefulWidget {
@@ -182,7 +183,7 @@ class _SymptomScreenState extends State<SymptomScreen> {
               hint: const Text('Semptom seçin'),
               items: _symptoms.map((s) {
                 return DropdownMenuItem<int>(
-                  value: s['id'] as int,
+                  value: parseInt(s['id']),
                   child: Text(s['name']),
                 );
               }).toList(),

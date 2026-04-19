@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../medication_service.dart';
+import '../../../core/utils/parse_utils.dart';
 
 class ChronicConditionScreen extends StatefulWidget {
   const ChronicConditionScreen({super.key});
@@ -50,7 +51,7 @@ class _ChronicConditionScreenState extends State<ChronicConditionScreen> {
     );
     List<int> selectedIds = existing != null
         ? (existing['medications'] as List)
-            .map((m) => m['id'] as int)
+            .map((m) => parseInt(m['id']))
             .toList()
         : [];
 
@@ -75,7 +76,7 @@ class _ChronicConditionScreenState extends State<ChronicConditionScreen> {
                 const Text('İlaçlar:', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 ..._medications.map((m) {
-                  final id = m['id'] as int;
+                  final id = parseInt(m['id']);
                   final name = m['name'] as String;
                   return CheckboxListTile(
                     title: Text(name),
@@ -107,7 +108,7 @@ class _ChronicConditionScreenState extends State<ChronicConditionScreen> {
                 try {
                   if (existing != null) {
                     await _service.updateChronicCondition(
-                      id: existing['id'] as int,
+                      id: parseInt(existing['id']),
                       name: name,
                       medicationIds: selectedIds,
                     );
@@ -189,7 +190,7 @@ class _ChronicConditionScreenState extends State<ChronicConditionScreen> {
                                     ),
                                     IconButton(
                                       icon: const Icon(Icons.delete, size: 20, color: Colors.red),
-                                      onPressed: () => _delete(c['id'] as int),
+                                      onPressed: () => _delete(parseInt(c['id'])),
                                     ),
                                   ],
                                 ),

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../analytics_service.dart';
+import '../../../core/utils/parse_utils.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -180,7 +181,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
 
   Widget _buildFrequencyBars(List<Map<String, dynamic>> data) {
     final maxCount = data
-        .map((e) => (e['count'] as int))
+        .map((e) => parseInt(e['count']))
         .reduce((a, b) => a > b ? a : b)
         .toDouble();
 
@@ -189,7 +190,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
         padding: const EdgeInsets.all(16),
         child: Column(
           children: data.map((item) {
-            final count = item['count'] as int;
+            final count = parseInt(item['count']);
             final avgSev = item['avg_severity'];
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
@@ -224,7 +225,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
   Widget _buildSeverityTrendChart(List<Map<String, dynamic>> trend) {
     final spots = trend.asMap().entries.map((e) {
       return FlSpot(
-          e.key.toDouble(), (e.value['avg_severity'] as num).toDouble());
+          e.key.toDouble(), parseDouble(e.value['avg_severity']));
     }).toList();
 
     return Card(
@@ -339,8 +340,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
     for (int i = 0; i < trends.length; i++) {
       final mood = trends[i]['mood'];
       final energy = trends[i]['energy_level'];
-      if (mood != null) moodSpots.add(FlSpot(i.toDouble(), (mood as num).toDouble()));
-      if (energy != null) energySpots.add(FlSpot(i.toDouble(), (energy as num).toDouble()));
+      if (mood != null) moodSpots.add(FlSpot(i.toDouble(), parseDouble(mood)));
+      if (energy != null) energySpots.add(FlSpot(i.toDouble(), parseDouble(energy)));
     }
 
     return Card(
@@ -447,8 +448,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
   }
 
   Widget _buildMedEffectCard(Map<String, dynamic> effect) {
-    final before = (effect['avg_severity_before'] as num).toDouble();
-    final after = (effect['avg_severity_after'] as num).toDouble();
+    final before = parseDouble(effect['avg_severity_before']);
+    final after = parseDouble(effect['avg_severity_after']);
     final relief = effect['avg_relief_minutes'];
 
     return Card(
@@ -522,7 +523,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
   }
 
   Widget _buildAdherenceCard(Map<String, dynamic> item) {
-    final rate = (item['adherence_rate'] as num).toDouble();
+    final rate = parseDouble(item['adherence_rate']);
     final color = rate >= 80
         ? Colors.green
         : rate >= 50

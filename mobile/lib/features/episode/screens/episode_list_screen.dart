@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../episode_service.dart';
 import 'episode_close_screen.dart';
 import 'package:mobile/features/medication/medication_service.dart';
+import 'package:mobile/core/utils/parse_utils.dart';
 
 class EpisodeListScreen extends StatefulWidget {
   const EpisodeListScreen({super.key});
@@ -106,7 +107,7 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
                   hint: const Text('İlaç seçin...'),
                   items: medications.map((m) {
                     return DropdownMenuItem<int>(
-                      value: m['id'] as int,
+                      value: parseInt(m['id']),
                       child: Text(m['name'] as String),
                     );
                   }).toList(),
@@ -219,7 +220,7 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
                     icon: const Icon(Icons.medication, size: 16),
                     label: const Text('İlaç Ekle'),
                     onPressed: () =>
-                        _showAddMedicationSheet(episode['id'] as int),
+                        _showAddMedicationSheet(parseInt(episode['id'])),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -262,7 +263,7 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
     final entries = episode['entries'] as List<dynamic>? ?? [];
     final maxSeverity = entries.isNotEmpty
         ? entries
-            .map((e) => e['severity'] as int)
+            .map((e) => parseInt(e['severity']))
             .reduce((a, b) => a > b ? a : b)
         : '-';
 

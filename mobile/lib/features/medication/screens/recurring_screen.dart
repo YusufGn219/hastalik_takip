@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../medication_service.dart';
 import '../../../core/notifications/notification_service.dart';
+import '../../../core/utils/parse_utils.dart';
 
 class RecurringScreen extends StatefulWidget {
   const RecurringScreen({super.key});
@@ -84,7 +85,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                   hint: const Text('İlaç seçin...'),
                   items: _medications.map((m) {
                     return DropdownMenuItem<int>(
-                      value: m['id'] as int,
+                      value: parseInt(m['id']),
                       child: Text(m['name'] as String),
                     );
                   }).toList(),
@@ -187,7 +188,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
   Future<void> _markAsTaken(Map<String, dynamic> med) async {
     try {
       await _service.createMedicationLog(
-        medicationId: med['id'] as int,
+        medicationId: parseInt(med['id']),
         takenAt: DateTime.now().toIso8601String(),
       );
       _showSnack('${med['name']} alındı olarak işaretlendi.');
