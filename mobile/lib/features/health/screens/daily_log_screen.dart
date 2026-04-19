@@ -17,7 +17,15 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
   int _mood = 3;
   int _energyLevel = 3;
   bool _isLoading = false;
+  bool _isFetchingExisting = true;
   String? _errorMessage;
+  int? _existingLogId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTodayLog();
+  }
 
   @override
   void dispose() {
@@ -27,28 +35,59 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
     super.dispose();
   }
 
+  Future<void> _loadTodayLog() async {
+    try {
+      final response = await ApiClient.dio.get('/health/logs/');
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      final logs = (response.data['data'] as List? ?? []);
+      final todayLog = logs.cast<Map<String, dynamic>>().firstWhere(
+            (l) => (l['date'] as String?)?.startsWith(today) == true,
+            orElse: () => {},
+          );
+      if (todayLog.isNotEmpty) {
+        setState(() {
+          _existingLogId = todayLog['id'] as int?;
+          _sleepController.text =
+              todayLog['sleep_hours']?.toString() ?? '';
+          _waterController.text =
+              todayLog['water_intake']?.toString() ?? '';
+          _mood = int.tryParse(todayLog['mood']?.toString() ?? '3') ?? 3;
+          _energyLevel =
+              int.tryParse(todayLog['energy_level']?.toString() ?? '3') ?? 3;
+          _notesController.text = todayLog['notes'] ?? '';
+        });
+      }
+    } catch (_) {}
+    setState(() => _isFetchingExisting = false);
+  }
+
   Future<void> _saveLog() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
+    final data = {
+      'date': DateTime.now().toIso8601String().split('T')[0],
+      'sleep_hours': double.tryParse(_sleepController.text.trim()) ?? 0,
+      'water_intake': double.tryParse(_waterController.text.trim()) ?? 0,
+      'mood': _mood,
+      'energy_level': _energyLevel,
+      'notes': _notesController.text.trim(),
+    };
+
     try {
-      await ApiClient.dio.post(
-        '/health/logs/',
-        data: {
-          'date': DateTime.now().toIso8601String().split('T')[0],
-          'sleep_hours': double.tryParse(_sleepController.text.trim()) ?? 0,
-          'water_intake': double.tryParse(_waterController.text.trim()) ?? 0,
-          'mood': _mood,
-          'energy_level': _energyLevel,
-          'notes': _notesController.text.trim(),
-        },
-      );
+      if (_existingLogId != null) {
+        await ApiClient.dio.patch('/health/logs/$_existingLogId/', data: data);
+      } else {
+        await ApiClient.dio.post('/health/logs/', data: data);
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Günlük kayıt kaydedildi'),
+          content: Text(_existingLogId != null
+              ? 'Günlük kayıt güncellendi'
+              : 'Günlük kayıt kaydedildi'),
           backgroundColor: AppColors.daily,
           behavior: SnackBarBehavior.floating,
           shape:
@@ -93,7 +132,7 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Günlük Kayıt'),
+        title: Text(_existingLogId != null ? 'Kaydı Güncelle' : 'Günlük Kayıt'),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -113,7 +152,9 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
+      body: _isFetchingExisting
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

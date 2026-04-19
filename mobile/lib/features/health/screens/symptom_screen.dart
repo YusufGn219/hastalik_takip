@@ -36,6 +36,54 @@ class _SymptomScreenState extends State<SymptomScreen> {
     }
   }
 
+  Future<void> _showAddSymptomDialog() async {
+    final nameCtrl = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Yeni Semptom Ekle'),
+        content: TextField(
+          controller: nameCtrl,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(
+            labelText: 'Semptom adı',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('İptal'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final name = nameCtrl.text.trim();
+              if (name.isEmpty) return;
+              Navigator.pop(ctx);
+              try {
+                final response = await ApiClient.dio.post(
+                  '/health/symptoms/',
+                  data: {'name': name, 'description': ''},
+                );
+                await _loadSymptoms();
+                final newId = parseInt(response.data['id']);
+                setState(() {
+                  _selectedSymptomId = newId;
+                  _message = '';
+                });
+              } catch (e) {
+                setState(() => _message = 'Semptom eklenemedi');
+              }
+            },
+            child: const Text('Ekle'),
+          ),
+        ],
+      ),
+    );
+    nameCtrl.dispose();
+  }
+
   Future<void> _submitEntry() async {
     if (_selectedSymptomId == null) {
       setState(() => _message = 'Lütfen bir semptom seçin');
@@ -176,11 +224,23 @@ class _SymptomScreenState extends State<SymptomScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Semptom', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Semptom',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                TextButton.icon(
+                  icon: const Icon(Icons.add, size: 16),
+                  label: const Text('Yeni ekle'),
+                  onPressed: _showAddSymptomDialog,
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
             DropdownButtonFormField<int>(
               value: _selectedSymptomId,
               hint: const Text('Semptom seçin'),
+              isExpanded: true,
               items: _symptoms.map((s) {
                 return DropdownMenuItem<int>(
                   value: parseInt(s['id']),
@@ -188,6 +248,7 @@ class _SymptomScreenState extends State<SymptomScreen> {
                 );
               }).toList(),
               onChanged: (val) => setState(() => _selectedSymptomId = val),
+              decoration: const InputDecoration(border: OutlineInputBorder()),
             ),
             const SizedBox(height: 24),
             Text(
