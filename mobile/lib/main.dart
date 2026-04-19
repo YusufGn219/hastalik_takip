@@ -9,6 +9,7 @@ import 'features/medication/screens/medication_log_screen.dart';
 import 'features/medication/screens/chronic_condition_screen.dart';
 import 'features/medication/screens/recurring_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'features/analytics/screens/analytics_screen.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         '/medication-log': (context) => const MedicationLogScreen(),
         '/chronic-conditions': (context) => const ChronicConditionScreen(),
         '/recurring': (context) => const RecurringScreen(),
+        '/analytics': (context) => const AnalyticsScreen(),
       },
     );
   }

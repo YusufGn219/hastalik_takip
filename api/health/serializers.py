@@ -244,3 +244,61 @@ class MedicationLogSerializer(serializers.ModelSerializer):
             )
         except ValueError as e:
             raise serializers.ValidationError(str(e))
+
+
+class SymptomFrequencySerializer(serializers.Serializer):
+    symptom_name = serializers.CharField()
+    count = serializers.IntegerField()
+    avg_severity = serializers.FloatField()
+
+class SeverityTrendSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    avg_severity = serializers.FloatField()
+
+class SymptomAnalyticsSerializer(serializers.Serializer):
+    period_days = serializers.IntegerField()
+    symptom_frequency = SymptomFrequencySerializer(many=True)
+    severity_trend = SeverityTrendSerializer(many=True)
+
+
+class DailyTrendItemSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    sleep_hours = serializers.FloatField(allow_null=True)
+    water_intake = serializers.FloatField(allow_null=True)
+    mood = serializers.IntegerField(allow_null=True)
+    energy_level = serializers.IntegerField(allow_null=True)
+
+class DailyAveragesSerializer(serializers.Serializer):
+    sleep_hours = serializers.FloatField(allow_null=True)
+    water_intake = serializers.FloatField(allow_null=True)
+    mood = serializers.FloatField(allow_null=True)
+    energy_level = serializers.FloatField(allow_null=True)
+
+class DailyTrendsSerializer(serializers.Serializer):
+    period_days = serializers.IntegerField()
+    trends = DailyTrendItemSerializer(many=True)
+    averages = DailyAveragesSerializer()
+
+
+class MedicationEffectItemSerializer(serializers.Serializer):
+    medication_name = serializers.CharField()
+    usage_count = serializers.IntegerField()
+    avg_severity_before = serializers.FloatField()
+    avg_severity_after = serializers.FloatField()
+    avg_relief_minutes = serializers.IntegerField(allow_null=True)
+
+class MedicationEffectSerializer(serializers.Serializer):
+    period_days = serializers.IntegerField()
+    effects = MedicationEffectItemSerializer(many=True)
+
+
+class AdherenceItemSerializer(serializers.Serializer):
+    medication_name = serializers.CharField()
+    expected_days = serializers.IntegerField()
+    taken_days = serializers.IntegerField()
+    missed_days = serializers.IntegerField()
+    adherence_rate = serializers.FloatField()
+
+class MedicationAdherenceSerializer(serializers.Serializer):
+    period_days = serializers.IntegerField()
+    adherence = AdherenceItemSerializer(many=True)

@@ -123,6 +123,11 @@ class _TimelineScreenState extends State<TimelineScreen> {
         title: const Text('Sağlık Takibi'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.bar_chart),
+            tooltip: 'Analizler',
+            onPressed: () => Navigator.pushNamed(context, '/analytics'),
+          ),
+          IconButton(
             icon: const Icon(Icons.edit_note),
             tooltip: 'Günlük Kayıt',
             onPressed: () => Navigator.pushNamed(context, '/daily-log'),

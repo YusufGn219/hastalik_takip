@@ -8,7 +8,11 @@ from api.health.serializers import (
     ActiveEpisodeSerializer,
     MedicationLogSerializer,
     MedicationSerializer,
-    ChronicConditionSerializer
+    ChronicConditionSerializer,
+    SymptomAnalyticsSerializer,
+    DailyTrendsSerializer,
+    MedicationEffectSerializer,
+    MedicationAdherenceSerializer
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -30,7 +34,12 @@ from apps.health.models import (
     ChronicCondition,
     MedicationLog
 )
-
+from services.health.analytics import (
+    get_symptom_analytics,
+    get_daily_trends,
+    get_medication_effect,
+    get_medication_adherence
+)
 
 class DailyLogListCreateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -456,3 +465,66 @@ class MedicationLogDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return MedicationLog.objects.filter(user=self.request.user)
+
+class SymptomAnalyticsView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            days = int(request.query_params.get('days', 7))
+            if days not in [7, 30, 90]:
+                days = 7
+        except ValueError:
+            days = 7
+
+        data = get_symptom_analytics(request.user, days)
+        serializer = SymptomAnalyticsSerializer(data)
+        return Response({'success': True, 'data': serializer.data, 'message': ''})
+
+
+class DailyTrendsView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            days = int(request.query_params.get('days', 7))
+            if days not in [7, 30, 90]:
+                days = 7
+        except ValueError:
+            days = 7
+
+        data = get_daily_trends(request.user, days)
+        serializer = DailyTrendsSerializer(data)
+        return Response({'success': True, 'data': serializer.data, 'message': ''})
+
+
+class MedicationEffectView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            days = int(request.query_params.get('days', 30))
+            if days not in [7, 30, 90]:
+                days = 30
+        except ValueError:
+            days = 30
+
+        data = get_medication_effect(request.user, days)
+        serializer = MedicationEffectSerializer(data)
+        return Response({'success': True, 'data': serializer.data, 'message': ''})
+
+
+class MedicationAdherenceView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            days = int(request.query_params.get('days', 30))
+            if days not in [7, 30, 90]:
+                days = 30
+        except ValueError:
+            days = 30
+
+        data = get_medication_adherence(request.user, days)
+        serializer = MedicationAdherenceSerializer(data)
+        return Response({'success': True, 'data': serializer.data, 'message': ''})
