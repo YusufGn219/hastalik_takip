@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/theme/app_theme.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -14,28 +15,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, dynamic>> _pages = [
     {
-      'icon': Icons.assignment,
+      'icon': Icons.assignment_outlined,
       'title': 'Sağlığını Takip Et',
       'description': 'Günlük uyku, su, ruh halin ve enerji seviyeni kolayca kaydet.',
-      'color': Colors.blue,
+      'color': AppColors.primary400,
+      'bgColor': AppColors.primary50,
     },
     {
-      'icon': Icons.sick,
+      'icon': Icons.sick_outlined,
       'title': 'Semptomlarını Kaydet',
       'description': 'Yaşadığın semptomları zaman ve şiddetiyle not al.',
-      'color': Colors.orange,
+      'color': AppColors.symptom,
+      'bgColor': AppColors.symptomBg,
     },
     {
-      'icon': Icons.crisis_alert,
+      'icon': Icons.crisis_alert_outlined,
       'title': 'Atakları Yönet',
       'description': 'Semptom ataklarını başlat, takip et ve kapat.',
-      'color': Colors.red,
+      'color': AppColors.episode,
+      'bgColor': AppColors.episodeBg,
     },
     {
-      'icon': Icons.bar_chart,
+      'icon': Icons.bar_chart_outlined,
       'title': 'Analizlerini Gör',
       'description': 'Verilerinin grafiklerini ve trendlerini incele.',
-      'color': Colors.green,
+      'color': AppColors.daily,
+      'bgColor': AppColors.dailyBg,
     },
   ];
 
@@ -52,6 +57,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8, right: 16),
+                child: TextButton(
+                  onPressed: _completeOnboarding,
+                  child: const Text(
+                    'Geç',
+                    style: TextStyle(
+                      color: AppColors.primary400,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -59,31 +80,45 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 itemCount: _pages.length,
                 itemBuilder: (context, index) {
                   final page = _pages[index];
+                  final color = page['color'] as Color;
+                  final bgColor = page['bgColor'] as Color;
                   return Padding(
-                    padding: const EdgeInsets.all(40.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          page['icon'] as IconData,
-                          size: 100,
-                          color: page['color'] as Color,
+                        Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            color: bgColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            page['icon'] as IconData,
+                            size: 60,
+                            color: color,
+                          ),
                         ),
                         const SizedBox(height: 40),
                         Text(
                           page['title'] as String,
                           style: const TextStyle(
                             fontSize: 26,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                         Text(
                           page['description'] as String,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.5),
+                            height: 1.5,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -93,8 +128,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
               ),
             ),
-
-            // Page indicator
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
@@ -106,44 +139,37 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: 8,
                   decoration: BoxDecoration(
                     color: _currentPage == index
-                        ? Theme.of(context).primaryColor
-                        : Colors.grey.shade300,
+                        ? AppColors.primary400
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               ),
             ),
-
             const SizedBox(height: 32),
-
-            // Butonlar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: _completeOnboarding,
-                    child: const Text('Geç'),
-                  ),
-                  _currentPage == _pages.length - 1
-                      ? ElevatedButton(
-                          onPressed: _completeOnboarding,
-                          child: const Text('Başla'),
-                        )
-                      : ElevatedButton(
-                          onPressed: () {
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                          child: const Text('İleri →'),
-                        ),
-                ],
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: SizedBox(
+                width: double.infinity,
+                child: _currentPage == _pages.length - 1
+                    ? ElevatedButton(
+                        onPressed: _completeOnboarding,
+                        child: const Text('Başla'),
+                      )
+                    : ElevatedButton(
+                        onPressed: () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        child: const Text('İleri →'),
+                      ),
               ),
             ),
-
             const SizedBox(height: 24),
           ],
         ),

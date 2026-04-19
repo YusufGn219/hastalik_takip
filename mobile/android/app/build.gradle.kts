@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.mobile"
+        applicationId = "com.vitapuls.app"
         minSdk = 26
         targetSdk = 36
         versionCode = flutter.versionCode

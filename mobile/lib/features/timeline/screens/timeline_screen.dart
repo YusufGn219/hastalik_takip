@@ -200,7 +200,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                 ),
               ),
               const SizedBox(width: 10),
-              const Text('Sağlık Takibi'),
+              const Text('Vitapuls'),
             ],
           ),
           actions: [
