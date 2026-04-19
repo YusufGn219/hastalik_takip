@@ -45,5 +45,5 @@ mobile/*.iml
 mobile/.idea/
 mobile/*.g.dart
 mobile/pubspec.lock
-
+.claude/
 start_server.bat

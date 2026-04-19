@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
 User = get_user_model()
 
@@ -68,3 +70,48 @@ class LoginView(APIView):
                 }
             }
         }, status=status.HTTP_200_OK) 
+
+class MeView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def retrieve(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object())
+        return Response({
+            'success': True,
+            'data': serializer.data,
+            'message': ''
+        })
+
+class ChangePasswordView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+
+        if not request.user.check_password(old_password):
+            return Response({
+                'success': False,
+                'data': None,
+                'message': 'Mevcut şifre yanlış.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not new_password or len(new_password) < 8:
+            return Response({
+                'success': False,
+                'data': None,
+                'message': 'Yeni şifre en az 8 karakter olmalı.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        request.user.set_password(new_password)
+        request.user.save()
+
+        return Response({
+            'success': True,
+            'data': None,
+            'message': 'Şifre başarıyla değiştirildi.'
+        })

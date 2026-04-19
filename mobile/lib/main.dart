@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/screens/splash_screen.dart';
+import 'core/notifications/notification_service.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
 import 'features/health/screens/daily_log_screen.dart';
@@ -8,11 +11,15 @@ import 'features/episode/screens/episode_list_screen.dart';
 import 'features/medication/screens/medication_log_screen.dart';
 import 'features/medication/screens/chronic_condition_screen.dart';
 import 'features/medication/screens/recurring_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'features/analytics/screens/analytics_screen.dart';
+import 'features/auth/onboarding_screen.dart';
+import 'features/profile/screens/profile_screen.dart';
+import 'features/profile/screens/change_password_screen.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  await NotificationService.initialize();
   runApp(const MyApp());
 }
 
@@ -28,8 +35,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      initialRoute: '/login',
+      initialRoute: '/',
       routes: {
+        '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const TimelineScreen(),
@@ -40,6 +48,9 @@ class MyApp extends StatelessWidget {
         '/chronic-conditions': (context) => const ChronicConditionScreen(),
         '/recurring': (context) => const RecurringScreen(),
         '/analytics': (context) => const AnalyticsScreen(),
+        '/onboarding': (context) => const OnboardingScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/change-password': (context) => const ChangePasswordScreen(),
       },
     );
   }

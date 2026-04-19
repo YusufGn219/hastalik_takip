@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../medication_service.dart';
+import '../../../core/notifications/notification_service.dart';
 
 class RecurringScreen extends StatefulWidget {
   const RecurringScreen({super.key});
@@ -158,7 +159,18 @@ class _RecurringScreenState extends State<RecurringScreen> {
                     recurringTime: timeStr,
                     recurringDays: selectedDays,
                   );
-                  _showSnack('Rutin eklendi.');
+
+                  // Bildirim planla
+                  await NotificationService.scheduleRecurringNotification(
+                    id: selectedMedId!,
+                    medicationName: _medications
+                        .firstWhere((m) => m['id'] == selectedMedId)['name'],
+                    time:
+                        '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}',
+                    days: selectedDays,
+                  );
+
+                  _showSnack('Rutin eklendi, bildirim planlandı.');
                   _load();
                 } catch (e) {
                   _showSnack('Hata: $e', isError: true);

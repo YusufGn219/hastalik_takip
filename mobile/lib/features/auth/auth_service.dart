@@ -68,4 +68,29 @@ class AuthService {
   static Future<void> logout() async {
     await TokenStorage.clearTokens();
   }
+
+  static Future<Map<String, dynamic>> getMe() async {
+    try {
+      final response = await ApiClient.dio.get('/users/me/');
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Kullanıcı bilgisi alınamadı');
+    }
+  }
+
+  static Future<void> refreshToken() async {
+    final refresh = await TokenStorage.getRefreshToken();
+    if (refresh == null) throw Exception('Refresh token yok');
+
+    final response = await ApiClient.dio.post(
+      '/auth/token/refresh/',
+      data: {'refresh': refresh},
+    );
+
+    final newAccessToken = response.data['access'];
+    await TokenStorage.saveTokens(
+      accessToken: newAccessToken,
+      refreshToken: refresh,
+    );
+  }
 }
