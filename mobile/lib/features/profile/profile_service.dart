@@ -46,4 +46,32 @@ class ProfileService {
       throw Exception(e.response?.data['message'] ?? 'Şifre değiştirilemedi');
     }
   }
+
+  static Future<Map<String, dynamic>> uploadProfilePhoto(String filePath) async {
+    try {
+      final formData = FormData.fromMap({
+        'profile_photo': await MultipartFile.fromFile(
+          filePath,
+          filename: filePath.split('/').last,
+        ),
+      });
+      final response = await ApiClient.dio.post(
+        '/users/profile-photo/',
+        data: formData,
+        options: Options(contentType: 'multipart/form-data'),
+      );
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Fotoğraf yüklenemedi');
+    }
+  }
+
+  static Future<Map<String, dynamic>> deleteProfilePhoto() async {
+    try {
+      final response = await ApiClient.dio.delete('/users/profile-photo/');
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Fotoğraf silinemedi');
+    }
+  }
 }

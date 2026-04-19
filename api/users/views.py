@@ -7,6 +7,10 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+from api.users.serializers import RegisterSerializer, UserSerializer, UpdateProfileSerializer, UpdateProfilePhotoSerializer
+
+
 
 User = get_user_model()
 
@@ -130,4 +134,39 @@ class ChangePasswordView(generics.GenericAPIView):
             'success': True,
             'data': None,
             'message': 'Şifre başarıyla değiştirildi.'
+        })
+
+class UpdateProfilePhotoView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        user = request.user
+        serializer = UpdateProfilePhotoSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            # Eski fotoğrafı sil
+            if user.profile_photo:
+                user.profile_photo.delete(save=False)
+            serializer.save()
+            return Response({
+                'success': True,
+                'data': UserSerializer(user).data,
+                'message': 'Fotoğraf güncellendi'
+            })
+        return Response({
+            'success': False,
+            'data': serializer.errors,
+            'message': 'Fotoğraf yüklenemedi'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        user = request.user
+        if user.profile_photo:
+            user.profile_photo.delete(save=False)
+            user.profile_photo = None
+            user.save()
+        return Response({
+            'success': True,
+            'data': None,
+            'message': 'Fotoğraf silindi'
         })

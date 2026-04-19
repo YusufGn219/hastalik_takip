@@ -9,7 +9,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email','first_name', 'last_name', 'password']
+        fields = ['email', 'first_name', 'last_name', 'password']
 
     def create(self, validated_date):
         user = User.objects.create_user(**validated_date)
@@ -18,9 +18,14 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 'created_at']
+        fields = ['id', 'email', 'first_name', 'last_name', 'created_at', 'profile_photo']
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['first_name', 'last_name']
+
+class UpdateProfilePhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['profile_photo']

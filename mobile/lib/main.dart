@@ -15,6 +15,7 @@ import 'features/analytics/screens/analytics_screen.dart';
 import 'features/auth/onboarding_screen.dart';
 import 'features/profile/screens/profile_screen.dart';
 import 'features/profile/screens/change_password_screen.dart';
+import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,10 +32,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hastalık Takip',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.system,
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
