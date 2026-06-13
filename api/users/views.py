@@ -2,6 +2,8 @@ from api.users.serializers import RegisterSerializer, UserSerializer, UpdateProf
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -14,6 +16,7 @@ from api.users.serializers import RegisterSerializer, UserSerializer, UpdateProf
 
 User = get_user_model()
 
+@method_decorator(ratelimit(key='ip', rate='10/h', method='POST', block=True), name='post')
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -39,6 +42,7 @@ class RegisterView(APIView):
             'data': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
+@method_decorator(ratelimit(key='ip', rate='20/h', method='POST', block=True), name='post')
 class LoginView(APIView):
     permission_classes = [AllowAny]
 

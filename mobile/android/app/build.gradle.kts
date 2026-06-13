@@ -1,11 +1,19 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val keyPropertiesFile = rootProject.file("key.properties")
+val keyProperties = Properties()
+if (keyPropertiesFile.exists()) {
+    keyProperties.load(keyPropertiesFile.inputStream())
+}
+
 android {
-    namespace = "com.example.mobile"
+    namespace = "com.vitapuls.app"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -27,9 +35,29 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (keyPropertiesFile.exists()) {
+            create("release") {
+                keyAlias = keyProperties["keyAlias"] as String
+                keyPassword = keyProperties["keyPassword"] as String
+                storeFile = file(keyProperties["storeFile"] as String)
+                storePassword = keyProperties["storePassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keyPropertiesFile.exists())
+                signingConfigs.getByName("release")
+            else
+                signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }

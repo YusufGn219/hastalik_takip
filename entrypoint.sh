@@ -12,5 +12,8 @@ echo "Fixture'lar yükleniyor..."
 python manage.py loaddata apps/health/fixtures/initial_symptoms.json 2>/dev/null || echo "Semptom fixture zaten yüklenmiş, atlanıyor."
 python manage.py loaddata apps/health/fixtures/initial_medications.json 2>/dev/null || echo "İlaç fixture zaten yüklenmiş, atlanıyor."
 
+echo "Static dosyalar toplanıyor..."
+python manage.py collectstatic --noinput 2>/dev/null || echo "collectstatic atlandı (dev modunda normal)."
+
 echo "Sunucu başlatılıyor..."
 exec "$@"
