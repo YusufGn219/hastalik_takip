@@ -88,9 +88,12 @@ class AuthService {
     );
 
     final newAccessToken = response.data['access'];
+    // ROTATE_REFRESH_TOKENS aktif — backend yeni bir refresh token da döner,
+    // eskisi blacklist'e düşer, bu yüzden eskiyi tekrar kaydetmemek gerekir.
+    final newRefreshToken = response.data['refresh'] ?? refresh;
     await TokenStorage.saveTokens(
       accessToken: newAccessToken,
-      refreshToken: refresh,
+      refreshToken: newRefreshToken,
     );
   }
 }
