@@ -1,7 +1,7 @@
 from api.users.serializers import RegisterSerializer, UserSerializer, UpdateProfileSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
 from rest_framework.response import Response
@@ -57,9 +57,9 @@ class LoginView(APIView):
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.filter(email=email).first()
+        user = authenticate(request, email=email, password=password)
 
-        if not user or not user.check_password(password):
+        if not user:
             return Response({
                 'success': False,
                 'message': 'Email veya şifre hatalı',
@@ -110,6 +110,7 @@ class MeView(generics.RetrieveAPIView):
             'message': 'Güncelleme başarısız'
         }, status=status.HTTP_400_BAD_REQUEST)
 
+@method_decorator(ratelimit(key='ip', rate='5/h', method='POST', block=True), name='post')
 class ChangePasswordView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
