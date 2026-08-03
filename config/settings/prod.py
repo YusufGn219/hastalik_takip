@@ -26,10 +26,34 @@ CORS_ALLOWED_ORIGINS = [
 
 # Sentry — hata izleme (SENTRY_DSN env'e eklenince aktif olur)
 SENTRY_DSN = os.getenv('SENTRY_DSN', '')
+
+
+def _sentry_scrub_sensitive_data(event, hint):
+    """Authorization/Cookie header'larını ve request body'sini Sentry'ye
+    göndermeden önce temizler — sağlık verisi (semptom/ilaç bilgisi) request
+    body'sinde taşınabildiği için tamamı filtrelenir."""
+    request = event.get('request')
+    if request:
+        headers = request.get('headers')
+        if headers:
+            for key in list(headers.keys()):
+                if key.lower() in ('authorization', 'cookie'):
+                    headers[key] = '[Filtered]'
+        if 'data' in request:
+            request['data'] = '[Filtered]'
+        if 'cookies' in request:
+            request['cookies'] = '[Filtered]'
+    return event
+
+
 if SENTRY_DSN:
     import sentry_sdk
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         traces_sample_rate=0.2,
         profiles_sample_rate=0.1,
+        send_default_pii=False,
+        environment=os.getenv('SENTRY_ENVIRONMENT', 'production'),
+        release=f"vitapuls@{os.getenv('APP_VERSION', '1.0.0')}",
+        before_send=_sentry_scrub_sensitive_data,
     )
