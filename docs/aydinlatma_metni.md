@@ -23,7 +23,7 @@ Verileriniz yurt içinde sunucularımızda saklanmakta olup üçüncü taraflarl
 
 ## Saklama Süresi
 
-Hesabınız aktif olduğu süre boyunca; hesap silinmesi talebinizden itibaren 30 gün içinde verileriniz silinir.
+Hesabınız aktif olduğu süre boyunca verileriniz saklanır. Hesap silme talebinizi e-posta ile onayladığınızda hesabınız derhal pasif hale getirilir; onaydan itibaren 30 gün içinde kimliğinizi belirleyen bilgileriniz (ad, e-posta, profil fotoğrafı) kalıcı olarak anonimleştirilir. Anonimleştirme sonrasında sağlık verileriniz sizinle ilişkilendirilemez; ancak aynı (artık anonim) kayıt grubuna bağlı kalarak — hizmetin geliştirilmesi ve yapay zekâ/makine öğrenmesi modellerinin eğitilmesi amacıyla — süresiz olarak saklanabilir. Anonimleştirilmiş veri KVKK m.28 uyarınca kişisel veri sayılmadığından bu saklama KVKK kapsamı dışındadır.
 
 ## Haklarınız
 
@@ -31,4 +31,4 @@ KVKK m.11 kapsamında verilerinize erişim, düzeltme, silme, itiraz haklarını
 
 ---
 
-*Uygulamayı kullanmaya devam etmekle kimlik/iletişim verilerinizin işlenmesine onay vermiş sayılırsınız. Sağlık verilerinin işlenmesi için uygulama içinde ayrıca açık rıza alınmaktadır.*
+*Uygulamayı kullanmaya devam etmekle kimlik/iletişim verilerinizin işlenmesine onay vermiş sayılırsınız. Sağlık verilerinizin işlenmesi ve hesap silme sonrası anonimleştirilmiş halinin hizmet geliştirme/yapay zekâ model eğitimi amacıyla saklanması için açık rızanız, kayıt sırasında bu metnin onaylanmasıyla (tarih/saat damgasıyla kaydedilerek) alınır.*

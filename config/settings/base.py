@@ -121,6 +121,12 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Hesap silme onay e-postası gibi bağlantılar için mutlak URL üretiminde kullanılır
+SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@vitapuls.local')
+# Dev'de e-posta konsola yazılır; prod.py SMTP backend'e geçirir
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Şifre/token/sağlık verisi hiçbir logger.*() çağrısına gönderilmemeli —

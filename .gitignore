@@ -20,10 +20,6 @@ media/
 # VS Code
 .vscode/
 
-
-apps/*/migrations/*.py
-!apps/*/migrations/__init__.py
-
 # Flutter / Dart
 mobile/.dart_tool/
 mobile/.flutter-plugins

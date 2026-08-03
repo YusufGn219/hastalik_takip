@@ -11,6 +11,12 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from api.users.serializers import RegisterSerializer, UserSerializer, UpdateProfileSerializer, UpdateProfilePhotoSerializer
+from django.core import signing
+from django.core.mail import send_mail
+from django.conf import settings
+from django.http import HttpResponse
+from django.utils import timezone
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
 
 
 
@@ -175,3 +181,73 @@ class UpdateProfilePhotoView(generics.GenericAPIView):
             'data': None,
             'message': 'Fotoğraf silindi'
         })
+
+
+DELETION_TOKEN_SALT = 'account-deletion'
+DELETION_TOKEN_MAX_AGE = 60 * 60 * 24  # 24 saat
+
+
+@method_decorator(ratelimit(key='user', rate='3/d', method='POST', block=True), name='post')
+class AccountDeletionRequestView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        token = signing.dumps({'user_id': user.pk}, salt=DELETION_TOKEN_SALT)
+        confirm_url = f"{settings.SITE_URL}/api/v1/users/delete-account/confirm/?token={token}"
+
+        send_mail(
+            subject='Vitapuls — Hesap Silme Talebiniz',
+            message=(
+                f"Merhaba {user.first_name},\n\n"
+                "Hesabınızı silme talebinizi aldık. Bu talebi onaylamak için "
+                f"aşağıdaki bağlantıya tıklayın (24 saat geçerlidir):\n\n{confirm_url}\n\n"
+                "Bu talebi siz yapmadıysanız bu e-postayı yok sayabilirsiniz."
+            ),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+        )
+
+        return Response({
+            'success': True,
+            'data': None,
+            'message': 'Onay e-postası gönderildi. Silme işlemini tamamlamak için e-postanızı kontrol edin.'
+        })
+
+
+class AccountDeletionConfirmView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        token = request.query_params.get('token', '')
+        try:
+            payload = signing.loads(token, salt=DELETION_TOKEN_SALT, max_age=DELETION_TOKEN_MAX_AGE)
+        except signing.BadSignature:
+            return HttpResponse(
+                '<p>Bağlantı geçersiz ya da süresi dolmuş. Lütfen silme talebini tekrar oluşturun.</p>',
+                status=400,
+                content_type='text/html; charset=utf-8',
+            )
+
+        try:
+            user = User.objects.get(pk=payload['user_id'])
+        except User.DoesNotExist:
+            return HttpResponse(
+                '<p>Kullanıcı bulunamadı.</p>',
+                status=404,
+                content_type='text/html; charset=utf-8',
+            )
+
+        if not user.deletion_requested_at:
+            user.is_active = False
+            user.deletion_requested_at = timezone.now()
+            user.save(update_fields=['is_active', 'deletion_requested_at'])
+
+            for outstanding_token in OutstandingToken.objects.filter(user=user):
+                BlacklistedToken.objects.get_or_create(token=outstanding_token)
+
+        return HttpResponse(
+            '<p>Hesabınız pasif hale getirildi. Kimliğinizi belirleyen bilgileriniz '
+            '30 gün içinde kalıcı olarak anonimleştirilecektir.</p>',
+            content_type='text/html; charset=utf-8',
+        )

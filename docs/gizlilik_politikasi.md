@@ -20,13 +20,14 @@ Vitapuls aşağıdaki kişisel verileri işlemektedir:
 
 ## 3. Özel Nitelikli Kişisel Veriler
 
-Sağlık verileri (semptomlar, ilaçlar, kronik hastalıklar), 6698 sayılı KVKK kapsamında **özel nitelikli kişisel veri** sayılmaktadır. Bu veriler yalnızca **açık rızanız** ile ve hizmetin sağlanması amacıyla işlenmektedir.
+Sağlık verileri (semptomlar, ilaçlar, kronik hastalıklar), 6698 sayılı KVKK kapsamında **özel nitelikli kişisel veri** sayılmaktadır. Bu veriler yalnızca **açık rızanız** ile ve hizmetin sağlanması amacıyla işlenmektedir. Açık rızanız, hesap oluşturma sırasında onay kutucuğu ile alınır ve tarih/saat damgasıyla kaydedilir.
 
-## 4. Veri Saklama Süresi
+## 4. Veri Saklama Süresi ve Hesap Silme
 
-- Aktif hesap: Hesap silinene kadar veriler saklanır.
-- Hesap silinmesi: Siz tarafından talep edildiğinde 30 gün içinde tüm kişisel verileriniz silinir.
-- Log kayıtları: 90 gün saklanır, ardından otomatik olarak silinir.
+- **Aktif hesap:** Hesap silinene kadar veriler saklanır.
+- **Hesap silme talebi:** Uygulama üzerinden hesap silme talebinde bulunduğunuzda, e-posta adresinize bir onay bağlantısı gönderilir. Bu bağlantıyı onayladığınızda hesabınız derhal **pasif hale getirilir** ve tüm oturum token'larınız geçersiz kılınır.
+- **Anonimleştirme (30 gün sonra):** Onaydan 30 gün sonra, kimliğinizi belirleyen bilgileriniz (e-posta, ad-soyad, profil fotoğrafı) kalıcı olarak silinir/anonimleştirilir; hesabınızla bağlantınız artık kurulamaz. Semptom, episode ve ilaç kayıtlarınız bu noktadan sonra **sizinle ilişkilendirilemeyecek şekilde**, ancak kendi içinde tutarlı ve gruplanabilir bir kayıt seti olarak; hizmetin geliştirilmesi, istatistiksel analiz ve yapay zekâ/makine öğrenmesi modellerinin eğitilmesi amacıyla saklanabilir. Bu veriler artık kişisel veri niteliği taşımadığından KVKK kapsamı dışındadır (KVKK m.28).
+- **Log kayıtları:** 90 gün saklanır, ardından otomatik olarak silinir.
 
 ## 5. Veri Güvenliği
 
@@ -44,7 +45,7 @@ Verileriniz üçüncü taraflarla paylaşılmaz. Yasal zorunluluk halleri saklı
 Aşağıdaki haklara sahipsiniz:
 - Kişisel verilerinizin işlenip işlenmediğini öğrenme
 - İşlenen verileriniz hakkında bilgi talep etme
-- Verilerin silinmesini veya yok edilmesini isteme
+- Verilerin silinmesini veya yok edilmesini isteme (bkz. Madde 4 — silme talebi, 30 gün içinde anonimleştirme ile sonuçlanır)
 - İşlemeye itiraz etme
 
 Başvuru için: **[E-POSTA]**
