@@ -49,6 +49,9 @@ dependencies:
   path: ^1.9.1
   flutter_riverpod: ^2.6.1
   uuid: ^4.6.0
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
 
 # Yerel veritabanı SQLCipher ile şifrelenir. sqlcipher_flutter_libs paketi artık
 # kullanılmıyor (0.7.0+eol); sqlite3 3.x derleme kancası (hook) ile SQLCipher seçilir.
@@ -81,6 +84,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Çeviri dosyaları (lib/l10n/*.arb) için kod üretimini açar; ayarlar l10n.yaml'da.
+  generate: true
   assets:
     - .env
     - assets/icon/icon.png

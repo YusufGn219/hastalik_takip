@@ -1,0 +1,32 @@
+{
+  "@@locale": "tr",
+
+  "appTitle": "Vitapuls",
+  "@appTitle": {
+    "description": "Uygulama adı; başlıklarda ve görev listesinde görünür."
+  },
+
+  "homeTitle": "Vitapuls",
+  "@homeTitle": {
+    "description": "Ana ekranın üst çubuk başlığı."
+  },
+  "homeSubtitle": "Bugün ne kaydetmek istersiniz?",
+  "@homeSubtitle": {
+    "description": "Ana ekranın üstündeki yönlendirme cümlesi."
+  },
+  "homeDailyLog": "Günlük kayıt",
+  "homeDailyLogHint": "Uyku, su, ruh hali ve enerji",
+  "homeSymptoms": "Semptom girişi",
+  "homeSymptomsHint": "Bir şikâyet ekleyin ya da devam eden döneme not düşün",
+  "homeEpisodes": "Dönemler",
+  "@homeEpisodes": {
+    "description": "Şikâyet dönemlerinin listesi (eski adıyla atak). Kullanıcıya 'dönem' denir."
+  },
+  "homeEpisodesHint": "Devam eden ve biten dönemler",
+
+  "dbOpenErrorTitle": "Veritabanı açılamadı",
+  "dbOpenErrorBody": "Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.",
+  "@dbOpenErrorBody": {
+    "description": "Açılışta veritabanı anahtarla açılamazsa gösterilen hata metni."
+  }
+}
