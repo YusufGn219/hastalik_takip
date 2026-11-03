@@ -13,7 +13,7 @@ if (keyPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.vitapuls.app"
+    namespace = "com.alamutlabs.vitapuls"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
