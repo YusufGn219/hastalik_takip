@@ -27,6 +27,13 @@ DateTime parseDay(String day) {
   return DateTime.utc(int.parse(p[0]), int.parse(p[1]), int.parse(p[2]));
 }
 
+/// 'YYYY-MM-DD' gününe [n] gün ekler (negatif olabilir).
+String addDays(String day, int n) {
+  final d = parseDay(day);
+  final r = DateTime.utc(d.year, d.month, d.day + n);
+  return formatDay(r.year, r.month, r.day);
+}
+
 /// Yerel [day] gününe düşebilecek tüm anları kapsayan geniş UTC aralığı.
 /// Dünyadaki UTC farkları -12:00 ile +14:00 arasındadır; kesin süzme çağıran
 /// tarafta kaydın kendi farkıyla yapılır.

@@ -1,19 +1,23 @@
-// Analitik hesapları: eski `services/health/analytics.py` dosyasının Dart portu.
+// Analitik hesapları. Eski `services/health/analytics.py` dosyasının
+// düzeltilmiş Dart karşılığıdır.
 //
-// Amaç eşdeğerlik: aynı veriyle Python'la aynı sayıları üretmek
-// (test/golden/analytics_golden_test.dart). Bu yüzden eski kodun bilinen
-// tuhaflıkları BİLEREK korunmuştur; her biri aşağıda işaretlidir. Düzeltme
-// kararı ayrı verilecek; verilirse burada değişir ve altın veri bilinçli olarak
-// yeniden üretilir.
+// Eski kodun altı tuhaflığı bilerek düzeltildi (ayrıntı ve örnekler:
+// test/golden/FARKLAR.md). Doğruluk, Django'dan bağımsız yazılmış
+// `scripts/golden/generate_golden_v2.py` çıktısıyla karşılaştırılarak kanıtlanır
+// (test/golden/analytics_golden_test.dart).
 //
-// Korunan eski davranışlar:
-//  [T1] severity_trend günleri UTC takvim gününe göre gruplanır (yerel gün değil).
-//  [T2] 0 değerli uyku/su "yok" (null) sayılır; ortalaması 0 çıkarsa da null.
-//  [T3] Geçersiz gün adı yok sayılır; hiç geçerli gün kalmazsa ilaç her gün
-//       beklenir.
-//  [T4] Uyum: izin verilen günler dışında alınan dozlar da "alınan gün" sayılır.
-//  [T5] Pencere başlangıcı dahildir (>=); gün sınırları UTC "şimdi"ye göre.
-//  [T6] İlaç etkisi: "önce" penceresi alım anını içerir, "sonra" içermez.
+//  [T1] Günler, kaydın kendi UTC farkıyla yerel güne göre gruplanır.
+//  [T2] 0 geçerli bir değerdir; ortalama yalnız hiç kayıt yoksa boş.
+//  [T3] Geçersiz gün adı ilaç eklenirken reddedilir (MedicationService). Eski
+//       veride yine de bulunursa burada yok sayılır; kalan boşsa her gün.
+//  [T4] Uyum yalnız programlı günler üzerinden; programdışı günler `extraDays`.
+//  [T5] Pencere = bugün dahil son N yerel gün, gün başından.
+//  [T6] Rahatlama = dozdan sonraki 2 saatte şiddetin, dozdan önceki ortalamanın
+//       altına ilk indiği kayıt. "Önce" penceresi alım anını içerir, "sonra"
+//       içermez. Bilinen sınır: iki doz 2 saatten yakınsa pencereleri üst üste
+//       biner.
+//
+// Yuvarlama: yarım değer yukarı yuvarlanır (Dart `round`, pozitif sayılarda).
 
 import '../../data/database/app_database.dart';
 import '../../data/repositories/daily_log_repository.dart';
@@ -23,6 +27,7 @@ import '../../data/repositories/support.dart';
 import '../../data/repositories/symptom_entry_repository.dart';
 import '../../data/repositories/symptom_repository.dart';
 import '../local_day.dart';
+import '../weekdays.dart';
 
 double _round1(double x) => (x * 10).round() / 10;
 
@@ -77,8 +82,8 @@ class DailyTrendPoint {
     this.energyLevel,
   );
   final String date;
-  final double? sleepHours;
-  final double? waterIntake;
+  final double sleepHours;
+  final double waterIntake;
   final int mood;
   final int energyLevel;
 
@@ -96,7 +101,8 @@ class DailyTrends {
   final int periodDays;
   final List<DailyTrendPoint> trends;
 
-  /// Anahtarlar: sleep_hours, water_intake, mood, energy_level.
+  /// Anahtarlar: sleep_hours, water_intake, mood, energy_level. Dönemde hiç
+  /// kayıt yoksa değerler null.
   final Map<String, double?> averages;
 
   Map<String, dynamic> toJson() => {
@@ -118,6 +124,8 @@ class MedicationEffectItem {
   final int usageCount;
   final double avgSeverityBefore;
   final double avgSeverityAfter;
+
+  /// Rahatlama görülen dozların ortalaması; hiçbirinde görülmediyse null.
   final int? avgReliefMinutes;
 
   Map<String, dynamic> toJson() => {
@@ -145,19 +153,30 @@ class AdherenceItem {
     required this.medicationName,
     required this.expectedDays,
     required this.takenDays,
+    required this.extraDays,
     required this.missedDays,
     required this.adherenceRate,
   });
   final String medicationName;
+
+  /// Programlı gün sayısı.
   final int expectedDays;
+
+  /// Programlı günlerden doz alınanların sayısı.
   final int takenDays;
+
+  /// Programda olmayan günlerden doz alınanların sayısı.
+  final int extraDays;
   final int missedDays;
+
+  /// 0–100; yalnız programlı günler üzerinden.
   final double adherenceRate;
 
   Map<String, dynamic> toJson() => {
         'medication_name': medicationName,
         'expected_days': expectedDays,
         'taken_days': takenDays,
+        'extra_days': extraDays,
         'missed_days': missedDays,
         'adherence_rate': adherenceRate,
       };
@@ -177,6 +196,8 @@ class MedicationAdherence {
 // ------------------------------------------------------------------ servis
 
 class AnalyticsService {
+  /// [currentOffsetMinutes] "bugün"ün hangi yerel güne düştüğünü belirler;
+  /// verilmezse [clock] değerinin cihaz UTC farkı kullanılır.
   AnalyticsService({
     required SymptomEntryRepository entries,
     required SymptomRepository symptoms,
@@ -184,12 +205,14 @@ class AnalyticsService {
     required MedicationRepository medications,
     required DailyLogRepository dailyLogs,
     Clock? clock,
+    int Function()? currentOffsetMinutes,
   })  : _entries = entries,
         _symptoms = symptoms,
         _medicationLogs = medicationLogs,
         _medications = medications,
         _dailyLogs = dailyLogs,
-        _clock = clock ?? DateTime.now;
+        _clock = clock ?? DateTime.now,
+        _offset = currentOffsetMinutes;
 
   final SymptomEntryRepository _entries;
   final SymptomRepository _symptoms;
@@ -197,20 +220,34 @@ class AnalyticsService {
   final MedicationRepository _medications;
   final DailyLogRepository _dailyLogs;
   final Clock _clock;
+  final int Function()? _offset;
 
-  /// Pencere başlangıcı: şimdi − [days] gün (an olarak).
-  DateTime _windowStart(int days) =>
-      _clock().toUtc().subtract(Duration(days: days));
+  String _today() {
+    final now = _clock();
+    return localDayOf(now, _offset?.call() ?? now.timeZoneOffset.inMinutes);
+  }
+
+  /// [T5] Pencerenin ilk günü: bugün dahil son [days] gün.
+  String _startDay(int days) => addDays(_today(), -(days - 1));
+
+  /// Veritabanından geniş çekim için alt sınır; kesin süzme yerel günle yapılır.
+  DateTime _fetchFrom(String startDay) =>
+      parseDay(startDay).subtract(const Duration(hours: 14));
+
+  bool _fromDay(String day, String startDay) => day.compareTo(startDay) >= 0;
 
   // -------------------------------------------------- semptom sıklığı/trend
 
   Future<SymptomAnalytics> symptomAnalytics(int days) async {
-    final entries = await _entries.listSince(_windowStart(days));
+    final startDay = _startDay(days);
+    final entries = (await _entries.listSince(_fetchFrom(startDay)))
+        .where((e) =>
+            _fromDay(localDayOf(e.timestamp, e.utcOffsetMinutes), startDay))
+        .toList();
 
     final names = <String, String>{};
     for (final id in entries.map((e) => e.symptomId).toSet()) {
-      final s = await _symptoms.getById(id);
-      names[id] = s?.name ?? '';
+      names[id] = (await _symptoms.getById(id))?.name ?? '';
     }
 
     final bySymptom = <String, List<int>>{};
@@ -229,14 +266,17 @@ class AnalyticsService {
         return c != 0 ? c : a.symptomName.compareTo(b.symptomName);
       });
 
-    // [T1] UTC takvim günü.
+    // [T1] Kaydın kendi UTC farkıyla yerel gün.
     final byDay = <String, List<int>>{};
     for (final e in entries) {
-      byDay.putIfAbsent(utcDayOf(e.timestamp), () => []).add(e.severity);
+      byDay
+          .putIfAbsent(localDayOf(e.timestamp, e.utcOffsetMinutes), () => [])
+          .add(e.severity);
     }
-    final days_ = byDay.keys.toList()..sort();
+    final sortedDays = byDay.keys.toList()..sort();
     final trend = [
-      for (final d in days_) SeverityPoint(d, _round1(_avgOrNull(byDay[d]!)!)),
+      for (final d in sortedDays)
+        SeverityPoint(d, _round1(_avgOrNull(byDay[d]!)!)),
     ];
 
     return SymptomAnalytics(days, frequency, trend);
@@ -245,18 +285,15 @@ class AnalyticsService {
   // --------------------------------------------------------- günlük eğilim
 
   Future<DailyTrends> dailyTrends(int days) async {
-    // [T5] başlangıç günü UTC "şimdi − days" gününün tarihi.
-    final startDay = utcDayOf(_windowStart(days));
-    final logs = await _dailyLogs.listInRange(startDay, '9999-12-31');
+    final logs = await _dailyLogs.listInRange(_startDay(days), '9999-12-31');
 
-    // [T2] 0 → null.
-    double? orNull(double v) => v == 0 ? null : v;
+    // [T2] 0 geçerli değerdir; olduğu gibi gösterilir.
     final trends = [
       for (final l in logs)
         DailyTrendPoint(
           l.logDate,
-          orNull(l.sleepHours),
-          orNull(l.waterIntake),
+          l.sleepHours,
+          l.waterIntake,
           l.mood,
           l.energyLevel,
         ),
@@ -264,7 +301,7 @@ class AnalyticsService {
 
     double? avg(Iterable<num> v) {
       final a = _avgOrNull(v);
-      return (a == null || a == 0) ? null : _round1(a);
+      return a == null ? null : _round1(a);
     }
 
     return DailyTrends(days, trends, {
@@ -279,8 +316,11 @@ class AnalyticsService {
 
   Future<MedicationEffect> medicationEffect(int days) async {
     const window = Duration(hours: 2);
-    final logs = (await _medicationLogs.listSince(_windowStart(days)))
-        .where((l) => l.episodeId != null);
+    final startDay = _startDay(days);
+    final logs = (await _medicationLogs.listSince(_fetchFrom(startDay)))
+        .where((l) =>
+            l.episodeId != null &&
+            _fromDay(localDayOf(l.takenAt, l.utcOffsetMinutes), startDay));
 
     final episodeEntries = <String, List<SymptomEntry>>{};
     final medNames = <String, String>{};
@@ -293,25 +333,36 @@ class AnalyticsService {
           await _entries.listForEpisode(log.episodeId!);
       final taken = log.takenAt;
 
-      // [T6]
+      // [T6] "önce" alım anını içerir, "sonra" içermez.
       final before = all.where((e) =>
           !e.timestamp.isBefore(taken.subtract(window)) &&
           !e.timestamp.isAfter(taken));
-      final after = all.where((e) =>
-          e.timestamp.isAfter(taken) &&
-          !e.timestamp.isAfter(taken.add(window)));
+      final after = all
+          .where((e) =>
+              e.timestamp.isAfter(taken) &&
+              !e.timestamp.isAfter(taken.add(window)))
+          .toList()
+        ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
       if (before.isEmpty || after.isEmpty) continue;
 
-      final first = after.reduce(
-        (a, b) => b.timestamp.isBefore(a.timestamp) ? b : a,
-      );
-      final relief = (first.timestamp.difference(taken).inSeconds / 60).truncate();
+      final beforeAvg = _avgOrNull(before.map((e) => e.severity))!;
+      final afterAvg = _avgOrNull(after.map((e) => e.severity))!;
+
+      // [T6] İlk gerçek düşüş: şiddet önceki ortalamanın altına inince.
+      int? relief;
+      for (final e in after) {
+        if (e.severity < beforeAvg) {
+          relief =
+              (e.timestamp.difference(taken).inSeconds / 60).truncate();
+          break;
+        }
+      }
 
       final acc = effects.putIfAbsent(medName, _EffectAcc.new);
       acc.usage++;
-      acc.before.add(_avgOrNull(before.map((e) => e.severity))!);
-      acc.after.add(_avgOrNull(after.map((e) => e.severity))!);
-      acc.relief.add(relief);
+      acc.before.add(beforeAvg);
+      acc.after.add(afterAvg);
+      if (relief != null) acc.relief.add(relief);
     }
 
     return MedicationEffect(days, [
@@ -330,59 +381,47 @@ class AnalyticsService {
 
   // ------------------------------------------------------------------ uyum
 
-  static const _dayIndex = {
-    'monday': 0,
-    'tuesday': 1,
-    'wednesday': 2,
-    'thursday': 3,
-    'friday': 4,
-    'saturday': 5,
-    'sunday': 6,
-  };
-
   Future<MedicationAdherence> medicationAdherence(int days) async {
-    final now = _clock().toUtc();
-    final startDay = utcDayOf(_windowStart(days));
-    final todayDay = utcDayOf(now);
-    final start = parseDay(startDay);
-    final today = parseDay(todayDay);
+    final today = _today();
+    final startDay = _startDay(days);
+    final allDays = <String>[];
+    for (var d = startDay; d.compareTo(today) <= 0; d = addDays(d, 1)) {
+      allDays.add(d);
+    }
 
     final recurring =
         (await _medications.listAvailable()).where((m) => m.isRecurring);
-    final logs = await _medicationLogs.listSince(
-      start.subtract(const Duration(hours: 14)),
-    );
+    final logs = await _medicationLogs.listSince(_fetchFrom(startDay));
 
     final result = <AdherenceItem>[];
     for (final med in recurring) {
-      // [T3]
-      final allowed = [
+      // [T3] Geçersiz ad (yeni kayıtta olamaz) yok sayılır; boşsa her gün.
+      final allowed = <int>{
         for (final d in recurringDaysOf(med) ?? const <String>[])
-          if (_dayIndex.containsKey(d)) _dayIndex[d]!,
-      ];
+          if (weekdayIndex.containsKey(d)) weekdayIndex[d]!,
+      };
+      bool scheduled(String day) =>
+          allowed.isEmpty || allowed.contains(parseDay(day).weekday - 1);
 
-      var expected = 0;
-      for (var cur = start;
-          !cur.isAfter(today);
-          cur = DateTime.utc(cur.year, cur.month, cur.day + 1)) {
-        if (allowed.isEmpty || allowed.contains(cur.weekday - 1)) expected++;
-      }
+      final expected = allDays.where(scheduled).length;
       if (expected == 0) continue;
 
-      // [T4] Yerel gün, kaydın kendi UTC farkıyla.
+      // [T4] Alınan günler yerel gün, kaydın kendi farkıyla; programlı olanlar
+      // "alınan", olmayanlar "ekstra".
       final takenDays = <String>{
         for (final l in logs)
           if (l.medicationId == med.id)
             localDayOf(l.takenAt, l.utcOffsetMinutes),
-      }.where((d) => d.compareTo(startDay) >= 0 && d.compareTo(todayDay) <= 0);
-      final taken = takenDays.length;
+      }.where((d) => _fromDay(d, startDay) && d.compareTo(today) <= 0);
+      final onSchedule = takenDays.where(scheduled).length;
 
       result.add(AdherenceItem(
         medicationName: med.name,
         expectedDays: expected,
-        takenDays: taken,
-        missedDays: expected - taken < 0 ? 0 : expected - taken,
-        adherenceRate: _round1(taken / expected * 100),
+        takenDays: onSchedule,
+        extraDays: takenDays.length - onSchedule,
+        missedDays: expected - onSchedule,
+        adherenceRate: _round1(onSchedule / expected * 100),
       ));
     }
     return MedicationAdherence(days, result);

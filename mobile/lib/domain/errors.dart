@@ -14,4 +14,5 @@ abstract final class RuleCodes {
   static const episodeAlreadyClosed = 'episode_already_closed';
   static const episodeEndBeforeStart = 'episode_end_before_start';
   static const episodeAndConditionBoth = 'episode_and_condition_both';
+  static const invalidRecurringDay = 'invalid_recurring_day';
 }

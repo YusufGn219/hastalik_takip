@@ -1,10 +1,12 @@
 // Altın veri (golden data) bütünlük testi — Sprint 0.
 //
-// Dart'taki iş mantığı henüz yok; bu test yalnızca altın veri dosyalarının
-// okunabildiğini ve içeriğinin beklenen biçimde olduğunu doğrular. Sprint 2'de
-// aynı dosyalar Dart analitiğinin çıktısıyla birebir karşılaştırılacak.
+// Bu test yalnızca altın veri dosyalarının okunabildiğini ve içeriğinin
+// beklenen biçimde olduğunu doğrular. Dart analitiğiyle karşılaştırma
+// `analytics_golden_test.dart` içindedir; eski ve yeni beklenen dosya
+// arasındaki farklar `FARKLAR.md`'de açıklanır.
 //
-// Dosyalar `scripts/golden/generate_golden.py` ile üretilir; elle düzenlenmez.
+// Dosyalar `scripts/golden/generate_golden.py` (eski davranış) ve
+// `generate_golden_v2.py` (yeni kurallar) ile üretilir; elle düzenlenmez.
 
 import 'dart:convert';
 import 'dart:io';

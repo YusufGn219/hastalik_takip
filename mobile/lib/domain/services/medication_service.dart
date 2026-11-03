@@ -6,6 +6,7 @@ import '../../data/repositories/medication_log_repository.dart';
 import '../../data/repositories/medication_repository.dart';
 import '../errors.dart';
 import '../local_day.dart';
+import '../weekdays.dart';
 
 class MedicationService {
   MedicationService({
@@ -20,19 +21,37 @@ class MedicationService {
   /// Kullanılabilir ilaçlar (katalog + kullanıcının kendi ilaçları).
   Future<List<Medication>> available() => _medications.listAvailable();
 
+  /// Yeni ilaç ekler. [recurringDays] yalnız geçerli gün adları içerebilir
+  /// ([weekdayKeys]); aksi halde [RuleViolation] fırlatılır. Tekrarlar tek
+  /// sayılır. Boş liste ya da null "her gün" demektir ve null saklanır.
   Future<Medication> create({
     required String name,
     MedicationType type = MedicationType.symptomatic,
     bool isRecurring = false,
     String? recurringTime,
     List<String>? recurringDays,
-  }) {
+  }) async {
+    List<String>? days;
+    if (recurringDays != null) {
+      for (final d in recurringDays) {
+        if (!weekdayIndex.containsKey(d)) {
+          throw RuleViolation(
+            RuleCodes.invalidRecurringDay,
+            'Geçersiz gün adı: $d',
+          );
+        }
+      }
+      final unique = recurringDays.toSet();
+      days = unique.isEmpty
+          ? null
+          : (weekdayKeys.where(unique.contains).toList());
+    }
     return _medications.create(
       name: name,
       type: type,
       isRecurring: isRecurring,
       recurringTime: recurringTime,
-      recurringDays: recurringDays,
+      recurringDays: days,
     );
   }
 

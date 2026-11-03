@@ -1,8 +1,10 @@
 // Altın veri karşılaştırması — Sprint 2.
 //
-// Eski Python analitiğinin çıktısı (`expected_analytics.json`) ile Dart
-// servisinin çıktısı, aynı örnek veriyle (`dataset.json`) birebir aynı olmalı.
-// Dosyalar `scripts/golden/generate_golden.py` ile üretilir; elle düzenlenmez.
+// Dart servisinin çıktısı, aynı örnek veriyle (`dataset.json`) yeni kurallara
+// göre bağımsız üretilmiş beklenen çıktıyla (`expected_analytics_v2.json`)
+// birebir aynı olmalı. v2 dosyası `scripts/golden/generate_golden_v2.py` ile
+// üretilir; elle düzenlenmez. Eski davranışın kaydı `expected_analytics.json`
+// olarak tarihçe için durur; farklar test/golden/FARKLAR.md'de.
 
 import 'dart:convert';
 import 'dart:io';
@@ -152,7 +154,7 @@ void main() {
 
   setUp(() async {
     final dataset = _load('dataset.json');
-    expected = _load('expected_analytics.json');
+    expected = _load('expected_analytics_v2.json');
     db = createTestDb();
     await _loadDataset(db, dataset);
     final frozenNow = DateTime.parse(
@@ -165,6 +167,7 @@ void main() {
       medications: DriftMedicationRepository(db),
       dailyLogs: DriftDailyLogRepository(db),
       clock: () => frozenNow,
+      currentOffsetMinutes: () => _istanbulOffset,
     );
   });
   tearDown(() => db.close());
