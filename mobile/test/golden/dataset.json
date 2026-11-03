@@ -1,0 +1,1074 @@
+{
+  "meta": {
+    "frozen_now": "2026-11-01T10:00:00Z",
+    "timezone": "Europe/Istanbul",
+    "periods": [
+      7,
+      30,
+      90
+    ],
+    "note": "Tum zamanlar UTC (Z). Kimlikler Python tarafindaki tam sayi kimlikleridir."
+  },
+  "symptoms": [
+    {
+      "id": 1,
+      "name": "Baş ağrısı"
+    },
+    {
+      "id": 2,
+      "name": "Ateş"
+    },
+    {
+      "id": 3,
+      "name": "Öksürük"
+    },
+    {
+      "id": 4,
+      "name": "Yorgunluk"
+    },
+    {
+      "id": 5,
+      "name": "Bulantı"
+    },
+    {
+      "id": 6,
+      "name": "Karın ağrısı"
+    },
+    {
+      "id": 7,
+      "name": "Nefes darlığı"
+    },
+    {
+      "id": 8,
+      "name": "Baş dönmesi"
+    }
+  ],
+  "medications": [
+    {
+      "id": 1,
+      "name": "Parol",
+      "type": "symptomatic",
+      "is_global": true,
+      "is_recurring": false,
+      "recurring_time": null,
+      "recurring_days": null
+    },
+    {
+      "id": 2,
+      "name": "Aspirin",
+      "type": "symptomatic",
+      "is_global": true,
+      "is_recurring": false,
+      "recurring_time": null,
+      "recurring_days": null
+    },
+    {
+      "id": 11,
+      "name": "Gunluk vitamin",
+      "type": "chronic",
+      "is_global": false,
+      "is_recurring": true,
+      "recurring_time": "09:00",
+      "recurring_days": null
+    },
+    {
+      "id": 12,
+      "name": "Hafta ici ilac",
+      "type": "chronic",
+      "is_global": false,
+      "is_recurring": true,
+      "recurring_time": "08:00",
+      "recurring_days": [
+        "monday",
+        "wednesday",
+        "friday"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Hatali gun adi",
+      "type": "chronic",
+      "is_global": false,
+      "is_recurring": true,
+      "recurring_time": "21:00",
+      "recurring_days": [
+        "funday"
+      ]
+    }
+  ],
+  "chronic_conditions": [
+    {
+      "id": 1,
+      "name": "Migren",
+      "medication_ids": [
+        11,
+        12
+      ]
+    }
+  ],
+  "episodes": [
+    {
+      "id": 1,
+      "symptom_id": 1,
+      "start_time": "2026-10-03T06:00:00Z",
+      "ended_at": "2026-10-03T14:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": 2,
+      "symptom_id": 1,
+      "start_time": "2026-10-20T15:00:00Z",
+      "ended_at": "2026-10-21T01:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": 3,
+      "symptom_id": 2,
+      "start_time": "2026-10-28T08:00:00Z",
+      "ended_at": null,
+      "status": "ongoing"
+    }
+  ],
+  "symptom_entries": [
+    {
+      "id": 1,
+      "symptom_id": 1,
+      "episode_id": 1,
+      "severity": 7,
+      "timestamp": "2026-10-03T06:00:00Z",
+      "location": "alin"
+    },
+    {
+      "id": 2,
+      "symptom_id": 1,
+      "episode_id": 1,
+      "severity": 8,
+      "timestamp": "2026-10-03T07:30:00Z",
+      "location": ""
+    },
+    {
+      "id": 3,
+      "symptom_id": 1,
+      "episode_id": 1,
+      "severity": 5,
+      "timestamp": "2026-10-03T09:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 4,
+      "symptom_id": 1,
+      "episode_id": 1,
+      "severity": 4,
+      "timestamp": "2026-10-03T11:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 5,
+      "symptom_id": 1,
+      "episode_id": 2,
+      "severity": 6,
+      "timestamp": "2026-10-20T15:00:00Z",
+      "location": "sag sakak"
+    },
+    {
+      "id": 6,
+      "symptom_id": 1,
+      "episode_id": 2,
+      "severity": 7,
+      "timestamp": "2026-10-20T16:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 7,
+      "symptom_id": 1,
+      "episode_id": 2,
+      "severity": 4,
+      "timestamp": "2026-10-20T17:30:00Z",
+      "location": ""
+    },
+    {
+      "id": 8,
+      "symptom_id": 1,
+      "episode_id": 2,
+      "severity": 2,
+      "timestamp": "2026-10-20T18:30:00Z",
+      "location": ""
+    },
+    {
+      "id": 9,
+      "symptom_id": 1,
+      "episode_id": 2,
+      "severity": 3,
+      "timestamp": "2026-10-20T19:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 10,
+      "symptom_id": 1,
+      "episode_id": 2,
+      "severity": 5,
+      "timestamp": "2026-10-20T22:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 11,
+      "symptom_id": 1,
+      "episode_id": 2,
+      "severity": 1,
+      "timestamp": "2026-10-21T00:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 12,
+      "symptom_id": 2,
+      "episode_id": 3,
+      "severity": 6,
+      "timestamp": "2026-10-28T08:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 13,
+      "symptom_id": 2,
+      "episode_id": 3,
+      "severity": 7,
+      "timestamp": "2026-10-28T09:30:00Z",
+      "location": ""
+    },
+    {
+      "id": 14,
+      "symptom_id": 2,
+      "episode_id": 3,
+      "severity": 4,
+      "timestamp": "2026-10-28T11:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 15,
+      "symptom_id": 2,
+      "episode_id": 3,
+      "severity": 3,
+      "timestamp": "2026-10-28T11:45:00Z",
+      "location": ""
+    },
+    {
+      "id": 16,
+      "symptom_id": 2,
+      "episode_id": 3,
+      "severity": 5,
+      "timestamp": "2026-10-29T07:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 17,
+      "symptom_id": 2,
+      "episode_id": 3,
+      "severity": 6,
+      "timestamp": "2026-10-29T07:30:00Z",
+      "location": ""
+    },
+    {
+      "id": 18,
+      "symptom_id": 2,
+      "episode_id": 3,
+      "severity": 4,
+      "timestamp": "2026-10-29T09:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 19,
+      "symptom_id": 2,
+      "episode_id": 3,
+      "severity": 3,
+      "timestamp": "2026-10-29T09:30:00Z",
+      "location": ""
+    },
+    {
+      "id": 20,
+      "symptom_id": 2,
+      "episode_id": 3,
+      "severity": 6,
+      "timestamp": "2026-10-29T10:15:00Z",
+      "location": ""
+    },
+    {
+      "id": 21,
+      "symptom_id": 2,
+      "episode_id": 3,
+      "severity": 3,
+      "timestamp": "2026-10-30T13:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 22,
+      "symptom_id": 3,
+      "episode_id": null,
+      "severity": 3,
+      "timestamp": "2026-10-09T10:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 23,
+      "symptom_id": 3,
+      "episode_id": null,
+      "severity": 4,
+      "timestamp": "2026-10-12T21:30:00Z",
+      "location": ""
+    },
+    {
+      "id": 24,
+      "symptom_id": 3,
+      "episode_id": null,
+      "severity": 5,
+      "timestamp": "2026-10-15T12:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 25,
+      "symptom_id": 3,
+      "episode_id": null,
+      "severity": 2,
+      "timestamp": "2026-10-26T21:30:00Z",
+      "location": ""
+    },
+    {
+      "id": 26,
+      "symptom_id": 3,
+      "episode_id": null,
+      "severity": 3,
+      "timestamp": "2026-10-27T21:30:00Z",
+      "location": ""
+    },
+    {
+      "id": 27,
+      "symptom_id": 3,
+      "episode_id": null,
+      "severity": 3,
+      "timestamp": "2026-10-29T14:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 28,
+      "symptom_id": 4,
+      "episode_id": null,
+      "severity": 4,
+      "timestamp": "2026-10-22T10:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 29,
+      "symptom_id": 4,
+      "episode_id": null,
+      "severity": 4,
+      "timestamp": "2026-10-25T10:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 30,
+      "symptom_id": 4,
+      "episode_id": null,
+      "severity": 9,
+      "timestamp": "2026-10-25T09:59:00Z",
+      "location": ""
+    },
+    {
+      "id": 31,
+      "symptom_id": 4,
+      "episode_id": null,
+      "severity": 3,
+      "timestamp": "2026-10-02T10:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 32,
+      "symptom_id": 4,
+      "episode_id": null,
+      "severity": 8,
+      "timestamp": "2026-10-02T09:59:00Z",
+      "location": ""
+    },
+    {
+      "id": 33,
+      "symptom_id": 4,
+      "episode_id": null,
+      "severity": 3,
+      "timestamp": "2026-10-30T09:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 34,
+      "symptom_id": 4,
+      "episode_id": null,
+      "severity": 5,
+      "timestamp": "2026-10-31T09:00:00Z",
+      "location": ""
+    },
+    {
+      "id": 35,
+      "symptom_id": 4,
+      "episode_id": null,
+      "severity": 4,
+      "timestamp": "2026-10-31T15:00:00Z",
+      "location": ""
+    }
+  ],
+  "daily_logs": [
+    {
+      "id": 1,
+      "date": "2026-10-01",
+      "sleep_hours": 5.0,
+      "water_intake": 1.0,
+      "mood": 1,
+      "energy_level": 1
+    },
+    {
+      "id": 2,
+      "date": "2026-10-02",
+      "sleep_hours": 8.5,
+      "water_intake": 2.5,
+      "mood": 4,
+      "energy_level": 3
+    },
+    {
+      "id": 3,
+      "date": "2026-10-03",
+      "sleep_hours": 7.0,
+      "water_intake": 4.0,
+      "mood": 2,
+      "energy_level": 5
+    },
+    {
+      "id": 4,
+      "date": "2026-10-04",
+      "sleep_hours": 5.5,
+      "water_intake": 1.5,
+      "mood": 5,
+      "energy_level": 2
+    },
+    {
+      "id": 5,
+      "date": "2026-10-05",
+      "sleep_hours": 9.0,
+      "water_intake": 3.0,
+      "mood": 3,
+      "energy_level": 4
+    },
+    {
+      "id": 6,
+      "date": "2026-10-08",
+      "sleep_hours": 9.5,
+      "water_intake": 3.5,
+      "mood": 2,
+      "energy_level": 5
+    },
+    {
+      "id": 7,
+      "date": "2026-10-09",
+      "sleep_hours": 8.0,
+      "water_intake": 1.0,
+      "mood": 5,
+      "energy_level": 2
+    },
+    {
+      "id": 8,
+      "date": "2026-10-10",
+      "sleep_hours": 6.5,
+      "water_intake": 2.5,
+      "mood": 3,
+      "energy_level": 4
+    },
+    {
+      "id": 9,
+      "date": "2026-10-11",
+      "sleep_hours": 5.0,
+      "water_intake": 4.0,
+      "mood": 1,
+      "energy_level": 1
+    },
+    {
+      "id": 10,
+      "date": "2026-10-12",
+      "sleep_hours": 8.5,
+      "water_intake": 1.5,
+      "mood": 4,
+      "energy_level": 3
+    },
+    {
+      "id": 11,
+      "date": "2026-10-13",
+      "sleep_hours": 7.0,
+      "water_intake": 0.0,
+      "mood": 2,
+      "energy_level": 5
+    },
+    {
+      "id": 12,
+      "date": "2026-10-14",
+      "sleep_hours": 5.5,
+      "water_intake": 4.5,
+      "mood": 5,
+      "energy_level": 2
+    },
+    {
+      "id": 13,
+      "date": "2026-10-15",
+      "sleep_hours": 9.0,
+      "water_intake": 2.0,
+      "mood": 3,
+      "energy_level": 4
+    },
+    {
+      "id": 14,
+      "date": "2026-10-16",
+      "sleep_hours": 7.5,
+      "water_intake": 3.5,
+      "mood": 1,
+      "energy_level": 1
+    },
+    {
+      "id": 15,
+      "date": "2026-10-17",
+      "sleep_hours": 6.0,
+      "water_intake": 1.0,
+      "mood": 4,
+      "energy_level": 3
+    },
+    {
+      "id": 16,
+      "date": "2026-10-19",
+      "sleep_hours": 8.0,
+      "water_intake": 4.0,
+      "mood": 5,
+      "energy_level": 2
+    },
+    {
+      "id": 17,
+      "date": "2026-10-20",
+      "sleep_hours": 6.5,
+      "water_intake": 1.5,
+      "mood": 3,
+      "energy_level": 4
+    },
+    {
+      "id": 18,
+      "date": "2026-10-21",
+      "sleep_hours": 5.0,
+      "water_intake": 3.0,
+      "mood": 1,
+      "energy_level": 1
+    },
+    {
+      "id": 19,
+      "date": "2026-10-22",
+      "sleep_hours": 8.5,
+      "water_intake": 4.5,
+      "mood": 4,
+      "energy_level": 3
+    },
+    {
+      "id": 20,
+      "date": "2026-10-23",
+      "sleep_hours": 7.0,
+      "water_intake": 2.0,
+      "mood": 2,
+      "energy_level": 5
+    },
+    {
+      "id": 21,
+      "date": "2026-10-24",
+      "sleep_hours": 5.5,
+      "water_intake": 3.5,
+      "mood": 5,
+      "energy_level": 2
+    },
+    {
+      "id": 22,
+      "date": "2026-10-25",
+      "sleep_hours": 9.0,
+      "water_intake": 1.0,
+      "mood": 3,
+      "energy_level": 4
+    },
+    {
+      "id": 23,
+      "date": "2026-10-26",
+      "sleep_hours": 7.5,
+      "water_intake": 2.5,
+      "mood": 1,
+      "energy_level": 1
+    },
+    {
+      "id": 24,
+      "date": "2026-10-27",
+      "sleep_hours": 6.0,
+      "water_intake": 4.0,
+      "mood": 4,
+      "energy_level": 3
+    },
+    {
+      "id": 25,
+      "date": "2026-10-28",
+      "sleep_hours": 9.5,
+      "water_intake": 1.5,
+      "mood": 2,
+      "energy_level": 5
+    },
+    {
+      "id": 26,
+      "date": "2026-10-29",
+      "sleep_hours": 8.0,
+      "water_intake": 3.0,
+      "mood": 5,
+      "energy_level": 2
+    },
+    {
+      "id": 27,
+      "date": "2026-10-31",
+      "sleep_hours": 5.0,
+      "water_intake": 2.0,
+      "mood": 1,
+      "energy_level": 1
+    },
+    {
+      "id": 28,
+      "date": "2026-11-01",
+      "sleep_hours": 8.5,
+      "water_intake": 3.5,
+      "mood": 4,
+      "energy_level": 3
+    }
+  ],
+  "medication_logs": [
+    {
+      "id": 1,
+      "medication_id": 1,
+      "taken_at": "2026-10-03T08:00:00Z",
+      "dose_amount": 500.0,
+      "dose_unit": "tablet",
+      "episode_id": 1,
+      "condition_id": null
+    },
+    {
+      "id": 2,
+      "medication_id": 1,
+      "taken_at": "2026-10-20T16:30:00Z",
+      "dose_amount": 500.0,
+      "dose_unit": "tablet",
+      "episode_id": 2,
+      "condition_id": null
+    },
+    {
+      "id": 3,
+      "medication_id": 2,
+      "taken_at": "2026-10-20T20:00:00Z",
+      "dose_amount": 100.0,
+      "dose_unit": "tablet",
+      "episode_id": 2,
+      "condition_id": null
+    },
+    {
+      "id": 4,
+      "medication_id": 1,
+      "taken_at": "2026-10-20T22:00:00Z",
+      "dose_amount": 500.0,
+      "dose_unit": "tablet",
+      "episode_id": 2,
+      "condition_id": null
+    },
+    {
+      "id": 5,
+      "medication_id": 2,
+      "taken_at": "2026-10-28T10:00:00Z",
+      "dose_amount": 100.0,
+      "dose_unit": "tablet",
+      "episode_id": 3,
+      "condition_id": null
+    },
+    {
+      "id": 6,
+      "medication_id": 2,
+      "taken_at": "2026-10-29T08:00:00Z",
+      "dose_amount": 100.0,
+      "dose_unit": "tablet",
+      "episode_id": 3,
+      "condition_id": null
+    },
+    {
+      "id": 7,
+      "medication_id": 1,
+      "taken_at": "2026-10-30T12:00:00Z",
+      "dose_amount": 500.0,
+      "dose_unit": "tablet",
+      "episode_id": 3,
+      "condition_id": null
+    },
+    {
+      "id": 8,
+      "medication_id": 1,
+      "taken_at": "2026-10-31T09:00:00Z",
+      "dose_amount": 500.0,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": null
+    },
+    {
+      "id": 9,
+      "medication_id": 11,
+      "taken_at": "2026-10-02T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 10,
+      "medication_id": 11,
+      "taken_at": "2026-10-03T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 11,
+      "medication_id": 11,
+      "taken_at": "2026-10-04T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 12,
+      "medication_id": 11,
+      "taken_at": "2026-10-06T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 13,
+      "medication_id": 11,
+      "taken_at": "2026-10-07T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 14,
+      "medication_id": 11,
+      "taken_at": "2026-10-08T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 15,
+      "medication_id": 11,
+      "taken_at": "2026-10-09T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 16,
+      "medication_id": 11,
+      "taken_at": "2026-10-11T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 17,
+      "medication_id": 11,
+      "taken_at": "2026-10-12T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 18,
+      "medication_id": 11,
+      "taken_at": "2026-10-13T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 19,
+      "medication_id": 11,
+      "taken_at": "2026-10-14T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 20,
+      "medication_id": 11,
+      "taken_at": "2026-10-16T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 21,
+      "medication_id": 11,
+      "taken_at": "2026-10-17T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 22,
+      "medication_id": 11,
+      "taken_at": "2026-10-18T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 23,
+      "medication_id": 11,
+      "taken_at": "2026-10-19T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 24,
+      "medication_id": 11,
+      "taken_at": "2026-10-21T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 25,
+      "medication_id": 11,
+      "taken_at": "2026-10-22T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 26,
+      "medication_id": 11,
+      "taken_at": "2026-10-23T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 27,
+      "medication_id": 11,
+      "taken_at": "2026-10-24T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 28,
+      "medication_id": 11,
+      "taken_at": "2026-10-26T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 29,
+      "medication_id": 11,
+      "taken_at": "2026-10-27T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 30,
+      "medication_id": 11,
+      "taken_at": "2026-10-28T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 31,
+      "medication_id": 11,
+      "taken_at": "2026-10-29T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 32,
+      "medication_id": 11,
+      "taken_at": "2026-10-31T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 33,
+      "medication_id": 11,
+      "taken_at": "2026-10-04T18:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 34,
+      "medication_id": 11,
+      "taken_at": "2026-11-01T06:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 35,
+      "medication_id": 12,
+      "taken_at": "2026-10-05T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 36,
+      "medication_id": 12,
+      "taken_at": "2026-10-07T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 37,
+      "medication_id": 12,
+      "taken_at": "2026-10-09T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 38,
+      "medication_id": 12,
+      "taken_at": "2026-10-12T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 39,
+      "medication_id": 12,
+      "taken_at": "2026-10-14T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 40,
+      "medication_id": 12,
+      "taken_at": "2026-10-16T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 41,
+      "medication_id": 12,
+      "taken_at": "2026-10-21T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 42,
+      "medication_id": 12,
+      "taken_at": "2026-10-23T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 43,
+      "medication_id": 12,
+      "taken_at": "2026-10-26T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 44,
+      "medication_id": 12,
+      "taken_at": "2026-10-30T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 45,
+      "medication_id": 12,
+      "taken_at": "2026-10-13T05:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 46,
+      "medication_id": 13,
+      "taken_at": "2026-10-26T22:30:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 47,
+      "medication_id": 13,
+      "taken_at": "2026-10-29T12:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    },
+    {
+      "id": 48,
+      "medication_id": 13,
+      "taken_at": "2026-10-31T12:00:00Z",
+      "dose_amount": null,
+      "dose_unit": "tablet",
+      "episode_id": null,
+      "condition_id": 1
+    }
+  ]
+}
