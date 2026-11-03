@@ -1,0 +1,10 @@
+[
+  {"key": "headache", "name": "Baş ağrısı", "category": "ağrı"},
+  {"key": "fever", "name": "Ateş", "category": "genel"},
+  {"key": "cough", "name": "Öksürük", "category": "solunum"},
+  {"key": "fatigue", "name": "Yorgunluk", "category": "genel"},
+  {"key": "nausea", "name": "Bulantı", "category": "sindirim"},
+  {"key": "abdominal_pain", "name": "Karın ağrısı", "category": "sindirim"},
+  {"key": "shortness_of_breath", "name": "Nefes darlığı", "category": "solunum"},
+  {"key": "dizziness", "name": "Baş dönmesi", "category": "nörolojik"}
+]

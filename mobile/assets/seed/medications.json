@@ -1,0 +1,12 @@
+[
+  {"key": "parol", "name": "Parol", "type": "symptomatic"},
+  {"key": "aspirin", "name": "Aspirin", "type": "symptomatic"},
+  {"key": "majezik", "name": "Majezik", "type": "symptomatic"},
+  {"key": "nurofen", "name": "Nurofen", "type": "symptomatic"},
+  {"key": "augmentin", "name": "Augmentin", "type": "symptomatic"},
+  {"key": "vitamin_d", "name": "D Vitamini", "type": "chronic"},
+  {"key": "vitamin_c", "name": "C Vitamini", "type": "chronic"},
+  {"key": "omega_3", "name": "Omega-3", "type": "chronic"},
+  {"key": "magnesium", "name": "Magnezyum", "type": "chronic"},
+  {"key": "vitamin_b12", "name": "B12 Vitamini", "type": "chronic"}
+]
