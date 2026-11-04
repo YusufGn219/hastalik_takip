@@ -17,6 +17,8 @@ import 'features/health/screens/daily_log_screen.dart';
 import 'features/health/screens/symptom_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/lock/app_lock_gate.dart';
+import 'features/lock/app_lock_native.dart';
+import 'features/lock/app_lock_platform.dart';
 import 'features/medication/screens/chronic_condition_screen.dart';
 import 'features/medication/screens/medication_log_screen.dart';
 import 'features/medication/screens/recurring_screen.dart';
@@ -48,6 +50,10 @@ Future<void> main() async {
       prefs: prefs,
       openDatabase: _openSeededDatabase,
       eraseStorage: eraseDatabaseStorage,
+      overrides: [
+        biometricAuthenticatorProvider.overrideWithValue(LocalAuthBiometric()),
+        screenSecurityProvider.overrideWithValue(MethodChannelScreenSecurity()),
+      ],
       child: const MyApp(),
     ),
   );

@@ -357,6 +357,60 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Silinemedi, tekrar deneyin'**
   String get wipeFailed;
+
+  /// GEÇİCİ ana ekran satırı; ayarlar ekranı gelince oraya taşınır.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulama kilidi'**
+  String get lockSettingsTitle;
+
+  /// No description provided for @lockSettingsOffHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapalı. Açılışta PIN ya da parmak izi istenmez.'**
+  String get lockSettingsOffHint;
+
+  /// No description provided for @lockSettingsOnHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açık. Açılışta PIN ya da parmak izi istenir.'**
+  String get lockSettingsOnHint;
+
+  /// No description provided for @lockSettingsBiometric.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parmak iziyle aç'**
+  String get lockSettingsBiometric;
+
+  /// No description provided for @lockSettingsTimeout.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arka plandan dönünce kilitle'**
+  String get lockSettingsTimeout;
+
+  /// No description provided for @lockTimeoutNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hemen'**
+  String get lockTimeoutNow;
+
+  /// No description provided for @lockTimeoutSeconds.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} sn sonra'**
+  String lockTimeoutSeconds(int n);
+
+  /// No description provided for @lockTimeoutMinutes.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} dk sonra'**
+  String lockTimeoutMinutes(int n);
+
+  /// No description provided for @lockSettingsLockNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi kilitle'**
+  String get lockSettingsLockNow;
 }
 
 class _AppLocalizationsDelegate

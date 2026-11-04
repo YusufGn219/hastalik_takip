@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../lock/lock_settings_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -49,6 +50,8 @@ class HomeScreen extends StatelessWidget {
               hint: l10n.homeEpisodesHint,
               route: '/episodes',
             ),
+            // GEÇİCİ: ayarlar ekranı gelene kadar kilidi buradan yönetiyoruz.
+            const AppLockSettingsCard(),
           ],
         ),
       ),

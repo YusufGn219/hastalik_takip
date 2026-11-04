@@ -82,5 +82,20 @@
   "wipeTitle": "Tüm veriler silinsin mi?",
   "wipeBody": "Bu işlem tüm kayıtlarınızı kalıcı olarak siler ve geri alınamaz. Uygulama boş başlar.",
   "wipeConfirm": "Tümünü sil",
-  "wipeFailed": "Silinemedi, tekrar deneyin"
+  "wipeFailed": "Silinemedi, tekrar deneyin",
+
+  "lockSettingsTitle": "Uygulama kilidi",
+  "@lockSettingsTitle": {
+    "description": "GEÇİCİ ana ekran satırı; ayarlar ekranı gelince oraya taşınır."
+  },
+  "lockSettingsOffHint": "Kapalı. Açılışta PIN ya da parmak izi istenmez.",
+  "lockSettingsOnHint": "Açık. Açılışta PIN ya da parmak izi istenir.",
+  "lockSettingsBiometric": "Parmak iziyle aç",
+  "lockSettingsTimeout": "Arka plandan dönünce kilitle",
+  "lockTimeoutNow": "Hemen",
+  "lockTimeoutSeconds": "{n} sn sonra",
+  "lockTimeoutMinutes": "{n} dk sonra",
+  "@lockTimeoutMinutes": { "placeholders": { "n": { "type": "int" } } },
+  "@lockTimeoutSeconds": { "placeholders": { "n": { "type": "int" } } },
+  "lockSettingsLockNow": "Şimdi kilitle"
 }

@@ -11,15 +11,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/test_support.dart';
 
-Widget _localized(Widget home, {RouteFactory? onGenerateRoute}) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: home,
-      onGenerateRoute: onGenerateRoute,
+late SharedPreferences _prefs;
+
+Widget _localized(Widget home, {RouteFactory? onGenerateRoute}) => ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWithValue(_prefs)],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: home,
+        onGenerateRoute: onGenerateRoute,
+      ),
     );
 
 void main() {
   group('HomeScreen', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      _prefs = await SharedPreferences.getInstance();
+    });
+
     testWidgets('üç akışı Türkçe metinlerle gösterir', (tester) async {
       await tester.pumpWidget(_localized(const HomeScreen()));
 

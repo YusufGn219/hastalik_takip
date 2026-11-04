@@ -152,4 +152,37 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get wipeFailed => 'Silinemedi, tekrar deneyin';
+
+  @override
+  String get lockSettingsTitle => 'Uygulama kilidi';
+
+  @override
+  String get lockSettingsOffHint =>
+      'Kapalı. Açılışta PIN ya da parmak izi istenmez.';
+
+  @override
+  String get lockSettingsOnHint =>
+      'Açık. Açılışta PIN ya da parmak izi istenir.';
+
+  @override
+  String get lockSettingsBiometric => 'Parmak iziyle aç';
+
+  @override
+  String get lockSettingsTimeout => 'Arka plandan dönünce kilitle';
+
+  @override
+  String get lockTimeoutNow => 'Hemen';
+
+  @override
+  String lockTimeoutSeconds(int n) {
+    return '$n sn sonra';
+  }
+
+  @override
+  String lockTimeoutMinutes(int n) {
+    return '$n dk sonra';
+  }
+
+  @override
+  String get lockSettingsLockNow => 'Şimdi kilitle';
 }
