@@ -52,6 +52,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2
+  crypto: ^3.0.8
 
 # Yerel veritabanı SQLCipher ile şifrelenir. sqlcipher_flutter_libs paketi artık
 # kullanılmıyor (0.7.0+eol); sqlite3 3.x derleme kancası (hook) ile SQLCipher seçilir.
