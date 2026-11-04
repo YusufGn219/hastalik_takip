@@ -159,6 +159,204 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.'**
   String get dbOpenErrorBody;
+
+  /// No description provided for @commonContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam'**
+  String get commonContinue;
+
+  /// No description provided for @commonCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get commonCancel;
+
+  /// No description provided for @commonBack.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri'**
+  String get commonBack;
+
+  /// Kalan bekleme süresi, bir dakikadan kısa.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} sn'**
+  String waitSeconds(int n);
+
+  /// Kalan bekleme süresi, dakika ve saniye (s iki haneli, ör. 05).
+  ///
+  /// In tr, this message translates to:
+  /// **'{m} dk {s} sn'**
+  String waitMinutes(int m, String s);
+
+  /// No description provided for @lockTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vitapuls kilitli'**
+  String get lockTitle;
+
+  /// No description provided for @lockEnterPin.
+  ///
+  /// In tr, this message translates to:
+  /// **'PIN\'inizi girin'**
+  String get lockEnterPin;
+
+  /// No description provided for @lockWrongPin.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yanlış PIN'**
+  String get lockWrongPin;
+
+  /// Yanlış denemeler yüzünden giriş kapalıyken gösterilir.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok fazla yanlış deneme. {wait} sonra tekrar deneyin.'**
+  String lockBlocked(String wait);
+
+  /// No description provided for @lockBackspace.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get lockBackspace;
+
+  /// No description provided for @lockBiometricReason.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vitapuls\'ın kilidini açmak için doğrulayın'**
+  String get lockBiometricReason;
+
+  /// No description provided for @lockBiometricButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parmak iziyle aç'**
+  String get lockBiometricButton;
+
+  /// No description provided for @lockForgotPin.
+  ///
+  /// In tr, this message translates to:
+  /// **'PIN\'imi unuttum'**
+  String get lockForgotPin;
+
+  /// No description provided for @lockSetupTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'PIN belirleyin'**
+  String get lockSetupTitle;
+
+  /// No description provided for @lockSetupEnter.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni PIN belirleyin (4-8 rakam)'**
+  String get lockSetupEnter;
+
+  /// No description provided for @lockSetupConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'PIN\'i tekrar girin'**
+  String get lockSetupConfirm;
+
+  /// No description provided for @lockSetupMismatch.
+  ///
+  /// In tr, this message translates to:
+  /// **'PIN\'ler uyuşmadı, baştan başlayın'**
+  String get lockSetupMismatch;
+
+  /// No description provided for @lockConfirmCurrent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut PIN\'inizi girin'**
+  String get lockConfirmCurrent;
+
+  /// No description provided for @recoveryCodeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kurtarma kodunuz'**
+  String get recoveryCodeTitle;
+
+  /// No description provided for @recoveryCodeBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'PIN\'inizi unutursanız verilerinize bu kodla dönebilirsiniz. Kodu bir kâğıda yazıp güvenli bir yerde saklayın. Bir daha gösterilmeyecek. PIN\'i ve kodu birlikte kaybederseniz verileriniz kurtarılamaz.'**
+  String get recoveryCodeBody;
+
+  /// No description provided for @recoveryCodeConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kodu yazdım ve sakladım'**
+  String get recoveryCodeConfirm;
+
+  /// No description provided for @recoveryCodeDone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitti'**
+  String get recoveryCodeDone;
+
+  /// No description provided for @recoveryTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'PIN\'imi unuttum'**
+  String get recoveryTitle;
+
+  /// No description provided for @recoveryEnterCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'12 karakterlik kurtarma kodunuzu girin'**
+  String get recoveryEnterCode;
+
+  /// No description provided for @recoveryCodeField.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kurtarma kodu'**
+  String get recoveryCodeField;
+
+  /// No description provided for @recoveryCodeInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kod 12 karakter olmalı (harf ve rakam)'**
+  String get recoveryCodeInvalid;
+
+  /// No description provided for @recoveryWrongCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kod yanlış'**
+  String get recoveryWrongCode;
+
+  /// Kurtarma kodu girişi kapalıyken gösterilir.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok fazla yanlış deneme. {wait} sonra tekrar deneyin.'**
+  String recoveryBlocked(String wait);
+
+  /// No description provided for @recoveryLostBoth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kodu da kaybettim'**
+  String get recoveryLostBoth;
+
+  /// No description provided for @wipeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm veriler silinsin mi?'**
+  String get wipeTitle;
+
+  /// No description provided for @wipeBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu işlem tüm kayıtlarınızı kalıcı olarak siler ve geri alınamaz. Uygulama boş başlar.'**
+  String get wipeBody;
+
+  /// No description provided for @wipeConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tümünü sil'**
+  String get wipeConfirm;
+
+  /// No description provided for @wipeFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Silinemedi, tekrar deneyin'**
+  String get wipeFailed;
 }
 
 class _AppLocalizationsDelegate

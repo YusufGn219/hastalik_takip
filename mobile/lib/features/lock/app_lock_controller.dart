@@ -200,10 +200,28 @@ class AppLockController extends Notifier<AppLockState> {
     return result;
   }
 
+  /// Kurtarma kodunu yalnız denetler (PIN değişmez, kilit açılmaz). Doğruysa
+  /// sayaçlar sıfırlanır; yanlışsa PIN ile ortak sayaca işler. Ekran, yeni PIN'i
+  /// sormadan önce kodu burada sınar.
+  Future<PinResult> checkRecoveryCode(String code) =>
+      _verify(normalizeRecoveryCode(code), _store.recoverySalt, _store.recoveryHash, unlock: false);
+
+  bool _recoveryPending = false;
+
+  /// [recoverWithCode] `unlock: false` ile bittiyse kilidi açar (yeni kod
+  /// gösterildikten sonra). Bekleyen kurtarma yoksa hiçbir şey yapmaz.
+  void finishRecovery() {
+    if (!_recoveryPending) return;
+    _recoveryPending = false;
+    if (state.enabled) state = state.copyWith(locked: false);
+  }
+
   /// PIN'i unutan kullanıcı için: [code] doğruysa PIN'i [newPin] yapar, **yeni** bir
   /// kurtarma kodu üretir (eskisi geçersiz) ve kilidi açar. Kodun düz hâli
-  /// [RecoveryOutcome.newCode]'da bir kez döner.
-  Future<RecoveryOutcome> recoverWithCode(String code, String newPin) async {
+  /// [RecoveryOutcome.newCode]'da bir kez döner. [unlock] yanlışsa kilit açık
+  /// kalmaz; yeni kod gösterildikten sonra [finishRecovery] ile açılır (kilit
+  /// ekranı kodu göstermeden kaybolmasın diye).
+  Future<RecoveryOutcome> recoverWithCode(String code, String newPin, {bool unlock = true}) async {
     if (!isValidPin(newPin)) throw ArgumentError('Geçersiz PIN');
     final result = await _verify(
       normalizeRecoveryCode(code),
@@ -215,6 +233,10 @@ class AppLockController extends Notifier<AppLockState> {
     final newCode = await _writeRecoveryCode();
     await _writePin(newPin);
     _leftAt = null;
+    if (!unlock) {
+      _recoveryPending = true;
+      state = state.copyWith(locked: true);
+    }
     return RecoveryOutcome(PinResult.ok, newCode);
   }
 

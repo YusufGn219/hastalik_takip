@@ -48,6 +48,12 @@ class UnconfiguredDataWiper implements DataWiper {
   Future<void> wipe() => throw StateError('dataWiperProvider geçersiz kılınmadı.');
 }
 
+/// Uygulamayı baştan kurar (yeni veritabanı, boş durum). "Tüm veriyi sil"den
+/// sonra çağrılır; gerçeği `AppRoot` verir.
+final appRestartProvider = Provider<Future<void> Function()>(
+  (ref) => () => throw StateError('appRestartProvider geçersiz kılınmadı.'),
+);
+
 /// `main` içinde gerçekleriyle değiştirilir.
 final biometricAuthenticatorProvider = Provider<BiometricAuthenticator>((ref) => const NoBiometric());
 final screenSecurityProvider = Provider<ScreenSecurity>((ref) => const NoScreenSecurity());

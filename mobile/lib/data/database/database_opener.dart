@@ -34,6 +34,10 @@ class SecureStorageKeyStore implements DatabaseKeyStore {
     await _storage.write(key: _keyName, value: key);
     return key;
   }
+
+  /// Anahtarı Keystore'dan siler ("tüm veriyi sil" son çaresi). Anahtar gidince
+  /// kalan şifreli dosya zaten okunamaz.
+  Future<void> deleteKey() => _storage.delete(key: _keyName);
 }
 
 /// Veritabanı dosyası SQLCipher ile açılamazsa (şifreleme yok ya da anahtar
@@ -76,10 +80,29 @@ AppDatabase openEncryptedDatabase(File file, String hexKey) {
   return AppDatabase(executor);
 }
 
+const String databaseFileName = 'vitapuls.db';
+
 /// Üretimde kullanılan açılış: uygulama belgeler klasöründe `vitapuls.db`.
 Future<AppDatabase> openAppDatabase({DatabaseKeyStore? keyStore}) async {
   final dir = await getApplicationDocumentsDirectory();
-  final file = File(p.join(dir.path, 'vitapuls.db'));
+  final file = File(p.join(dir.path, databaseFileName));
   final key = await (keyStore ?? SecureStorageKeyStore()).readOrCreateKey();
   return openEncryptedDatabase(file, key);
+}
+
+/// "Tüm veriyi sil": veritabanı dosyasını (ve `-wal`, `-shm`, `-journal` yan
+/// dosyalarını) siler, sonra şifreleme anahtarını siler. Veritabanı önceden
+/// kapatılmış olmalıdır. Dosyalar önce gider: anahtar silinip dosya kalırsa
+/// ikisi de işe yaramaz hâle gelir, ama dosya silinemezse anahtar yerinde kalsın
+/// ki hata görülüp tekrar denenebilsin.
+Future<void> eraseDatabaseStorage({
+  Directory? directory,
+  Future<void> Function()? deleteKey,
+}) async {
+  final dir = directory ?? await getApplicationDocumentsDirectory();
+  for (final suffix in const ['', '-wal', '-shm', '-journal']) {
+    final file = File(p.join(dir.path, '$databaseFileName$suffix'));
+    if (await file.exists()) await file.delete();
+  }
+  await (deleteKey ?? SecureStorageKeyStore().deleteKey)();
 }

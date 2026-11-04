@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'app/app_root.dart';
 import 'app/database_error_app.dart';
-import 'app/providers.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'data/database/app_database.dart';
@@ -16,6 +16,7 @@ import 'features/episode/screens/episode_list_screen.dart';
 import 'features/health/screens/daily_log_screen.dart';
 import 'features/health/screens/symptom_screen.dart';
 import 'features/home/home_screen.dart';
+import 'features/lock/app_lock_gate.dart';
 import 'features/medication/screens/chronic_condition_screen.dart';
 import 'features/medication/screens/medication_log_screen.dart';
 import 'features/medication/screens/recurring_screen.dart';
@@ -29,24 +30,39 @@ Future<void> main() async {
   await dotenv.load(fileName: ".env");
   await NotificationService.initialize();
 
+  final prefs = await SharedPreferences.getInstance();
+
   // Şifreli yerel veritabanı: açılamazsa uygulama devam etmez, hata ekranı çıkar.
   AppDatabase? db;
   try {
-    db = await openAppDatabase();
-    await SeedLoader(db).seedIfNeeded();
+    db = await _openSeededDatabase();
   } catch (e) {
     debugPrint('Veritabanı açılamadı: ${e.runtimeType}');
-    await db?.close();
     runApp(const DatabaseErrorApp());
     return;
   }
 
   runApp(
-    ProviderScope(
-      overrides: [databaseProvider.overrideWithValue(db)],
+    AppRoot(
+      database: db,
+      prefs: prefs,
+      openDatabase: _openSeededDatabase,
+      eraseStorage: eraseDatabaseStorage,
       child: const MyApp(),
     ),
   );
+}
+
+/// Veritabanını açar ve başlangıç verisini yükler; yüklenemezse kapatıp hatayı atar.
+Future<AppDatabase> _openSeededDatabase() async {
+  final db = await openAppDatabase();
+  try {
+    await SeedLoader(db).seedIfNeeded();
+  } catch (_) {
+    await db.close();
+    rethrow;
+  }
+  return db;
 }
 
 class MyApp extends StatelessWidget {
@@ -62,6 +78,8 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      // Uygulama kilidi: kuruluysa tüm gezginin üstüne kilit ekranını bindirir.
+      builder: (context, child) => AppLockGate(child: child!),
       initialRoute: '/',
       routes: {
         // Giriş/kayıt yok (hesap yok); uygulama doğrudan ana ekrana açılır.

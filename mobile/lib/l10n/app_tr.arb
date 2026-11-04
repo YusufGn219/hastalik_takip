@@ -28,5 +28,59 @@
   "dbOpenErrorBody": "Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.",
   "@dbOpenErrorBody": {
     "description": "Açılışta veritabanı anahtarla açılamazsa gösterilen hata metni."
-  }
+  },
+
+  "commonContinue": "Devam",
+  "commonCancel": "Vazgeç",
+  "commonBack": "Geri",
+
+  "waitSeconds": "{n} sn",
+  "@waitSeconds": {
+    "description": "Kalan bekleme süresi, bir dakikadan kısa.",
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "waitMinutes": "{m} dk {s} sn",
+  "@waitMinutes": {
+    "description": "Kalan bekleme süresi, dakika ve saniye (s iki haneli, ör. 05).",
+    "placeholders": { "m": { "type": "int" }, "s": { "type": "String" } }
+  },
+
+  "lockTitle": "Vitapuls kilitli",
+  "lockEnterPin": "PIN'inizi girin",
+  "lockWrongPin": "Yanlış PIN",
+  "lockBlocked": "Çok fazla yanlış deneme. {wait} sonra tekrar deneyin.",
+  "@lockBlocked": {
+    "description": "Yanlış denemeler yüzünden giriş kapalıyken gösterilir.",
+    "placeholders": { "wait": { "type": "String" } }
+  },
+  "lockBackspace": "Sil",
+  "lockBiometricReason": "Vitapuls'ın kilidini açmak için doğrulayın",
+  "lockBiometricButton": "Parmak iziyle aç",
+  "lockForgotPin": "PIN'imi unuttum",
+  "lockSetupTitle": "PIN belirleyin",
+  "lockSetupEnter": "Yeni PIN belirleyin (4-8 rakam)",
+  "lockSetupConfirm": "PIN'i tekrar girin",
+  "lockSetupMismatch": "PIN'ler uyuşmadı, baştan başlayın",
+  "lockConfirmCurrent": "Mevcut PIN'inizi girin",
+
+  "recoveryCodeTitle": "Kurtarma kodunuz",
+  "recoveryCodeBody": "PIN'inizi unutursanız verilerinize bu kodla dönebilirsiniz. Kodu bir kâğıda yazıp güvenli bir yerde saklayın. Bir daha gösterilmeyecek. PIN'i ve kodu birlikte kaybederseniz verileriniz kurtarılamaz.",
+  "recoveryCodeConfirm": "Kodu yazdım ve sakladım",
+  "recoveryCodeDone": "Bitti",
+
+  "recoveryTitle": "PIN'imi unuttum",
+  "recoveryEnterCode": "12 karakterlik kurtarma kodunuzu girin",
+  "recoveryCodeField": "Kurtarma kodu",
+  "recoveryCodeInvalid": "Kod 12 karakter olmalı (harf ve rakam)",
+  "recoveryWrongCode": "Kod yanlış",
+  "recoveryBlocked": "Çok fazla yanlış deneme. {wait} sonra tekrar deneyin.",
+  "@recoveryBlocked": {
+    "description": "Kurtarma kodu girişi kapalıyken gösterilir.",
+    "placeholders": { "wait": { "type": "String" } }
+  },
+  "recoveryLostBoth": "Kodu da kaybettim",
+  "wipeTitle": "Tüm veriler silinsin mi?",
+  "wipeBody": "Bu işlem tüm kayıtlarınızı kalıcı olarak siler ve geri alınamaz. Uygulama boş başlar.",
+  "wipeConfirm": "Tümünü sil",
+  "wipeFailed": "Silinemedi, tekrar deneyin"
 }

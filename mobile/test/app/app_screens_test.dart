@@ -4,8 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/app/database_error_app.dart';
 import 'package:mobile/app/providers.dart';
 import 'package:mobile/features/home/home_screen.dart';
+import 'package:mobile/features/lock/app_lock_store.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'package:mobile/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/test_support.dart';
 
@@ -62,8 +64,13 @@ void main() {
       final db = createTestDb();
       addTearDown(db.close);
 
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
       await tester.pumpWidget(ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(db)],
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
         child: const MyApp(),
       ));
       await tester.pumpAndSettle();
@@ -76,8 +83,13 @@ void main() {
     testWidgets('uygulama başlığı çeviri dosyasından gelir', (tester) async {
       final db = createTestDb();
       addTearDown(db.close);
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
       await tester.pumpWidget(ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(db)],
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
         child: const MyApp(),
       ));
       await tester.pumpAndSettle();

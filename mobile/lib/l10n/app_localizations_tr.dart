@@ -42,4 +42,114 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get dbOpenErrorBody =>
       'Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.';
+
+  @override
+  String get commonContinue => 'Devam';
+
+  @override
+  String get commonCancel => 'Vazgeç';
+
+  @override
+  String get commonBack => 'Geri';
+
+  @override
+  String waitSeconds(int n) {
+    return '$n sn';
+  }
+
+  @override
+  String waitMinutes(int m, String s) {
+    return '$m dk $s sn';
+  }
+
+  @override
+  String get lockTitle => 'Vitapuls kilitli';
+
+  @override
+  String get lockEnterPin => 'PIN\'inizi girin';
+
+  @override
+  String get lockWrongPin => 'Yanlış PIN';
+
+  @override
+  String lockBlocked(String wait) {
+    return 'Çok fazla yanlış deneme. $wait sonra tekrar deneyin.';
+  }
+
+  @override
+  String get lockBackspace => 'Sil';
+
+  @override
+  String get lockBiometricReason =>
+      'Vitapuls\'ın kilidini açmak için doğrulayın';
+
+  @override
+  String get lockBiometricButton => 'Parmak iziyle aç';
+
+  @override
+  String get lockForgotPin => 'PIN\'imi unuttum';
+
+  @override
+  String get lockSetupTitle => 'PIN belirleyin';
+
+  @override
+  String get lockSetupEnter => 'Yeni PIN belirleyin (4-8 rakam)';
+
+  @override
+  String get lockSetupConfirm => 'PIN\'i tekrar girin';
+
+  @override
+  String get lockSetupMismatch => 'PIN\'ler uyuşmadı, baştan başlayın';
+
+  @override
+  String get lockConfirmCurrent => 'Mevcut PIN\'inizi girin';
+
+  @override
+  String get recoveryCodeTitle => 'Kurtarma kodunuz';
+
+  @override
+  String get recoveryCodeBody =>
+      'PIN\'inizi unutursanız verilerinize bu kodla dönebilirsiniz. Kodu bir kâğıda yazıp güvenli bir yerde saklayın. Bir daha gösterilmeyecek. PIN\'i ve kodu birlikte kaybederseniz verileriniz kurtarılamaz.';
+
+  @override
+  String get recoveryCodeConfirm => 'Kodu yazdım ve sakladım';
+
+  @override
+  String get recoveryCodeDone => 'Bitti';
+
+  @override
+  String get recoveryTitle => 'PIN\'imi unuttum';
+
+  @override
+  String get recoveryEnterCode => '12 karakterlik kurtarma kodunuzu girin';
+
+  @override
+  String get recoveryCodeField => 'Kurtarma kodu';
+
+  @override
+  String get recoveryCodeInvalid => 'Kod 12 karakter olmalı (harf ve rakam)';
+
+  @override
+  String get recoveryWrongCode => 'Kod yanlış';
+
+  @override
+  String recoveryBlocked(String wait) {
+    return 'Çok fazla yanlış deneme. $wait sonra tekrar deneyin.';
+  }
+
+  @override
+  String get recoveryLostBoth => 'Kodu da kaybettim';
+
+  @override
+  String get wipeTitle => 'Tüm veriler silinsin mi?';
+
+  @override
+  String get wipeBody =>
+      'Bu işlem tüm kayıtlarınızı kalıcı olarak siler ve geri alınamaz. Uygulama boş başlar.';
+
+  @override
+  String get wipeConfirm => 'Tümünü sil';
+
+  @override
+  String get wipeFailed => 'Silinemedi, tekrar deneyin';
 }
