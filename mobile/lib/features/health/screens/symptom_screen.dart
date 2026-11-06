@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/providers.dart';
-import '../../../core/network/api_client.dart';
-import '../../../core/utils/parse_utils.dart';
+import '../../../core/utils/turkish_text.dart';
 import '../../../data/database/app_database.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../episode/episode_service.dart';
 
 class SymptomScreen extends ConsumerStatefulWidget {
   const SymptomScreen({super.key});
@@ -17,14 +16,13 @@ class SymptomScreen extends ConsumerStatefulWidget {
 class _SymptomScreenState extends ConsumerState<SymptomScreen> {
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  // GEÇİCİ (Grup 3'te kalkar): eski Dio tabanlı servis yalnız kullanılınca kurulur.
-  late final EpisodeService _episodeService = EpisodeService();
 
   List<Symptom> _symptoms = [];
   String? _selectedSymptomId;
   double _severity = 5;
   bool _isLoading = false;
   String _message = '';
+  bool _messageIsError = false;
 
   /// Semptom listesi okunamadıysa kaydetmeye izin verilmez.
   bool _loadFailed = false;
@@ -35,202 +33,118 @@ class _SymptomScreenState extends ConsumerState<SymptomScreen> {
     _loadSymptoms();
   }
 
+  @override
+  void dispose() {
+    _notesController.dispose();
+    _locationController.dispose();
+    super.dispose();
+  }
+
+  void _setMessage(String text, {required bool error}) {
+    _message = text;
+    _messageIsError = error;
+  }
+
+  /// Türkçe alfabe sırasıyla ("Öksürük", "Yorgunluk"tan önce).
+  List<Symptom> _sorted(List<Symptom> symptoms) =>
+      [...symptoms]..sort((a, b) => compareTr(a.name, b.name));
+
   /// Yerel veritabanından silinmemiş semptomları (hazır + kullanıcının
-  /// eklediği) ada göre sıralı okur.
+  /// eklediği) okur ve Türkçe sırayla gösterir.
   Future<void> _loadSymptoms() async {
     try {
       final symptoms = await ref.read(symptomRepositoryProvider).listActive();
       if (!mounted) return;
       setState(() {
-        _symptoms = symptoms;
+        _symptoms = _sorted(symptoms);
         _loadFailed = false;
       });
     } catch (_) {
       if (!mounted) return;
       setState(() {
         _loadFailed = true;
-        _message = AppLocalizations.of(context).symptomsLoadError;
+        _setMessage(AppLocalizations.of(context).symptomsLoadError, error: true);
       });
     }
   }
 
   Future<void> _showAddSymptomDialog() async {
-    final nameCtrl = TextEditingController();
-    await showDialog(
+    final name = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Yeni Semptom Ekle'),
-        content: TextField(
-          controller: nameCtrl,
-          autofocus: true,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: const InputDecoration(
-            labelText: 'Semptom adı',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              final name = nameCtrl.text.trim();
-              if (name.isEmpty) return;
-              Navigator.pop(ctx);
-              try {
-                final response = await ApiClient.dio.post(
-                  '/health/symptoms/',
-                  data: {'name': name, 'description': ''},
-                );
-                await _loadSymptoms();
-                // GEÇİCİ: ekleme Grup 2'de yerel veritabanına bağlanana kadar.
-                final newId = parseInt(response.data['id']).toString();
-                setState(() {
-                  _selectedSymptomId = newId;
-                  _message = '';
-                });
-              } catch (e) {
-                setState(() => _message = 'Semptom eklenemedi');
-              }
-            },
-            child: const Text('Ekle'),
-          ),
-        ],
-      ),
+      builder: (ctx) => const _AddSymptomDialog(),
     );
-    nameCtrl.dispose();
+    if (name == null || !mounted) return;
+    await _addSymptom(name);
+  }
+
+  /// Aynı adlı semptom (büyük/küçük harf ve fazla boşluk önemsiz) zaten varsa
+  /// yeni satır açmaz, mevcut olanı seçer; yoksa özel semptom olarak ekler.
+  Future<void> _addSymptom(String name) async {
+    final l10n = AppLocalizations.of(context);
+    final repository = ref.read(symptomRepositoryProvider);
+    try {
+      final current = _sorted(await repository.listActive());
+      final key = foldTr(name);
+      final existing = current.where((s) => foldTr(s.name) == key).firstOrNull;
+      if (existing != null) {
+        if (!mounted) return;
+        setState(() {
+          _symptoms = current;
+          _selectedSymptomId = existing.id;
+          _loadFailed = false;
+          _setMessage(l10n.symptomExistsSelected, error: false);
+        });
+        return;
+      }
+      final created = await repository.createCustom(name: name.trim());
+      final updated = _sorted(await repository.listActive());
+      if (!mounted) return;
+      setState(() {
+        _symptoms = updated;
+        _selectedSymptomId = created.id;
+        _loadFailed = false;
+        _setMessage(l10n.symptomAdded, error: false);
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _setMessage(l10n.symptomAddError, error: true));
+    }
   }
 
   Future<void> _submitEntry() async {
-    if (_selectedSymptomId == null) {
-      setState(() => _message = 'Lütfen bir semptom seçin');
+    final l10n = AppLocalizations.of(context);
+    final symptomId = _selectedSymptomId;
+    if (symptomId == null) {
+      setState(() => _setMessage(l10n.symptomSelectRequired, error: true));
       return;
     }
 
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _setMessage('', error: false);
+    });
 
     try {
-      final response = await ApiClient.dio.post(
-        '/health/symptom-entries/',
-        data: {
-          'symptom': _selectedSymptomId,
-          'severity': _severity.round(),
-          'timestamp': DateTime.now().toIso8601String(),
-          'notes': _notesController.text,
-          'location': _locationController.text,
-        },
-      );
-
-      final entryId = response.data['id'];
-      final activeEpisode = response.data['active_episode'];
-
+      await ref.read(symptomEntryRepositoryProvider).create(
+            symptomId: symptomId,
+            severity: _severity.round(),
+            timestamp: ref.read(clockProvider)(),
+            location: _locationController.text.trim(),
+            notes: _notesController.text.trim(),
+          );
+      if (!mounted) return;
       setState(() {
         _selectedSymptomId = null;
         _severity = 5;
         _notesController.clear();
         _locationController.clear();
-        _message = '';
+        _setMessage(l10n.symptomSaved, error: false);
       });
-
-      if (activeEpisode != null && mounted) {
-        await _showEpisodeDialog(entryId, activeEpisode);
-      } else {
-        if (mounted) {
-          await _showStartEpisodeDialog(entryId);
-        }
-      }
-    } catch (e) {
-      setState(() => _message = 'Kayıt oluşturulamadı');
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _setMessage(l10n.symptomSaveError, error: true));
     } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _showStartEpisodeDialog(int entryId) async {
-    final result = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Atak Takibi'),
-        content: const Text('Bu semptomu takip etmek ister misin?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Hayır, sadece kaydet'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Evet, atak başlat'),
-          ),
-        ],
-      ),
-    );
-
-    if (result == true) {
-      await _startEpisode(entryId);
-    } else {
-      setState(() => _message = 'Semptom kaydedildi');
-    }
-  }
-
-  Future<void> _showEpisodeDialog(int entryId, Map<String, dynamic> activeEpisode) async {
-    final symptomName = activeEpisode['symptom_name'];
-
-    final result = await showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: Text('Devam eden $symptomName atağın var'),
-        content: const Text('Bu kayıt nasıl eklensin?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, 'independent'),
-            child: const Text('Bağımsız kayıt'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, 'add'),
-            child: const Text('Atağa ekle'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, 'new_location'),
-            child: const Text('Yeni lokasyon'),
-          ),
-        ],
-      ),
-    );
-
-    if (result == 'add') {
-      await _addToEpisode(entryId, activeEpisode['id'], false);
-    } else if (result == 'new_location') {
-      await _addToEpisode(entryId, activeEpisode['id'], true);
-    } else {
-      setState(() => _message = 'Semptom kaydedildi');
-    }
-  }
-
-  Future<void> _startEpisode(int entryId) async {
-    try {
-      await _episodeService.startEpisode(entryId);
-      setState(() => _message = 'Semptom kaydedildi ve atak başlatıldı');
-    } catch (e) {
-      setState(() => _message = 'Atak başlatılamadı');
-    }
-  }
-
-  Future<void> _addToEpisode(int entryId, int episodeId, bool isNewLocation) async {
-    try {
-      await _episodeService.addToEpisode(
-        symptomEntryId: entryId,
-        episodeId: episodeId,
-        isNewLocation: isNewLocation,
-      );
-      setState(() => _message = isNewLocation
-          ? 'Yeni lokasyon ile atağa eklendi'
-          : 'Atağa eklendi');
-    } catch (e) {
-      setState(() => _message = 'Atağa eklenemedi');
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -319,17 +233,67 @@ class _SymptomScreenState extends ConsumerState<SymptomScreen> {
                 child: Text(
                   _message,
                   style: TextStyle(
-                    color: _message.contains('kaydedildi') ||
-                            _message.contains('eklendi') ||
-                            _message.contains('başlatıldı')
-                        ? Colors.green
-                        : Colors.red,
+                    color: _messageIsError ? Colors.red : Colors.green,
                   ),
                 ),
               ),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// "Yeni semptom ekle" penceresi. Adı döndürür (kırpılmış, boş değil); iptalde
+/// null. Denetleyiciyi kendisi serbest bırakır.
+class _AddSymptomDialog extends StatefulWidget {
+  const _AddSymptomDialog();
+
+  @override
+  State<_AddSymptomDialog> createState() => _AddSymptomDialogState();
+}
+
+class _AddSymptomDialogState extends State<_AddSymptomDialog> {
+  final TextEditingController _nameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) return;
+    Navigator.pop(context, name);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Yeni Semptom Ekle'),
+      content: TextField(
+        controller: _nameController,
+        autofocus: true,
+        textCapitalization: TextCapitalization.sentences,
+        // Veritabanı alanı en çok 100 karakter alır.
+        inputFormatters: [LengthLimitingTextInputFormatter(100)],
+        onSubmitted: (_) => _submit(),
+        decoration: const InputDecoration(
+          labelText: 'Semptom adı',
+          border: OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('İptal'),
+        ),
+        FilledButton(
+          onPressed: _submit,
+          child: const Text('Ekle'),
+        ),
+      ],
     );
   }
 }

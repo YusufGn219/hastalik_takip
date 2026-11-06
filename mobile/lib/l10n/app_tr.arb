@@ -47,6 +47,18 @@
   "@symptomsLoadError": {
     "description": "Semptom girişi ekranı semptom listesini veritabanından okuyamazsa gösterilir; bu durumda kaydet düğmesi pasiftir."
   },
+  "symptomSelectRequired": "Lütfen bir semptom seçin",
+  "symptomSaved": "Semptom kaydedildi",
+  "symptomSaveError": "Semptom kaydedilemedi. Girdiğiniz değerler ekranda duruyor; yeniden deneyin.",
+  "@symptomSaveError": {
+    "description": "Semptom girişi veritabanına yazılamazsa gösterilir; form değerleri korunur."
+  },
+  "symptomAdded": "Semptom eklendi",
+  "symptomExistsSelected": "Bu semptom listede zaten var, onu seçtim.",
+  "@symptomExistsSelected": {
+    "description": "Kullanıcı listede zaten bulunan bir adı (büyük/küçük harf ve fazla boşluk önemsiz) yeni semptom olarak eklemeye çalışırsa gösterilir; yeni kayıt açılmaz, mevcut olan seçilir."
+  },
+  "symptomAddError": "Semptom eklenemedi. Yeniden deneyin.",
 
   "dbOpenErrorTitle": "Veritabanı açılamadı",
   "dbOpenErrorBody": "Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.",

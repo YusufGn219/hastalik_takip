@@ -63,6 +63,26 @@ class AppLocalizationsTr extends AppLocalizations {
       'Semptom listesi okunamadı. Kayıtlarınız silinmedi; ekranı kapatıp yeniden açmayı deneyin.';
 
   @override
+  String get symptomSelectRequired => 'Lütfen bir semptom seçin';
+
+  @override
+  String get symptomSaved => 'Semptom kaydedildi';
+
+  @override
+  String get symptomSaveError =>
+      'Semptom kaydedilemedi. Girdiğiniz değerler ekranda duruyor; yeniden deneyin.';
+
+  @override
+  String get symptomAdded => 'Semptom eklendi';
+
+  @override
+  String get symptomExistsSelected =>
+      'Bu semptom listede zaten var, onu seçtim.';
+
+  @override
+  String get symptomAddError => 'Semptom eklenemedi. Yeniden deneyin.';
+
+  @override
   String get dbOpenErrorTitle => 'Veritabanı açılamadı';
 
   @override

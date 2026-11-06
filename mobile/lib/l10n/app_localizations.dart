@@ -190,6 +190,42 @@ abstract class AppLocalizations {
   /// **'Semptom listesi okunamadı. Kayıtlarınız silinmedi; ekranı kapatıp yeniden açmayı deneyin.'**
   String get symptomsLoadError;
 
+  /// No description provided for @symptomSelectRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen bir semptom seçin'**
+  String get symptomSelectRequired;
+
+  /// No description provided for @symptomSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom kaydedildi'**
+  String get symptomSaved;
+
+  /// Semptom girişi veritabanına yazılamazsa gösterilir; form değerleri korunur.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom kaydedilemedi. Girdiğiniz değerler ekranda duruyor; yeniden deneyin.'**
+  String get symptomSaveError;
+
+  /// No description provided for @symptomAdded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom eklendi'**
+  String get symptomAdded;
+
+  /// Kullanıcı listede zaten bulunan bir adı (büyük/küçük harf ve fazla boşluk önemsiz) yeni semptom olarak eklemeye çalışırsa gösterilir; yeni kayıt açılmaz, mevcut olan seçilir.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu semptom listede zaten var, onu seçtim.'**
+  String get symptomExistsSelected;
+
+  /// No description provided for @symptomAddError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom eklenemedi. Yeniden deneyin.'**
+  String get symptomAddError;
+
   /// No description provided for @dbOpenErrorTitle.
   ///
   /// In tr, this message translates to:
