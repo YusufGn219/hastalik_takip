@@ -50,6 +50,14 @@ class HomeScreen extends StatelessWidget {
               hint: l10n.homeEpisodesHint,
               route: '/episodes',
             ),
+            _HomeTile(
+              icon: Icons.medication,
+              color: AppColors.medication,
+              background: AppColors.medicationBg,
+              title: l10n.homeMedication,
+              hint: l10n.homeMedicationHint,
+              route: '/medication-log',
+            ),
             // GEÇİCİ: ayarlar ekranı gelene kadar kilidi buradan yönetiyoruz.
             const AppLockSettingsCard(),
           ],

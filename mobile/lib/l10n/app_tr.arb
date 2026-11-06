@@ -23,6 +23,44 @@
     "description": "Şikâyet dönemlerinin listesi (eski adıyla atak). Kullanıcıya 'dönem' denir."
   },
   "homeEpisodesHint": "Devam eden ve biten dönemler",
+  "homeMedication": "İlaç / takviye",
+  "homeMedicationHint": "Aldığınız ilacı ya da takviyeyi kaydedin",
+
+  "medLogTitle": "İlaç / Takviye Al",
+  "medLogPick": "İlaç seç",
+  "medLogAddNew": "Yeni ilaç ekle",
+  "medLogPickHint": "İlaç seçin...",
+  "medLogTypeChronic": "Kronik",
+  "medLogTypeSymptomatic": "Semptomatik",
+  "medLogDoseLabel": "Doz miktarı (isteğe bağlı)",
+  "medLogNoteLabel": "Not (isteğe bağlı)",
+  "medLogSave": "Kaydet",
+  "medLogSaved": "İlaç kaydedildi.",
+  "medLogPickRequired": "Lütfen bir ilaç seçin.",
+  "medLogLoadError": "İlaç listesi okunamadı. Ekranı kapatıp yeniden açmayı deneyin.",
+  "medLogSaveError": "İlaç kaydedilemedi. Tekrar deneyin; yazdıklarınız korunur.",
+  "medLogAddError": "İlaç eklenemedi. Tekrar deneyin.",
+  "medLogNewTitle": "Yeni İlaç Ekle",
+  "medLogNewName": "İlaç adı",
+  "medLogCancel": "İptal",
+  "medLogAdd": "Ekle",
+  "medLogAdded": "{name} eklendi.",
+  "@medLogAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "medLogExistsSelected": "{name} zaten var, seçildi.",
+  "@medLogExistsSelected": {
+    "description": "Aynı adlı ilaç (büyük/küçük harf ve fazla boşluk önemsiz) varsa yeni satır açılmaz, mevcut olan seçilir.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
 
   "dailyLogLoadError": "Bugünün kaydı okunamadı. Mevcut değerleriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.",
   "@dailyLogLoadError": {

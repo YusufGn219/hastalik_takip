@@ -37,6 +37,78 @@ class AppLocalizationsTr extends AppLocalizations {
   String get homeEpisodesHint => 'Devam eden ve biten dönemler';
 
   @override
+  String get homeMedication => 'İlaç / takviye';
+
+  @override
+  String get homeMedicationHint => 'Aldığınız ilacı ya da takviyeyi kaydedin';
+
+  @override
+  String get medLogTitle => 'İlaç / Takviye Al';
+
+  @override
+  String get medLogPick => 'İlaç seç';
+
+  @override
+  String get medLogAddNew => 'Yeni ilaç ekle';
+
+  @override
+  String get medLogPickHint => 'İlaç seçin...';
+
+  @override
+  String get medLogTypeChronic => 'Kronik';
+
+  @override
+  String get medLogTypeSymptomatic => 'Semptomatik';
+
+  @override
+  String get medLogDoseLabel => 'Doz miktarı (isteğe bağlı)';
+
+  @override
+  String get medLogNoteLabel => 'Not (isteğe bağlı)';
+
+  @override
+  String get medLogSave => 'Kaydet';
+
+  @override
+  String get medLogSaved => 'İlaç kaydedildi.';
+
+  @override
+  String get medLogPickRequired => 'Lütfen bir ilaç seçin.';
+
+  @override
+  String get medLogLoadError =>
+      'İlaç listesi okunamadı. Ekranı kapatıp yeniden açmayı deneyin.';
+
+  @override
+  String get medLogSaveError =>
+      'İlaç kaydedilemedi. Tekrar deneyin; yazdıklarınız korunur.';
+
+  @override
+  String get medLogAddError => 'İlaç eklenemedi. Tekrar deneyin.';
+
+  @override
+  String get medLogNewTitle => 'Yeni İlaç Ekle';
+
+  @override
+  String get medLogNewName => 'İlaç adı';
+
+  @override
+  String get medLogCancel => 'İptal';
+
+  @override
+  String get medLogAdd => 'Ekle';
+
+  @override
+  String medLogAdded(String name) {
+    return '$name eklendi.';
+  }
+
+  @override
+  String medLogExistsSelected(String name) {
+    return '$name zaten var, seçildi.';
+  }
+
+  @override
   String get dailyLogLoadError =>
       'Bugünün kaydı okunamadı. Mevcut değerleriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.';
 

@@ -30,12 +30,13 @@ void main() {
       _prefs = await SharedPreferences.getInstance();
     });
 
-    testWidgets('üç akışı Türkçe metinlerle gösterir', (tester) async {
+    testWidgets('akışları Türkçe metinlerle gösterir', (tester) async {
       await tester.pumpWidget(_localized(const HomeScreen()));
 
       expect(find.text('Günlük kayıt'), findsOneWidget);
       expect(find.text('Semptom girişi'), findsOneWidget);
       expect(find.text('Dönemler'), findsOneWidget);
+      expect(find.text('İlaç / takviye'), findsOneWidget);
       // "Atak" kullanıcıya gösterilmez.
       expect(find.textContaining('Atak'), findsNothing);
     });
@@ -57,6 +58,7 @@ void main() {
         'Günlük kayıt': '/daily-log',
         'Semptom girişi': '/symptoms',
         'Dönemler': '/episodes',
+        'İlaç / takviye': '/medication-log',
       }.entries) {
         await tester.tap(find.text(entry.key));
         await tester.pumpAndSettle();
@@ -64,7 +66,7 @@ void main() {
         tester.state<NavigatorState>(find.byType(Navigator)).pop();
         await tester.pumpAndSettle();
       }
-      expect(pushed, hasLength(3));
+      expect(pushed, hasLength(4));
     });
   });
 

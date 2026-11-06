@@ -148,6 +148,138 @@ abstract class AppLocalizations {
   /// **'Devam eden ve biten dönemler'**
   String get homeEpisodesHint;
 
+  /// No description provided for @homeMedication.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç / takviye'**
+  String get homeMedication;
+
+  /// No description provided for @homeMedicationHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aldığınız ilacı ya da takviyeyi kaydedin'**
+  String get homeMedicationHint;
+
+  /// No description provided for @medLogTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç / Takviye Al'**
+  String get medLogTitle;
+
+  /// No description provided for @medLogPick.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç seç'**
+  String get medLogPick;
+
+  /// No description provided for @medLogAddNew.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni ilaç ekle'**
+  String get medLogAddNew;
+
+  /// No description provided for @medLogPickHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç seçin...'**
+  String get medLogPickHint;
+
+  /// No description provided for @medLogTypeChronic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kronik'**
+  String get medLogTypeChronic;
+
+  /// No description provided for @medLogTypeSymptomatic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptomatik'**
+  String get medLogTypeSymptomatic;
+
+  /// No description provided for @medLogDoseLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doz miktarı (isteğe bağlı)'**
+  String get medLogDoseLabel;
+
+  /// No description provided for @medLogNoteLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Not (isteğe bağlı)'**
+  String get medLogNoteLabel;
+
+  /// No description provided for @medLogSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get medLogSave;
+
+  /// No description provided for @medLogSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç kaydedildi.'**
+  String get medLogSaved;
+
+  /// No description provided for @medLogPickRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen bir ilaç seçin.'**
+  String get medLogPickRequired;
+
+  /// No description provided for @medLogLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç listesi okunamadı. Ekranı kapatıp yeniden açmayı deneyin.'**
+  String get medLogLoadError;
+
+  /// No description provided for @medLogSaveError.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç kaydedilemedi. Tekrar deneyin; yazdıklarınız korunur.'**
+  String get medLogSaveError;
+
+  /// No description provided for @medLogAddError.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç eklenemedi. Tekrar deneyin.'**
+  String get medLogAddError;
+
+  /// No description provided for @medLogNewTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni İlaç Ekle'**
+  String get medLogNewTitle;
+
+  /// No description provided for @medLogNewName.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç adı'**
+  String get medLogNewName;
+
+  /// No description provided for @medLogCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get medLogCancel;
+
+  /// No description provided for @medLogAdd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ekle'**
+  String get medLogAdd;
+
+  /// No description provided for @medLogAdded.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} eklendi.'**
+  String medLogAdded(String name);
+
+  /// Aynı adlı ilaç (büyük/küçük harf ve fazla boşluk önemsiz) varsa yeni satır açılmaz, mevcut olan seçilir.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} zaten var, seçildi.'**
+  String medLogExistsSelected(String name);
+
   /// Günlük kayıt ekranı bugünün kaydını veritabanından okuyamazsa gösterilir; bu durumda kaydet düğmesi pasiftir.
   ///
   /// In tr, this message translates to:
