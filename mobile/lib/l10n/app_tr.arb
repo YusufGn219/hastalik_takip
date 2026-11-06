@@ -24,6 +24,11 @@
   },
   "homeEpisodesHint": "Devam eden ve biten dönemler",
 
+  "dailyLogLoadError": "Bugünün kaydı okunamadı. Mevcut değerleriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.",
+  "@dailyLogLoadError": {
+    "description": "Günlük kayıt ekranı bugünün kaydını veritabanından okuyamazsa gösterilir; bu durumda kaydet düğmesi pasiftir."
+  },
+
   "dbOpenErrorTitle": "Veritabanı açılamadı",
   "dbOpenErrorBody": "Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.",
   "@dbOpenErrorBody": {

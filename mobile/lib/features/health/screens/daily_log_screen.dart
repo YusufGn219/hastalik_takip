@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../app/providers.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../data/repositories/support.dart';
+import '../../../l10n/app_localizations.dart';
 
-class DailyLogScreen extends StatefulWidget {
+class DailyLogScreen extends ConsumerStatefulWidget {
   const DailyLogScreen({super.key});
 
   @override
-  State<DailyLogScreen> createState() => _DailyLogScreenState();
+  ConsumerState<DailyLogScreen> createState() => _DailyLogScreenState();
 }
 
-class _DailyLogScreenState extends State<DailyLogScreen> {
+class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
   final _sleepController = TextEditingController();
   final _waterController = TextEditingController();
   final _notesController = TextEditingController();
@@ -19,7 +23,11 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
   bool _isLoading = false;
   bool _isFetchingExisting = true;
   String? _errorMessage;
-  int? _existingLogId;
+  String? _existingLogId;
+
+  /// Bugünün kaydı okunamadıysa kaydetmeye izin verilmez: aksi halde mevcut
+  /// değerlerin habersizce üzerine yazılabilir.
+  bool _loadFailed = false;
 
   @override
   void initState() {
@@ -35,30 +43,36 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
     super.dispose();
   }
 
+  /// 8.0 → "8", 7.5 → "7.5": alanda gereksiz ondalık görünmesin.
+  String _numText(double v) =>
+      v == v.roundToDouble() ? v.toInt().toString() : v.toString();
+
+  /// Bugünün (yerel gün) kaydı varsa alanları onun değerleriyle doldurur.
   Future<void> _loadTodayLog() async {
+    final repository = ref.read(dailyLogRepositoryProvider);
+    final today = dayKey(ref.read(clockProvider)());
     try {
-      final response = await ApiClient.dio.get('/health/logs/');
-      final today = DateTime.now().toIso8601String().split('T')[0];
-      final logs = (response.data['data'] as List? ?? []);
-      final todayLog = logs.cast<Map<String, dynamic>>().firstWhere(
-            (l) => (l['date'] as String?)?.startsWith(today) == true,
-            orElse: () => {},
-          );
-      if (todayLog.isNotEmpty) {
-        setState(() {
-          _existingLogId = todayLog['id'] as int?;
-          _sleepController.text =
-              todayLog['sleep_hours']?.toString() ?? '';
-          _waterController.text =
-              todayLog['water_intake']?.toString() ?? '';
-          _mood = int.tryParse(todayLog['mood']?.toString() ?? '3') ?? 3;
-          _energyLevel =
-              int.tryParse(todayLog['energy_level']?.toString() ?? '3') ?? 3;
-          _notesController.text = todayLog['notes'] ?? '';
-        });
-      }
-    } catch (_) {}
-    setState(() => _isFetchingExisting = false);
+      final log = await repository.getByDate(today);
+      if (!mounted) return;
+      setState(() {
+        if (log != null) {
+          _existingLogId = log.id;
+          _sleepController.text = _numText(log.sleepHours);
+          _waterController.text = _numText(log.waterIntake);
+          _mood = log.mood;
+          _energyLevel = log.energyLevel;
+          _notesController.text = log.notes ?? '';
+        }
+        _isFetchingExisting = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loadFailed = true;
+        _errorMessage = AppLocalizations.of(context).dailyLogLoadError;
+        _isFetchingExisting = false;
+      });
+    }
   }
 
   Future<void> _saveLog() async {
@@ -455,7 +469,7 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
 
             // Kaydet butonu
             ElevatedButton(
-              onPressed: _isLoading ? null : _saveLog,
+              onPressed: (_isLoading || _loadFailed) ? null : _saveLog,
               child: _isLoading
                   ? const SizedBox(
                       width: 20,

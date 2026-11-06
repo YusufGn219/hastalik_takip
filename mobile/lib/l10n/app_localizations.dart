@@ -148,6 +148,12 @@ abstract class AppLocalizations {
   /// **'Devam eden ve biten dönemler'**
   String get homeEpisodesHint;
 
+  /// Günlük kayıt ekranı bugünün kaydını veritabanından okuyamazsa gösterilir; bu durumda kaydet düğmesi pasiftir.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün kaydı okunamadı. Mevcut değerleriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.'**
+  String get dailyLogLoadError;
+
   /// No description provided for @dbOpenErrorTitle.
   ///
   /// In tr, this message translates to:

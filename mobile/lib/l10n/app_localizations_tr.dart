@@ -37,6 +37,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get homeEpisodesHint => 'Devam eden ve biten dönemler';
 
   @override
+  String get dailyLogLoadError =>
+      'Bugünün kaydı okunamadı. Mevcut değerleriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.';
+
+  @override
   String get dbOpenErrorTitle => 'Veritabanı açılamadı';
 
   @override
