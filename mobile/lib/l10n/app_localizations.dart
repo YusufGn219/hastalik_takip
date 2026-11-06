@@ -406,6 +406,96 @@ abstract class AppLocalizations {
   /// **'Dönemi Kapat'**
   String get episodeClose;
 
+  /// No description provided for @episodeMedicationTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Döneme İlaç Ekle'**
+  String get episodeMedicationTitle;
+
+  /// No description provided for @episodeMedicationHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç seçin...'**
+  String get episodeMedicationHint;
+
+  /// No description provided for @episodeMedicationNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıtlı ilaç yok.'**
+  String get episodeMedicationNone;
+
+  /// No description provided for @episodeMedicationLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç listesi okunamadı.'**
+  String get episodeMedicationLoadError;
+
+  /// No description provided for @episodeMedicationPick.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen bir ilaç seçin'**
+  String get episodeMedicationPick;
+
+  /// No description provided for @episodeDoseLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doz miktarı'**
+  String get episodeDoseLabel;
+
+  /// No description provided for @episodeDoseInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doz sıfırdan büyük bir sayı olmalı'**
+  String get episodeDoseInvalid;
+
+  /// No description provided for @episodeMedicationSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get episodeMedicationSave;
+
+  /// No description provided for @episodeMedicationSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç döneme eklendi.'**
+  String get episodeMedicationSaved;
+
+  /// No description provided for @episodeMedicationSaveFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç kaydedilemedi. Tekrar deneyin.'**
+  String get episodeMedicationSaveFailed;
+
+  /// No description provided for @doseUnitTablet.
+  ///
+  /// In tr, this message translates to:
+  /// **'tablet'**
+  String get doseUnitTablet;
+
+  /// No description provided for @doseUnitMg.
+  ///
+  /// In tr, this message translates to:
+  /// **'mg'**
+  String get doseUnitMg;
+
+  /// No description provided for @doseUnitMl.
+  ///
+  /// In tr, this message translates to:
+  /// **'ml'**
+  String get doseUnitMl;
+
+  /// No description provided for @doseUnitDrop.
+  ///
+  /// In tr, this message translates to:
+  /// **'damla'**
+  String get doseUnitDrop;
+
+  /// No description provided for @doseUnitCapsule.
+  ///
+  /// In tr, this message translates to:
+  /// **'kapsül'**
+  String get doseUnitCapsule;
+
   /// No description provided for @episodeClosed.
   ///
   /// In tr, this message translates to:

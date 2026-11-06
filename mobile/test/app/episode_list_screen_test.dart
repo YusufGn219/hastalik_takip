@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/app/providers.dart';
+import 'package:mobile/core/utils/turkish_text.dart';
 import 'package:mobile/data/database/app_database.dart';
 import 'package:mobile/data/database/seed_loader.dart';
 import 'package:mobile/data/repositories/episode_repository.dart';
+import 'package:mobile/data/database/enums.dart';
+import 'package:mobile/data/repositories/medication_log_repository.dart';
+import 'package:mobile/data/repositories/medication_repository.dart';
 import 'package:mobile/data/repositories/symptom_entry_repository.dart';
 import 'package:mobile/domain/services/episode_service.dart';
+import 'package:mobile/domain/services/medication_service.dart';
 import 'package:mobile/features/episode/episode_format.dart';
 import 'package:mobile/features/episode/screens/episode_list_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
@@ -74,6 +79,46 @@ class _FailingCloseService extends EpisodeService {
     String resolutionNotes = '',
   }) async =>
       throw StateError('yazılamadı');
+}
+
+/// İlaç servisi bozuk: listeyi ya da kaydı hata verdirerek pencerenin hata
+/// yollarını denemek için.
+class _BrokenMedicationService extends MedicationService {
+  _BrokenMedicationService(AppDatabase db,
+      {this.failList = false, this.failLog = false})
+      : super(
+          medications: DriftMedicationRepository(db),
+          logs: DriftMedicationLogRepository(db),
+        );
+
+  final bool failList;
+  final bool failLog;
+
+  @override
+  Future<List<Medication>> available() =>
+      failList ? throw StateError('okunamadı') : super.available();
+
+  @override
+  Future<MedicationLog> logIntake({
+    required String medicationId,
+    required DateTime takenAt,
+    double? doseAmount,
+    DoseUnit doseUnit = DoseUnit.tablet,
+    String? episodeId,
+    String? conditionId,
+    String notes = '',
+  }) =>
+      failLog
+          ? throw StateError('yazılamadı')
+          : super.logIntake(
+              medicationId: medicationId,
+              takenAt: takenAt,
+              doseAmount: doseAmount,
+              doseUnit: doseUnit,
+              episodeId: episodeId,
+              conditionId: conditionId,
+              notes: notes,
+            );
 }
 
 Widget _app(List<Override> overrides) => ProviderScope(
@@ -168,7 +213,7 @@ void main() {
 
     testWidgets(
         'devam eden dönem kartı: semptom adı, son giriş şiddeti, bugünse yalnız '
-        'saat, konumlar; İlaç Ekle henüz pasif', (tester) async {
+        'saat, konumlar; iki düğme de aktif', (tester) async {
       await openApp(tester);
       final episode =
           await startEpisode(tester, headacheId, utc(2026, 11, 6, 8, 0));
@@ -192,7 +237,7 @@ void main() {
       expect(find.text('Şiddet: 7/10'), findsOneWidget); // son giriş, en yüksek değil
       expect(find.text('Başlangıç: 08:00'), findsOneWidget);
       expect(find.text('Lokasyon: Şakak, Alın'), findsOneWidget);
-      // Kapatma bağlandı (Grup 2); ilaç ekleme Grup 3'e kadar pasif.
+      // Kartın iki düğmesi de bağlı (Grup 2 ve 3).
       expect(
         tester.widget<ElevatedButton>(
           find.widgetWithText(ElevatedButton, 'Dönemi Kapat'),
@@ -206,7 +251,7 @@ void main() {
             matching: find.bySubtype<ButtonStyleButton>(),
           ),
         ).onPressed,
-        isNull,
+        isNotNull,
       );
     });
 
@@ -497,6 +542,184 @@ void main() {
             .onPressed,
         isNotNull,
       );
+    });
+  });
+
+  group('EpisodeListScreen / döneme ilaç ekleme', () {
+    final start = DateTime(2026, 11, 6, 8, 0);
+    final parolId = SeedLoader.medicationId('parol');
+
+    Future<List<MedicationLog>> allLogs(WidgetTester tester) => tester
+        .runAsync(() => DriftMedicationLogRepository(db)
+            .listInRange(DateTime.utc(2000), DateTime.utc(2100)))
+        .then((v) => v!);
+
+    /// Dönemi kurar, listeyi yeniler, pencereyi açar.
+    Future<Episode> openSheet(
+      WidgetTester tester, [
+      List<Override>? extra,
+      Future<void> Function()? beforeOpen,
+    ]) async {
+      await openApp(tester, extra);
+      final episode = await startEpisode(tester, headacheId, start);
+      await beforeOpen?.call();
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(ElevatedButton, 'İlaç Ekle'));
+      await tester.pumpAndSettle();
+      return episode;
+    }
+
+    Future<void> pickMedication(WidgetTester tester, String name) async {
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(name).last);
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> tapSave(WidgetTester tester) async {
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Kaydet'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('ilaçlar Türkçe sırada listelenir', (tester) async {
+      // Kullanıcının eklediği "Çinko": veritabanının ikili sırası Ç'yi Z'den
+      // sonraya atar, Türkçe sırada C'den hemen sonra, D'den önce gelir.
+      await openSheet(tester, null, () async {
+        await tester.runAsync(
+            () => DriftMedicationRepository(db).create(name: 'Çinko'));
+      });
+
+      expect(find.text('Döneme İlaç Ekle'), findsOneWidget);
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      final names = tester
+          .widgetList<DropdownMenuItem<String>>(
+              find.byType(DropdownMenuItem<String>))
+          .map((i) => (i.child as Text).data!)
+          .toList();
+      expect(names, hasLength(11)); // 10 katalog + Çinko
+      final sorted = [...names]..sort(compareTr);
+      expect(names, sorted);
+      expect(names.indexOf('Çinko'), lessThan(names.indexOf('D Vitamini')));
+      expect(names, contains('Parol'));
+    });
+
+    testWidgets(
+        'ilaç, doz ve birim seçilip kaydedilince alım döneme bağlı yazılır, '
+        'pencere kapanır, bilgi çıkar', (tester) async {
+      final episode = await openSheet(tester);
+
+      await pickMedication(tester, 'Parol');
+      await tester.enterText(find.byType(TextField), '1,5'); // ondalık virgül
+      await tester.tap(find.byType(DropdownButton<DoseUnit>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('damla').last);
+      await tester.pumpAndSettle();
+      await tapSave(tester);
+
+      final logs = await allLogs(tester);
+      expect(logs, hasLength(1));
+      final log = logs.single;
+      expect(log.medicationId, parolId);
+      expect(log.episodeId, episode.id);
+      expect(log.doseAmount, 1.5);
+      expect(log.doseUnit, DoseUnit.drop);
+      expect(log.takenAt.toUtc(), _now().toUtc()); // "şimdi"
+
+      expect(find.text('Döneme İlaç Ekle'), findsNothing); // kapandı
+      expect(find.text('İlaç döneme eklendi.'), findsOneWidget);
+    });
+
+    testWidgets('doz boş bırakılabilir; varsayılan birim tablet',
+        (tester) async {
+      await openSheet(tester);
+
+      await pickMedication(tester, 'Parol');
+      await tapSave(tester);
+
+      final log = (await allLogs(tester)).single;
+      expect(log.doseAmount, isNull);
+      expect(log.doseUnit, DoseUnit.tablet);
+    });
+
+    testWidgets('ilaç seçilmeden kaydedilmez', (tester) async {
+      await openSheet(tester);
+
+      await tapSave(tester);
+
+      expect(find.text('Lütfen bir ilaç seçin'), findsOneWidget);
+      expect(find.text('Döneme İlaç Ekle'), findsOneWidget); // açık kaldı
+      expect(await allLogs(tester), isEmpty);
+    });
+
+    for (final bad in ['abc', '0', '-2']) {
+      testWidgets('geçersiz doz "$bad" reddedilir, kayıt yazılmaz',
+          (tester) async {
+        await openSheet(tester);
+
+        await pickMedication(tester, 'Parol');
+        await tester.enterText(find.byType(TextField), bad);
+        await tapSave(tester);
+
+        expect(find.text('Doz sıfırdan büyük bir sayı olmalı'), findsOneWidget);
+        expect(await allLogs(tester), isEmpty);
+      });
+    }
+
+    testWidgets('pencerenin dışına dokunup kapatılırsa hiçbir şey yazılmaz',
+        (tester) async {
+      await openSheet(tester);
+      await pickMedication(tester, 'Parol');
+
+      // Pencerenin dışına dokunmak kapatır.
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Döneme İlaç Ekle'), findsNothing);
+      expect(find.text('İlaç döneme eklendi.'), findsNothing);
+      expect(await allLogs(tester), isEmpty);
+    });
+
+    testWidgets('ilaç listesi okunamazsa mesaj çıkar, Kaydet pasif',
+        (tester) async {
+      await openSheet(tester, [
+        medicationServiceProvider
+            .overrideWithValue(_BrokenMedicationService(db, failList: true)),
+      ]);
+
+      expect(find.text('İlaç listesi okunamadı.'), findsOneWidget);
+      expect(
+        tester
+            .widget<ElevatedButton>(find.widgetWithText(ElevatedButton, 'Kaydet'))
+            .onPressed,
+        isNull,
+      );
+    });
+
+    testWidgets(
+        'yazma hata verirse pencere açık kalır, mesaj çıkar, değerler korunur',
+        (tester) async {
+      await openSheet(tester, [
+        medicationServiceProvider
+            .overrideWithValue(_BrokenMedicationService(db, failLog: true)),
+      ]);
+
+      await pickMedication(tester, 'Parol');
+      await tester.enterText(find.byType(TextField), '2');
+      await tapSave(tester);
+
+      expect(find.text('İlaç kaydedilemedi. Tekrar deneyin.'), findsOneWidget);
+      expect(find.text('Döneme İlaç Ekle'), findsOneWidget);
+      expect(tester.widget<TextField>(find.byType(TextField)).controller!.text,
+          '2');
+      expect(
+        tester
+            .widget<ElevatedButton>(find.widgetWithText(ElevatedButton, 'Kaydet'))
+            .onPressed,
+        isNotNull,
+      );
+      expect(await allLogs(tester), isEmpty);
     });
   });
 

@@ -194,6 +194,52 @@ class AppLocalizationsTr extends AppLocalizations {
   String get episodeClose => 'Dönemi Kapat';
 
   @override
+  String get episodeMedicationTitle => 'Döneme İlaç Ekle';
+
+  @override
+  String get episodeMedicationHint => 'İlaç seçin...';
+
+  @override
+  String get episodeMedicationNone => 'Kayıtlı ilaç yok.';
+
+  @override
+  String get episodeMedicationLoadError => 'İlaç listesi okunamadı.';
+
+  @override
+  String get episodeMedicationPick => 'Lütfen bir ilaç seçin';
+
+  @override
+  String get episodeDoseLabel => 'Doz miktarı';
+
+  @override
+  String get episodeDoseInvalid => 'Doz sıfırdan büyük bir sayı olmalı';
+
+  @override
+  String get episodeMedicationSave => 'Kaydet';
+
+  @override
+  String get episodeMedicationSaved => 'İlaç döneme eklendi.';
+
+  @override
+  String get episodeMedicationSaveFailed =>
+      'İlaç kaydedilemedi. Tekrar deneyin.';
+
+  @override
+  String get doseUnitTablet => 'tablet';
+
+  @override
+  String get doseUnitMg => 'mg';
+
+  @override
+  String get doseUnitMl => 'ml';
+
+  @override
+  String get doseUnitDrop => 'damla';
+
+  @override
+  String get doseUnitCapsule => 'kapsül';
+
+  @override
   String get episodeClosed => 'Dönem kapatıldı.';
 
   @override

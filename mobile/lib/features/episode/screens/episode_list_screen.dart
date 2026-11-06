@@ -6,6 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../episode_format.dart';
 import '../episode_overview.dart';
 import 'episode_close_screen.dart';
+import 'episode_medication_sheet.dart';
 
 class EpisodeListScreen extends ConsumerStatefulWidget {
   const EpisodeListScreen({super.key});
@@ -71,6 +72,19 @@ class _EpisodeListScreenState extends ConsumerState<EpisodeListScreen>
     );
   }
 
+  /// İlaç penceresini açar; kaydedildiyse haber verir (liste değişmez: kartta
+  /// ilaç gösterilmiyor).
+  Future<void> _openAddMedication(EpisodeOverview o) async {
+    final saved = await showEpisodeMedicationSheet(
+      context,
+      episodeId: o.episode.id,
+    );
+    if (saved != true || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).episodeMedicationSaved)),
+    );
+  }
+
   String _moment(DateTime instant, int offsetMinutes) => formatEpisodeMoment(
         instant,
         offsetMinutes,
@@ -114,15 +128,13 @@ class _EpisodeListScreenState extends ConsumerState<EpisodeListScreen>
             Text(l10n.episodeStart(start)),
             Text(_locations(o, l10n)),
             const SizedBox(height: 12),
-            // GEÇİCİ (Dönemler ekranı Grup 3): ilaç ekleme yeni servise
-            // bağlanana kadar pasif.
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.medication, size: 16),
                     label: Text(l10n.episodeAddMedication),
-                    onPressed: null,
+                    onPressed: () => _openAddMedication(o),
                   ),
                 ),
                 const SizedBox(width: 8),
