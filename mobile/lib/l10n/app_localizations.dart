@@ -154,6 +154,36 @@ abstract class AppLocalizations {
   /// **'Bugünün kaydı okunamadı. Mevcut değerleriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.'**
   String get dailyLogLoadError;
 
+  /// Günlük kayıtta uyku alanı boş, sayı değil ya da 0-24 saat dışındaysa gösterilir. Alan zorunludur.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku süresini 0 ile 24 saat arasında bir sayı olarak girin.'**
+  String get dailyLogSleepInvalid;
+
+  /// Günlük kayıtta su alanı boş, sayı değil ya da 0-10 litre dışındaysa gösterilir. Alan zorunludur.
+  ///
+  /// In tr, this message translates to:
+  /// **'Su tüketimini 0 ile 10 litre arasında bir sayı olarak girin.'**
+  String get dailyLogWaterInvalid;
+
+  /// No description provided for @dailyLogSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük kayıt kaydedildi'**
+  String get dailyLogSaved;
+
+  /// No description provided for @dailyLogUpdated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük kayıt güncellendi'**
+  String get dailyLogUpdated;
+
+  /// Günlük kayıt veritabanına yazılamazsa gösterilir; form değerleri korunur.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt kaydedilemedi. Girdiğiniz değerler ekranda duruyor; yeniden deneyin.'**
+  String get dailyLogSaveError;
+
   /// No description provided for @dbOpenErrorTitle.
   ///
   /// In tr, this message translates to:

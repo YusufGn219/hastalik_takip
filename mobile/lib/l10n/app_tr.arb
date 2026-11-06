@@ -28,6 +28,20 @@
   "@dailyLogLoadError": {
     "description": "Günlük kayıt ekranı bugünün kaydını veritabanından okuyamazsa gösterilir; bu durumda kaydet düğmesi pasiftir."
   },
+  "dailyLogSleepInvalid": "Uyku süresini 0 ile 24 saat arasında bir sayı olarak girin.",
+  "@dailyLogSleepInvalid": {
+    "description": "Günlük kayıtta uyku alanı boş, sayı değil ya da 0-24 saat dışındaysa gösterilir. Alan zorunludur."
+  },
+  "dailyLogWaterInvalid": "Su tüketimini 0 ile 10 litre arasında bir sayı olarak girin.",
+  "@dailyLogWaterInvalid": {
+    "description": "Günlük kayıtta su alanı boş, sayı değil ya da 0-10 litre dışındaysa gösterilir. Alan zorunludur."
+  },
+  "dailyLogSaved": "Günlük kayıt kaydedildi",
+  "dailyLogUpdated": "Günlük kayıt güncellendi",
+  "dailyLogSaveError": "Kayıt kaydedilemedi. Girdiğiniz değerler ekranda duruyor; yeniden deneyin.",
+  "@dailyLogSaveError": {
+    "description": "Günlük kayıt veritabanına yazılamazsa gösterilir; form değerleri korunur."
+  },
 
   "dbOpenErrorTitle": "Veritabanı açılamadı",
   "dbOpenErrorBody": "Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.",

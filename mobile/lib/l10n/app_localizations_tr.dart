@@ -41,6 +41,24 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bugünün kaydı okunamadı. Mevcut değerleriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.';
 
   @override
+  String get dailyLogSleepInvalid =>
+      'Uyku süresini 0 ile 24 saat arasında bir sayı olarak girin.';
+
+  @override
+  String get dailyLogWaterInvalid =>
+      'Su tüketimini 0 ile 10 litre arasında bir sayı olarak girin.';
+
+  @override
+  String get dailyLogSaved => 'Günlük kayıt kaydedildi';
+
+  @override
+  String get dailyLogUpdated => 'Günlük kayıt güncellendi';
+
+  @override
+  String get dailyLogSaveError =>
+      'Kayıt kaydedilemedi. Girdiğiniz değerler ekranda duruyor; yeniden deneyin.';
+
+  @override
   String get dbOpenErrorTitle => 'Veritabanı açılamadı';
 
   @override

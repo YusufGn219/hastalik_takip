@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/providers.dart';
-import '../../../core/network/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/repositories/support.dart';
 import '../../../l10n/app_localizations.dart';
@@ -25,6 +23,10 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
   String? _errorMessage;
   String? _existingLogId;
 
+  /// Ekran açıldığındaki yerel gün ('YYYY-MM-DD'). Gece yarısı geçilse bile
+  /// okunan ve yazılan gün aynı kalır.
+  late final String _logDate;
+
   /// Bugünün kaydı okunamadıysa kaydetmeye izin verilmez: aksi halde mevcut
   /// değerlerin habersizce üzerine yazılabilir.
   bool _loadFailed = false;
@@ -32,6 +34,7 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
   @override
   void initState() {
     super.initState();
+    _logDate = dayKey(ref.read(clockProvider)());
     _loadTodayLog();
   }
 
@@ -50,9 +53,8 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
   /// Bugünün (yerel gün) kaydı varsa alanları onun değerleriyle doldurur.
   Future<void> _loadTodayLog() async {
     final repository = ref.read(dailyLogRepositoryProvider);
-    final today = dayKey(ref.read(clockProvider)());
     try {
-      final log = await repository.getByDate(today);
+      final log = await repository.getByDate(_logDate);
       if (!mounted) return;
       setState(() {
         if (log != null) {
@@ -75,33 +77,50 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     }
   }
 
+  /// Ondalık virgül (Türkçe klavye) de kabul edilir: "7,5" → 7.5. Boş, sayı
+  /// olmayan veya [min]..[max] dışındaki değer için null döner.
+  double? _parseInRange(String text, {required double min, required double max}) {
+    final v = double.tryParse(text.trim().replaceAll(',', '.'));
+    if (v == null || v.isNaN || v < min || v > max) return null;
+    return v;
+  }
+
   Future<void> _saveLog() async {
+    final l10n = AppLocalizations.of(context);
+
+    // Dört alan zorunlu (istatistikleri etkiler); ruh hali ve enerji her zaman
+    // seçili olduğundan burada yalnız uyku ve su doğrulanır.
+    final sleep = _parseInRange(_sleepController.text, min: 0, max: 24);
+    if (sleep == null) {
+      setState(() => _errorMessage = l10n.dailyLogSleepInvalid);
+      return;
+    }
+    final water = _parseInRange(_waterController.text, min: 0, max: 10);
+    if (water == null) {
+      setState(() => _errorMessage = l10n.dailyLogWaterInvalid);
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
-    final data = {
-      'date': DateTime.now().toIso8601String().split('T')[0],
-      'sleep_hours': double.tryParse(_sleepController.text.trim()) ?? 0,
-      'water_intake': double.tryParse(_waterController.text.trim()) ?? 0,
-      'mood': _mood,
-      'energy_level': _energyLevel,
-      'notes': _notesController.text.trim(),
-    };
-
+    final wasUpdate = _existingLogId != null;
+    final notes = _notesController.text.trim();
     try {
-      if (_existingLogId != null) {
-        await ApiClient.dio.patch('/health/logs/$_existingLogId/', data: data);
-      } else {
-        await ApiClient.dio.post('/health/logs/', data: data);
-      }
+      await ref.read(dailyLogRepositoryProvider).upsert(
+            logDate: _logDate,
+            sleepHours: sleep,
+            waterIntake: water,
+            mood: _mood,
+            energyLevel: _energyLevel,
+            notes: notes.isEmpty ? null : notes,
+          );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_existingLogId != null
-              ? 'Günlük kayıt güncellendi'
-              : 'Günlük kayıt kaydedildi'),
+          content: Text(wasUpdate ? l10n.dailyLogUpdated : l10n.dailyLogSaved),
           backgroundColor: AppColors.daily,
           behavior: SnackBarBehavior.floating,
           shape:
@@ -109,11 +128,11 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
         ),
       );
       Navigator.pop(context);
-    } on DioException catch (e) {
-      setState(() =>
-          _errorMessage = e.response?.data['message'] ?? 'Bir hata oluştu');
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _errorMessage = l10n.dailyLogSaveError);
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
