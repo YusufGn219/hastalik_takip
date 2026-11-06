@@ -252,6 +252,55 @@ void main() {
     });
   });
 
+  group('SymptomScreen / klavye ve odak', () {
+    testWidgets(
+        'klavye açıkken (kısa ekran) taşma olmaz, içerik kaydırılıp Kaydet\'e '
+        'ulaşılır', (tester) async {
+      // Telefonun klavye açıkken kalan görünür alanı gibi kısa bir ekran.
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.runAsync(() => seedLoaderFor(db).seedIfNeeded());
+      await tester.pumpWidget(_app(overrides()));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull); // eskiden: BOTTOM OVERFLOWED
+      final save = find.widgetWithText(ElevatedButton, 'Kaydet');
+      await tester.ensureVisible(save);
+      await tester.pumpAndSettle();
+      expect(tester.getBottomLeft(save).dy, lessThanOrEqualTo(600));
+    });
+
+    testWidgets(
+        'Kaydet\'ten sonra dönem sorusu kapanınca odak alana dönmez '
+        '(klavye kendiliğinden açılmaz)', (tester) async {
+      _phoneSize(tester);
+      await tester.runAsync(() => seedLoaderFor(db).seedIfNeeded());
+      await tester.pumpWidget(_app(overrides()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Baş ağrısı').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).at(0), 'Şakaklarda');
+      bool locationHasFocus() => tester
+          .widget<EditableText>(find.byType(EditableText).first)
+          .focusNode
+          .hasFocus;
+      expect(locationHasFocus(), isTrue); // yazarken odakta
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Kaydet'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('Hayır, sadece kaydet')));
+      await tester.pumpAndSettle();
+
+      expect(locationHasFocus(), isFalse);
+    });
+  });
+
   group('SymptomScreen / dönem akışı', () {
     final headacheId = SeedLoader.symptomId('headache');
 

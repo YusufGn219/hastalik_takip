@@ -119,6 +119,10 @@ class _SymptomScreenState extends ConsumerState<SymptomScreen> {
       return;
     }
 
+    // Odağı bırak: dönem sorusu kapanınca Flutter odağı son alana geri verir
+    // ve klavye kendiliğinden açılırdı.
+    FocusManager.instance.primaryFocus?.unfocus();
+
     setState(() {
       _isLoading = true;
       _setMessage('', error: false);
@@ -244,7 +248,8 @@ class _SymptomScreenState extends ConsumerState<SymptomScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Semptom Ekle')),
-      body: Padding(
+      // Kaydırılabilir: klavye açıkken içerik taşmaz, Kaydet'e ulaşılır.
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

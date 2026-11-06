@@ -721,6 +721,77 @@ void main() {
       );
       expect(await allLogs(tester), isEmpty);
     });
+
+    testWidgets('ilaç seçilince "Lütfen bir ilaç seçin" uyarısı kalkar',
+        (tester) async {
+      await openSheet(tester);
+      await tapSave(tester);
+      expect(find.text('Lütfen bir ilaç seçin'), findsOneWidget);
+
+      await pickMedication(tester, 'Parol');
+
+      expect(find.text('Lütfen bir ilaç seçin'), findsNothing);
+    });
+
+    testWidgets('doz yazılmaya başlanınca "geçersiz doz" uyarısı kalkar',
+        (tester) async {
+      await openSheet(tester);
+      await pickMedication(tester, 'Parol');
+      await tester.enterText(find.byType(TextField), 'abc');
+      await tapSave(tester);
+      expect(find.text('Doz sıfırdan büyük bir sayı olmalı'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), '2');
+      await tester.pump();
+
+      expect(find.text('Doz sıfırdan büyük bir sayı olmalı'), findsNothing);
+    });
+
+    testWidgets(
+        'klavye açıkken geri tuşu önce yalnız klavyeyi kapatır, pencere '
+        'bir sonraki geri tuşuyla kapanır', (tester) async {
+      await openSheet(tester);
+      await pickMedication(tester, 'Parol');
+
+      // Klavye açık: alan odakta ve ekranın altı klavyeyle kısalmış.
+      await tester.tap(find.byType(TextField));
+      tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+      addTearDown(tester.view.resetViewInsets);
+      await tester.pumpAndSettle();
+      bool doseHasFocus() => tester
+          .widget<EditableText>(find.byType(EditableText))
+          .focusNode
+          .hasFocus;
+      expect(doseHasFocus(), isTrue);
+
+      await tester.binding.handlePopRoute(); // 1. geri
+      await tester.pumpAndSettle();
+      expect(find.text('Döneme İlaç Ekle'), findsOneWidget); // pencere açık
+      expect(doseHasFocus(), isFalse); // odak bırakıldı (klavye kapanır)
+
+      // Klavye kapandı (sistem alanı geri verir); ikinci geri pencereyi kapatır.
+      tester.view.resetViewInsets();
+      await tester.pumpAndSettle();
+      await tester.binding.handlePopRoute(); // 2. geri
+      await tester.pumpAndSettle();
+      expect(find.text('Döneme İlaç Ekle'), findsNothing);
+    });
+  });
+
+  group('EpisodeListScreen / kapatma ekranı görünümü', () {
+    testWidgets('semptom kartı tam genişlikte', (tester) async {
+      await openApp(tester);
+      await startEpisode(tester, headacheId, DateTime(2026, 11, 6, 8, 0));
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Dönemi Kapat'));
+      await tester.pumpAndSettle();
+
+      // Ekran 800 geniş, kenar boşlukları 16'şar: kart 768 olmalı. Sayfada tek
+      // Card var.
+      expect(tester.getSize(find.byType(Card)).width, 800 - 32);
+    });
   });
 
   group('formatEpisodeMoment', () {

@@ -78,22 +78,26 @@ class _EpisodeCloseScreenState extends ConsumerState<EpisodeCloseScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      overview.symptomName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+            // Tam genişlik: yoksa kart içeriği kadar dar kalır.
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        overview.symptomName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    if (locations.isNotEmpty)
-                      Text(l10n.episodeLocation(locations)),
-                  ],
+                      if (locations.isNotEmpty)
+                        Text(l10n.episodeLocation(locations)),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -72,12 +72,12 @@ class _EpisodeMedicationSheetState
   }
 
   String _unitLabel(DoseUnit unit, AppLocalizations l10n) => switch (unit) {
-        DoseUnit.tablet => l10n.doseUnitTablet,
-        DoseUnit.mg => l10n.doseUnitMg,
-        DoseUnit.ml => l10n.doseUnitMl,
-        DoseUnit.drop => l10n.doseUnitDrop,
-        DoseUnit.capsule => l10n.doseUnitCapsule,
-      };
+    DoseUnit.tablet => l10n.doseUnitTablet,
+    DoseUnit.mg => l10n.doseUnitMg,
+    DoseUnit.ml => l10n.doseUnitMl,
+    DoseUnit.drop => l10n.doseUnitDrop,
+    DoseUnit.capsule => l10n.doseUnitCapsule,
+  };
 
   /// Boş = doz yok (null). Dolu ama sayı değilse ya da 0'dan büyük değilse
   /// `false`. Ondalık virgül kabul edilir.
@@ -107,7 +107,9 @@ class _EpisodeMedicationSheetState
       _message = '';
     });
     try {
-      await ref.read(medicationServiceProvider).logIntake(
+      await ref
+          .read(medicationServiceProvider)
+          .logIntake(
             medicationId: _selectedId!,
             takenAt: ref.read(clockProvider)(),
             doseAmount: dose.amount,
@@ -127,94 +129,124 @@ class _EpisodeMedicationSheetState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.episodeMedicationTitle,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            if (_loading)
-              const Center(child: CircularProgressIndicator())
-            else if (_loadFailed)
+    final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+    // Klavye açıkken geri tuşu önce yalnız klavyeyi kapatır; pencere bir
+    // sonraki geri tuşuyla kapanır.
+    return PopScope(
+      canPop: !keyboardOpen,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 16,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                l10n.episodeMedicationLoadError,
-                style: const TextStyle(color: Colors.red),
-              )
-            else if (_medications.isEmpty)
-              Text(l10n.episodeMedicationNone)
-            else ...[
-              DropdownButtonFormField<String>(
-                hint: Text(l10n.episodeMedicationHint),
-                initialValue: _selectedId,
-                isExpanded: true,
-                items: [
-                  for (final m in _medications)
-                    DropdownMenuItem<String>(value: m.id, child: Text(m.name)),
-                ],
-                onChanged: (val) => setState(() => _selectedId = val),
-                decoration: const InputDecoration(border: OutlineInputBorder()),
+                l10n.episodeMedicationTitle,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _doseController,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
+              if (_loading)
+                const Center(child: CircularProgressIndicator())
+              else if (_loadFailed)
+                Text(
+                  l10n.episodeMedicationLoadError,
+                  style: const TextStyle(color: Colors.red),
+                )
+              else if (_medications.isEmpty)
+                Text(l10n.episodeMedicationNone)
+              else ...[
+                DropdownButtonFormField<String>(
+                  hint: Text(l10n.episodeMedicationHint),
+                  initialValue: _selectedId,
+                  isExpanded: true,
+                  items: [
+                    for (final m in _medications)
+                      DropdownMenuItem<String>(
+                        value: m.id,
+                        child: Text(m.name),
                       ),
-                      decoration: InputDecoration(
-                        labelText: l10n.episodeDoseLabel,
-                        border: const OutlineInputBorder(),
+                  ],
+                  onChanged: (val) => setState(() {
+                    _selectedId = val;
+                    _message = ''; // eski uyarı kalmasın
+                  }),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _doseController,
+                        onChanged: (_) {
+                          if (_message.isNotEmpty) {
+                            setState(() => _message = '');
+                          }
+                        },
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: l10n.episodeDoseLabel,
+                          border: const OutlineInputBorder(),
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 12),
+                    DropdownButton<DoseUnit>(
+                      value: _unit,
+                      items: [
+                        for (final u in DoseUnit.values)
+                          DropdownMenuItem(
+                            value: u,
+                            child: Text(_unitLabel(u, l10n)),
+                          ),
+                      ],
+                      onChanged: (val) => setState(() => _unit = val ?? _unit),
+                    ),
+                  ],
+                ),
+              ],
+              if (_message.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text(
+                    _message,
+                    style: const TextStyle(color: Colors.red),
                   ),
-                  const SizedBox(width: 12),
-                  DropdownButton<DoseUnit>(
-                    value: _unit,
-                    items: [
-                      for (final u in DoseUnit.values)
-                        DropdownMenuItem(
-                          value: u,
-                          child: Text(_unitLabel(u, l10n)),
-                        ),
-                    ],
-                    onChanged: (val) => setState(() => _unit = val ?? _unit),
-                  ),
-                ],
+                ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: (_loading || _loadFailed || _saving)
+                      ? null
+                      : _save,
+                  child: _saving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(l10n.episodeMedicationSave),
+                ),
               ),
             ],
-            if (_message.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 12),
-                child: Text(_message, style: const TextStyle(color: Colors.red)),
-              ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: (_loading || _loadFailed || _saving) ? null : _save,
-                child: _saving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(l10n.episodeMedicationSave),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
