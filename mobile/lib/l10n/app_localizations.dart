@@ -226,6 +226,84 @@ abstract class AppLocalizations {
   /// **'Semptom eklenemedi. Yeniden deneyin.'**
   String get symptomAddError;
 
+  /// Devam eden dönemi olmayan bir semptom kaydedilince çıkan sorunun başlığı. Dönem = başlangıcı ve sonu olan şikâyet dönemi; kullanıcıya 'atak' denmez.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dönem takibi'**
+  String get symptomEpisodeTrackTitle;
+
+  /// No description provided for @symptomEpisodeTrackQuestion.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu şikâyeti bir dönem olarak takip etmek ister misiniz?'**
+  String get symptomEpisodeTrackQuestion;
+
+  /// No description provided for @symptomEpisodeTrackNo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hayır, sadece kaydet'**
+  String get symptomEpisodeTrackNo;
+
+  /// No description provided for @symptomEpisodeTrackYes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evet, dönem başlat'**
+  String get symptomEpisodeTrackYes;
+
+  /// No description provided for @symptomSavedEpisodeStarted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom kaydedildi ve dönem başlatıldı'**
+  String get symptomSavedEpisodeStarted;
+
+  /// Aynı semptom için devam eden bir dönem varken yeni giriş kaydedilince çıkan sorunun başlığı.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam eden {symptom} döneminiz var'**
+  String symptomEpisodeOngoingTitle(String symptom);
+
+  /// No description provided for @symptomEpisodeOngoingQuestion.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kayıt nasıl eklensin?'**
+  String get symptomEpisodeOngoingQuestion;
+
+  /// No description provided for @symptomEpisodeIndependent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağımsız kayıt'**
+  String get symptomEpisodeIndependent;
+
+  /// No description provided for @symptomEpisodeAdd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Döneme ekle'**
+  String get symptomEpisodeAdd;
+
+  /// Yalnızca girişte konum yazılmışsa gösterilir; konum dönemin konumlarına eklenir.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni konumla ekle'**
+  String get symptomEpisodeNewLocation;
+
+  /// No description provided for @symptomAddedToEpisode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom kaydedildi ve döneme eklendi'**
+  String get symptomAddedToEpisode;
+
+  /// No description provided for @symptomAddedToEpisodeNewLocation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom kaydedildi, yeni konumla döneme eklendi'**
+  String get symptomAddedToEpisodeNewLocation;
+
+  /// Dönem işlemi (başlatma ya da ekleme) başarısız olursa gösterilir; giriş zaten kayıtlıdır.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom kaydedildi ama dönem işlemi yapılamadı.'**
+  String get symptomEpisodeError;
+
   /// No description provided for @dbOpenErrorTitle.
   ///
   /// In tr, this message translates to:

@@ -60,6 +60,38 @@
   },
   "symptomAddError": "Semptom eklenemedi. Yeniden deneyin.",
 
+  "symptomEpisodeTrackTitle": "Dönem takibi",
+  "@symptomEpisodeTrackTitle": {
+    "description": "Devam eden dönemi olmayan bir semptom kaydedilince çıkan sorunun başlığı. Dönem = başlangıcı ve sonu olan şikâyet dönemi; kullanıcıya 'atak' denmez."
+  },
+  "symptomEpisodeTrackQuestion": "Bu şikâyeti bir dönem olarak takip etmek ister misiniz?",
+  "symptomEpisodeTrackNo": "Hayır, sadece kaydet",
+  "symptomEpisodeTrackYes": "Evet, dönem başlat",
+  "symptomSavedEpisodeStarted": "Semptom kaydedildi ve dönem başlatıldı",
+
+  "symptomEpisodeOngoingTitle": "Devam eden {symptom} döneminiz var",
+  "@symptomEpisodeOngoingTitle": {
+    "description": "Aynı semptom için devam eden bir dönem varken yeni giriş kaydedilince çıkan sorunun başlığı.",
+    "placeholders": {
+      "symptom": {
+        "type": "String"
+      }
+    }
+  },
+  "symptomEpisodeOngoingQuestion": "Bu kayıt nasıl eklensin?",
+  "symptomEpisodeIndependent": "Bağımsız kayıt",
+  "symptomEpisodeAdd": "Döneme ekle",
+  "symptomEpisodeNewLocation": "Yeni konumla ekle",
+  "@symptomEpisodeNewLocation": {
+    "description": "Yalnızca girişte konum yazılmışsa gösterilir; konum dönemin konumlarına eklenir."
+  },
+  "symptomAddedToEpisode": "Semptom kaydedildi ve döneme eklendi",
+  "symptomAddedToEpisodeNewLocation": "Semptom kaydedildi, yeni konumla döneme eklendi",
+  "symptomEpisodeError": "Semptom kaydedildi ama dönem işlemi yapılamadı.",
+  "@symptomEpisodeError": {
+    "description": "Dönem işlemi (başlatma ya da ekleme) başarısız olursa gösterilir; giriş zaten kayıtlıdır."
+  },
+
   "dbOpenErrorTitle": "Veritabanı açılamadı",
   "dbOpenErrorBody": "Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.",
   "@dbOpenErrorBody": {

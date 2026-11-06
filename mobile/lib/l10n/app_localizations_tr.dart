@@ -83,6 +83,51 @@ class AppLocalizationsTr extends AppLocalizations {
   String get symptomAddError => 'Semptom eklenemedi. Yeniden deneyin.';
 
   @override
+  String get symptomEpisodeTrackTitle => 'Dönem takibi';
+
+  @override
+  String get symptomEpisodeTrackQuestion =>
+      'Bu şikâyeti bir dönem olarak takip etmek ister misiniz?';
+
+  @override
+  String get symptomEpisodeTrackNo => 'Hayır, sadece kaydet';
+
+  @override
+  String get symptomEpisodeTrackYes => 'Evet, dönem başlat';
+
+  @override
+  String get symptomSavedEpisodeStarted =>
+      'Semptom kaydedildi ve dönem başlatıldı';
+
+  @override
+  String symptomEpisodeOngoingTitle(String symptom) {
+    return 'Devam eden $symptom döneminiz var';
+  }
+
+  @override
+  String get symptomEpisodeOngoingQuestion => 'Bu kayıt nasıl eklensin?';
+
+  @override
+  String get symptomEpisodeIndependent => 'Bağımsız kayıt';
+
+  @override
+  String get symptomEpisodeAdd => 'Döneme ekle';
+
+  @override
+  String get symptomEpisodeNewLocation => 'Yeni konumla ekle';
+
+  @override
+  String get symptomAddedToEpisode => 'Semptom kaydedildi ve döneme eklendi';
+
+  @override
+  String get symptomAddedToEpisodeNewLocation =>
+      'Semptom kaydedildi, yeni konumla döneme eklendi';
+
+  @override
+  String get symptomEpisodeError =>
+      'Semptom kaydedildi ama dönem işlemi yapılamadı.';
+
+  @override
   String get dbOpenErrorTitle => 'Veritabanı açılamadı';
 
   @override

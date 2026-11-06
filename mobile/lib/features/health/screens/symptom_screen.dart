@@ -124,27 +124,119 @@ class _SymptomScreenState extends ConsumerState<SymptomScreen> {
       _setMessage('', error: false);
     });
 
+    // Formu sıfırlamadan önce: dönem sorusunda semptomun adı gerekir.
+    final symptomName =
+        _symptoms.where((s) => s.id == symptomId).firstOrNull?.name ?? '';
+
+    final SymptomEntry entry;
     try {
-      await ref.read(symptomEntryRepositoryProvider).create(
+      entry = await ref.read(symptomEntryRepositoryProvider).create(
             symptomId: symptomId,
             severity: _severity.round(),
             timestamp: ref.read(clockProvider)(),
             location: _locationController.text.trim(),
             notes: _notesController.text.trim(),
           );
-      if (!mounted) return;
-      setState(() {
-        _selectedSymptomId = null;
-        _severity = 5;
-        _notesController.clear();
-        _locationController.clear();
-        _setMessage(l10n.symptomSaved, error: false);
-      });
     } catch (_) {
       if (!mounted) return;
-      setState(() => _setMessage(l10n.symptomSaveError, error: true));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _setMessage(l10n.symptomSaveError, error: true);
+      });
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+      _selectedSymptomId = null;
+      _severity = 5;
+      _notesController.clear();
+      _locationController.clear();
+      _setMessage(l10n.symptomSaved, error: false);
+    });
+
+    await _offerEpisode(entry, symptomName);
+  }
+
+  /// Giriş kaydedildikten sonra dönem (başlangıcı ve sonu olan şikâyet dönemi)
+  /// akışı: semptom için devam eden dönem yoksa takip etmek isteyip istemediği
+  /// sorulur; varsa girişin nasıl ekleneceği sorulur. Giriş her durumda zaten
+  /// kayıtlıdır; buradaki bir hata girişi etkilemez.
+  Future<void> _offerEpisode(SymptomEntry entry, String symptomName) async {
+    final l10n = AppLocalizations.of(context);
+    final episodes = ref.read(episodeServiceProvider);
+    try {
+      final active = await episodes.activeEpisode(entry.symptomId);
+      if (!mounted) return;
+      if (active == null) {
+        final start = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            title: Text(l10n.symptomEpisodeTrackTitle),
+            content: Text(l10n.symptomEpisodeTrackQuestion),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text(l10n.symptomEpisodeTrackNo),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(l10n.symptomEpisodeTrackYes),
+              ),
+            ],
+          ),
+        );
+        if (start != true) return;
+        await episodes.start(entry);
+        if (!mounted) return;
+        setState(() =>
+            _setMessage(l10n.symptomSavedEpisodeStarted, error: false));
+        return;
+      }
+
+      final choice = await showDialog<_EpisodeChoice>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+          title: Text(l10n.symptomEpisodeOngoingTitle(symptomName)),
+          content: Text(l10n.symptomEpisodeOngoingQuestion),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, _EpisodeChoice.independent),
+              child: Text(l10n.symptomEpisodeIndependent),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, _EpisodeChoice.add),
+              child: Text(l10n.symptomEpisodeAdd),
+            ),
+            // Konum yazılmadıysa "yeni konum" seçeneğinin anlamı yoktur.
+            if (entry.location.isNotEmpty)
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, _EpisodeChoice.newLocation),
+                child: Text(l10n.symptomEpisodeNewLocation),
+              ),
+          ],
+        ),
+      );
+      switch (choice) {
+        case _EpisodeChoice.add:
+          await episodes.addEntry(active, entry);
+          if (!mounted) return;
+          setState(() =>
+              _setMessage(l10n.symptomAddedToEpisode, error: false));
+        case _EpisodeChoice.newLocation:
+          await episodes.addEntry(active, entry, isNewLocation: true);
+          if (!mounted) return;
+          setState(() => _setMessage(l10n.symptomAddedToEpisodeNewLocation,
+              error: false));
+        case _EpisodeChoice.independent:
+        case null:
+          return;
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _setMessage(l10n.symptomEpisodeError, error: true));
     }
   }
 
@@ -243,6 +335,9 @@ class _SymptomScreenState extends ConsumerState<SymptomScreen> {
     );
   }
 }
+
+/// Devam eden dönem varken yeni girişin nasıl ekleneceği.
+enum _EpisodeChoice { independent, add, newLocation }
 
 /// "Yeni semptom ekle" penceresi. Adı döndürür (kırpılmış, boş değil); iptalde
 /// null. Denetleyiciyi kendisi serbest bırakır.

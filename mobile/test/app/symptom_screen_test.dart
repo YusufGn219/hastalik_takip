@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/app/providers.dart';
 import 'package:mobile/data/database/app_database.dart';
+import 'package:mobile/data/database/enums.dart';
 import 'package:mobile/data/database/seed_loader.dart';
+import 'package:mobile/data/repositories/episode_repository.dart';
 import 'package:mobile/data/repositories/symptom_entry_repository.dart';
+import 'package:mobile/domain/services/episode_service.dart';
 import 'package:mobile/data/repositories/symptom_repository.dart';
 import 'package:mobile/features/health/screens/symptom_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
@@ -249,6 +252,196 @@ void main() {
     });
   });
 
+  group('SymptomScreen / dönem akışı', () {
+    final headacheId = SeedLoader.symptomId('headache');
+
+    Future<void> openApp(WidgetTester tester, [List<Override>? extra]) async {
+      _phoneSize(tester);
+      await seed(tester);
+      await tester.pumpWidget(_app([
+        ...overrides(),
+        clockProvider.overrideWithValue(_now),
+        ...?extra,
+      ]));
+      await tester.pumpAndSettle();
+    }
+
+    /// Semptomu seçer, istenirse konum yazar, Kaydet'e basar.
+    Future<void> record(WidgetTester tester, String symptom,
+        {String? location}) async {
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(symptom).last);
+      await tester.pumpAndSettle();
+      if (location != null) {
+        await tester.enterText(find.byType(TextField).at(0), location);
+      }
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Kaydet'));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> choose(WidgetTester tester, String label) async {
+      await tester.tap(find.descendant(
+          of: find.byType(AlertDialog), matching: find.text(label)));
+      await tester.pumpAndSettle();
+    }
+
+    Future<List<SymptomEntry>> entries(WidgetTester tester) => tester
+        .runAsync(() => DriftSymptomEntryRepository(db)
+            .listInRange(DateTime.utc(2000), DateTime.utc(2100)))
+        .then((v) => v!);
+
+    Future<List<Episode>> episodes(WidgetTester tester) =>
+        tester.runAsync(() => db.select(db.episodes).get()).then((v) => v!);
+
+    Future<List<EpisodeLocationEntry>> locations(WidgetTester tester) => tester
+        .runAsync(() => db.select(db.episodeLocationEntries).get())
+        .then((v) => v!);
+
+    Future<Episode> seedOngoing(WidgetTester tester, String symptomId) async {
+      return (await tester.runAsync(() => DriftEpisodeRepository(db)
+          .start(symptomId: symptomId, startTime: utc(2026, 11, 5, 8))))!;
+    }
+
+    /// Kullanıcıya "atak" denmez: görünen hiçbir metinde geçmemeli.
+    void expectNoAtak(WidgetTester tester) {
+      final texts = tester
+          .widgetList<Text>(find.byType(Text))
+          .map((t) => (t.data ?? '').toLowerCase());
+      expect(texts.where((t) => t.contains('atak')), isEmpty);
+    }
+
+    testWidgets('devam eden dönem yoksa takip sorulur; "Hayır" dönem açmaz',
+        (tester) async {
+      await openApp(tester);
+
+      await record(tester, 'Baş ağrısı');
+
+      expect(find.text('Dönem takibi'), findsOneWidget);
+      expect(find.text('Bu şikâyeti bir dönem olarak takip etmek ister misiniz?'),
+          findsOneWidget);
+      expectNoAtak(tester);
+
+      await choose(tester, 'Hayır, sadece kaydet');
+
+      expect(await episodes(tester), isEmpty);
+      final saved = await entries(tester);
+      expect(saved, hasLength(1));
+      expect(saved.single.episodeId, isNull);
+      expect(find.text('Semptom kaydedildi'), findsOneWidget);
+    });
+
+    testWidgets(
+        '"Evet": dönem girişin zamanında başlar, giriş ona bağlanır, konum '
+        'dönemin ilk konumu olur', (tester) async {
+      await openApp(tester);
+
+      await record(tester, 'Baş ağrısı', location: 'Şakaklarda');
+      await choose(tester, 'Evet, dönem başlat');
+
+      final eps = await episodes(tester);
+      expect(eps, hasLength(1));
+      final ep = eps.single;
+      expect(ep.symptomId, headacheId);
+      expect(ep.startTime.toUtc(), _now().toUtc());
+      expect(ep.endedAt, isNull);
+      expect(ep.status, EpisodeStatus.ongoing);
+      expect((await entries(tester)).single.episodeId, ep.id);
+      final locs = await locations(tester);
+      expect(locs.map((l) => l.location), ['Şakaklarda']);
+      expect(find.text('Semptom kaydedildi ve dönem başlatıldı'),
+          findsOneWidget);
+    });
+
+    testWidgets('devam eden dönem varken seçenekler sorulur; konum yoksa '
+        '"Yeni konumla ekle" görünmez', (tester) async {
+      await openApp(tester);
+      await seedOngoing(tester, headacheId);
+
+      await record(tester, 'Baş ağrısı');
+
+      expect(find.text('Devam eden Baş ağrısı döneminiz var'), findsOneWidget);
+      expect(find.text('Bu kayıt nasıl eklensin?'), findsOneWidget);
+      expect(find.text('Bağımsız kayıt'), findsOneWidget);
+      expect(find.text('Döneme ekle'), findsOneWidget);
+      expect(find.text('Yeni konumla ekle'), findsNothing);
+      expectNoAtak(tester);
+      // Aynı semptom için ikinci bir dönem açılmaz.
+      expect(await episodes(tester), hasLength(1));
+    });
+
+    testWidgets('"Döneme ekle": giriş bağlanır, konum dönemin konumlarına '
+        'eklenmez', (tester) async {
+      await openApp(tester);
+      final ep = await seedOngoing(tester, headacheId);
+
+      await record(tester, 'Baş ağrısı', location: 'Şakaklarda');
+      expect(find.text('Yeni konumla ekle'), findsOneWidget); // konum yazıldı
+      await choose(tester, 'Döneme ekle');
+
+      expect((await entries(tester)).single.episodeId, ep.id);
+      expect(await locations(tester), isEmpty);
+      expect(await episodes(tester), hasLength(1));
+      expect(find.text('Semptom kaydedildi ve döneme eklendi'), findsOneWidget);
+    });
+
+    testWidgets('"Yeni konumla ekle": konum bir kez eklenir, tekrarı çoğaltmaz',
+        (tester) async {
+      await openApp(tester);
+      final ep = await seedOngoing(tester, headacheId);
+
+      await record(tester, 'Baş ağrısı', location: 'Göz arkasında');
+      await choose(tester, 'Yeni konumla ekle');
+      expect(find.text('Semptom kaydedildi, yeni konumla döneme eklendi'),
+          findsOneWidget);
+
+      await record(tester, 'Baş ağrısı', location: 'Göz arkasında');
+      await choose(tester, 'Yeni konumla ekle');
+
+      final saved = await entries(tester);
+      expect(saved, hasLength(2));
+      expect(saved.every((e) => e.episodeId == ep.id), isTrue);
+      expect((await locations(tester)).map((l) => l.location), ['Göz arkasında']);
+    });
+
+    testWidgets('"Bağımsız kayıt": giriş döneme bağlanmaz', (tester) async {
+      await openApp(tester);
+      await seedOngoing(tester, headacheId);
+
+      await record(tester, 'Baş ağrısı', location: 'Şakaklarda');
+      await choose(tester, 'Bağımsız kayıt');
+
+      expect((await entries(tester)).single.episodeId, isNull);
+      expect(await locations(tester), isEmpty);
+      expect(find.text('Semptom kaydedildi'), findsOneWidget);
+    });
+
+    testWidgets('başka semptomun devam eden dönemi karışmaz', (tester) async {
+      await openApp(tester);
+      await seedOngoing(tester, SeedLoader.symptomId('fever'));
+
+      await record(tester, 'Baş ağrısı');
+
+      // Baş ağrısı için devam eden dönem yok: takip sorulur.
+      expect(find.text('Dönem takibi'), findsOneWidget);
+      expect(find.textContaining('Devam eden'), findsNothing);
+    });
+
+    testWidgets('dönem işlemi hata verirse mesaj çıkar, giriş yine de kayıtlıdır',
+        (tester) async {
+      await openApp(tester, [
+        episodeServiceProvider.overrideWithValue(_FailingEpisodeService(db)),
+      ]);
+
+      await record(tester, 'Baş ağrısı');
+
+      expect(find.text('Semptom kaydedildi ama dönem işlemi yapılamadı.'),
+          findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(await entries(tester), hasLength(1));
+    });
+  });
+
   group('SymptomScreen / yeni semptom ekleme', () {
     Future<void> openApp(WidgetTester tester) async {
       _phoneSize(tester);
@@ -331,6 +524,19 @@ void main() {
       expect(await symptoms(tester), hasLength(8));
     });
   });
+}
+
+/// Devam eden dönem sorgusu hata verir; dönem hata yolunu denemek için.
+class _FailingEpisodeService extends EpisodeService {
+  _FailingEpisodeService(AppDatabase db)
+      : super(
+          episodes: DriftEpisodeRepository(db),
+          entries: DriftSymptomEntryRepository(db),
+        );
+
+  @override
+  Future<Episode?> activeEpisode(String symptomId) async =>
+      throw StateError('okunamadı');
 }
 
 /// Yazma her zaman hata verir; kaydetme hata yolunu denemek için.
