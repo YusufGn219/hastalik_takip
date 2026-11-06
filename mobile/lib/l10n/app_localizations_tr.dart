@@ -59,6 +59,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Kayıt kaydedilemedi. Girdiğiniz değerler ekranda duruyor; yeniden deneyin.';
 
   @override
+  String get symptomsLoadError =>
+      'Semptom listesi okunamadı. Kayıtlarınız silinmedi; ekranı kapatıp yeniden açmayı deneyin.';
+
+  @override
   String get dbOpenErrorTitle => 'Veritabanı açılamadı';
 
   @override

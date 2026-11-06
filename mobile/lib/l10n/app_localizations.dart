@@ -184,6 +184,12 @@ abstract class AppLocalizations {
   /// **'Kayıt kaydedilemedi. Girdiğiniz değerler ekranda duruyor; yeniden deneyin.'**
   String get dailyLogSaveError;
 
+  /// Semptom girişi ekranı semptom listesini veritabanından okuyamazsa gösterilir; bu durumda kaydet düğmesi pasiftir.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom listesi okunamadı. Kayıtlarınız silinmedi; ekranı kapatıp yeniden açmayı deneyin.'**
+  String get symptomsLoadError;
+
   /// No description provided for @dbOpenErrorTitle.
   ///
   /// In tr, this message translates to:

@@ -43,6 +43,11 @@
     "description": "Günlük kayıt veritabanına yazılamazsa gösterilir; form değerleri korunur."
   },
 
+  "symptomsLoadError": "Semptom listesi okunamadı. Kayıtlarınız silinmedi; ekranı kapatıp yeniden açmayı deneyin.",
+  "@symptomsLoadError": {
+    "description": "Semptom girişi ekranı semptom listesini veritabanından okuyamazsa gösterilir; bu durumda kaydet düğmesi pasiftir."
+  },
+
   "dbOpenErrorTitle": "Veritabanı açılamadı",
   "dbOpenErrorBody": "Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.",
   "@dbOpenErrorBody": {

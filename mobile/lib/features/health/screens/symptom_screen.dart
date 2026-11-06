@@ -1,25 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../app/providers.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/utils/parse_utils.dart';
+import '../../../data/database/app_database.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../episode/episode_service.dart';
 
-class SymptomScreen extends StatefulWidget {
+class SymptomScreen extends ConsumerStatefulWidget {
   const SymptomScreen({super.key});
 
   @override
-  State<SymptomScreen> createState() => _SymptomScreenState();
+  ConsumerState<SymptomScreen> createState() => _SymptomScreenState();
 }
 
-class _SymptomScreenState extends State<SymptomScreen> {
+class _SymptomScreenState extends ConsumerState<SymptomScreen> {
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final EpisodeService _episodeService = EpisodeService();
+  // GEÇİCİ (Grup 3'te kalkar): eski Dio tabanlı servis yalnız kullanılınca kurulur.
+  late final EpisodeService _episodeService = EpisodeService();
 
-  List<dynamic> _symptoms = [];
-  int? _selectedSymptomId;
+  List<Symptom> _symptoms = [];
+  String? _selectedSymptomId;
   double _severity = 5;
   bool _isLoading = false;
   String _message = '';
+
+  /// Semptom listesi okunamadıysa kaydetmeye izin verilmez.
+  bool _loadFailed = false;
 
   @override
   void initState() {
@@ -27,12 +35,22 @@ class _SymptomScreenState extends State<SymptomScreen> {
     _loadSymptoms();
   }
 
+  /// Yerel veritabanından silinmemiş semptomları (hazır + kullanıcının
+  /// eklediği) ada göre sıralı okur.
   Future<void> _loadSymptoms() async {
     try {
-      final response = await ApiClient.dio.get('/health/symptoms/');
-      setState(() => _symptoms = response.data);
-    } catch (e) {
-      setState(() => _message = 'Semptomlar yüklenemedi');
+      final symptoms = await ref.read(symptomRepositoryProvider).listActive();
+      if (!mounted) return;
+      setState(() {
+        _symptoms = symptoms;
+        _loadFailed = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loadFailed = true;
+        _message = AppLocalizations.of(context).symptomsLoadError;
+      });
     }
   }
 
@@ -67,7 +85,8 @@ class _SymptomScreenState extends State<SymptomScreen> {
                   data: {'name': name, 'description': ''},
                 );
                 await _loadSymptoms();
-                final newId = parseInt(response.data['id']);
+                // GEÇİCİ: ekleme Grup 2'de yerel veritabanına bağlanana kadar.
+                final newId = parseInt(response.data['id']).toString();
                 setState(() {
                   _selectedSymptomId = newId;
                   _message = '';
@@ -237,14 +256,14 @@ class _SymptomScreenState extends State<SymptomScreen> {
               ],
             ),
             const SizedBox(height: 4),
-            DropdownButtonFormField<int>(
+            DropdownButtonFormField<String>(
               value: _selectedSymptomId,
               hint: const Text('Semptom seçin'),
               isExpanded: true,
               items: _symptoms.map((s) {
-                return DropdownMenuItem<int>(
-                  value: parseInt(s['id']),
-                  child: Text(s['name']),
+                return DropdownMenuItem<String>(
+                  value: s.id,
+                  child: Text(s.name),
                 );
               }).toList(),
               onChanged: (val) => setState(() => _selectedSymptomId = val),
@@ -288,7 +307,7 @@ class _SymptomScreenState extends State<SymptomScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _isLoading ? null : _submitEntry,
+                onPressed: (_isLoading || _loadFailed) ? null : _submitEntry,
                 child: _isLoading
                     ? const CircularProgressIndicator()
                     : const Text('Kaydet'),
