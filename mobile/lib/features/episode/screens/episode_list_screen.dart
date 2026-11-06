@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
-import '../episode_service.dart';
-import 'episode_close_screen.dart';
-import 'package:mobile/features/medication/medication_service.dart';
-import 'package:mobile/core/utils/parse_utils.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class EpisodeListScreen extends StatefulWidget {
+import '../../../app/providers.dart';
+import '../../../l10n/app_localizations.dart';
+import '../episode_format.dart';
+import '../episode_overview.dart';
+
+class EpisodeListScreen extends ConsumerStatefulWidget {
   const EpisodeListScreen({super.key});
 
   @override
-  State<EpisodeListScreen> createState() => _EpisodeListScreenState();
+  ConsumerState<EpisodeListScreen> createState() => _EpisodeListScreenState();
 }
 
-class _EpisodeListScreenState extends State<EpisodeListScreen>
+class _EpisodeListScreenState extends ConsumerState<EpisodeListScreen>
     with SingleTickerProviderStateMixin {
-  final EpisodeService _episodeService = EpisodeService();
-  late TabController _tabController;
+  late final TabController _tabController;
 
-  List<dynamic> _activeEpisodes = [];
-  List<dynamic> _historyEpisodes = [];
-  bool _isLoading = false;
-  String _message = '';
+  List<EpisodeOverview> _activeEpisodes = [];
+  List<EpisodeOverview> _historyEpisodes = [];
+  bool _isLoading = true;
+  bool _loadFailed = false;
 
   @override
   void initState() {
@@ -34,158 +35,44 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
     super.dispose();
   }
 
-  Future<void> _loadEpisodes() async {
-    setState(() => _isLoading = true);
+  /// Dönemleri yerel veritabanından okur. [showSpinner] kapalıysa (çek-bırak
+  /// yenileme) mevcut liste ekranda kalır.
+  Future<void> _loadEpisodes({bool showSpinner = true}) async {
+    if (showSpinner) setState(() => _isLoading = true);
     try {
-      final active = await _episodeService.getActiveEpisodes();
-      final history = await _episodeService.getHistoryEpisodes();
+      final result = await ref.read(episodeOverviewLoaderProvider).load();
+      if (!mounted) return;
       setState(() {
-        _activeEpisodes = active;
-        _historyEpisodes = history;
+        _activeEpisodes = result.active;
+        _historyEpisodes = result.history;
+        _loadFailed = false;
+        _isLoading = false;
       });
-    } catch (e) {
-      setState(() => _message = 'Ataklar yüklenemedi');
-    } finally {
-      setState(() => _isLoading = false);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loadFailed = true;
+        _isLoading = false;
+      });
     }
   }
 
-  String _formatDateTime(String isoString) {
-    final dt = DateTime.parse(isoString).toLocal();
-    return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  String _moment(DateTime instant, int offsetMinutes) => formatEpisodeMoment(
+        instant,
+        offsetMinutes,
+        ref.read(clockProvider)(),
+        Localizations.localeOf(context).toString(),
+      );
+
+  String _locations(EpisodeOverview o, AppLocalizations l10n) {
+    if (o.locations.isEmpty) return l10n.episodeNoLocation;
+    return l10n.episodeLocation(o.locations.map((l) => l.location).join(', '));
   }
 
-  String _formatDuration(int? minutes) {
-    if (minutes == null) return '';
-    final h = minutes ~/ 60;
-    final m = minutes % 60;
-    if (h > 0) return '$h saat $m dakika';
-    return '$m dakika';
-  }
-
-  String _formatLocations(List<dynamic> locations) {
-    if (locations.isEmpty) return 'Lokasyon belirtilmemiş';
-    return locations.map((l) => l['location']).join(', ');
-  }
-
-  void _showAddMedicationSheet(int episodeId) {
-    final MedicationService medService = MedicationService();
-    List<dynamic> medications = [];
-    int? selectedMedId;
-    double? doseAmount;
-    String doseUnit = 'tablet';
-    final doseController = TextEditingController();
-    final List<String> doseUnits = ['tablet', 'mg', 'ml', 'damla', 'kapsul'];
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setLocal) {
-          if (medications.isEmpty) {
-            medService.getMedications().then((data) {
-              setLocal(() => medications = data);
-            });
-          }
-          return Padding(
-            padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 16,
-              bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Atağa İlaç Ekle',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<int>(
-                  hint: const Text('İlaç seçin...'),
-                  items: medications.map((m) {
-                    return DropdownMenuItem<int>(
-                      value: parseInt(m['id']),
-                      child: Text(m['name'] as String),
-                    );
-                  }).toList(),
-                  onChanged: (val) => setLocal(() => selectedMedId = val),
-                  decoration:
-                      const InputDecoration(border: OutlineInputBorder()),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: doseController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Doz miktarı',
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: (val) => doseAmount = double.tryParse(val),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    DropdownButton<String>(
-                      value: doseUnit,
-                      items: doseUnits.map((u) {
-                        return DropdownMenuItem(value: u, child: Text(u));
-                      }).toList(),
-                      onChanged: (val) =>
-                          setLocal(() => doseUnit = val ?? 'tablet'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (selectedMedId == null) return;
-                      Navigator.pop(ctx);
-                      try {
-                        await medService.createMedicationLog(
-                          medicationId: selectedMedId!,
-                          takenAt: DateTime.now().toIso8601String(),
-                          doseAmount: doseAmount,
-                          doseUnit: doseUnit,
-                          episodeId: episodeId,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('İlaç atağa eklendi.'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Hata: $e'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text('Kaydet'),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildActiveCard(Map<String, dynamic> episode) {
-    final startTime = _formatDateTime(episode['start_time']);
-    final locations = _formatLocations(episode['locations'] ?? []);
-    final entries = episode['entries'] as List<dynamic>? ?? [];
-    final lastSeverity = entries.isNotEmpty ? entries.last['severity'] : '-';
+  Widget _buildActiveCard(EpisodeOverview o, AppLocalizations l10n) {
+    final episode = o.episode;
+    final start = _moment(episode.startTime, episode.startUtcOffsetMinutes);
+    final severity = o.lastSeverity?.toString() ?? '-';
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -199,7 +86,7 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
                 const Text('🟡 ', style: TextStyle(fontSize: 18)),
                 Expanded(
                   child: Text(
-                    episode['symptom_name'],
+                    o.symptomName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -209,18 +96,19 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
               ],
             ),
             const SizedBox(height: 8),
-            Text('Şiddet: $lastSeverity/10'),
-            Text('Başlangıç: $startTime'),
-            Text('Lokasyon: $locations'),
+            Text(l10n.episodeSeverity(severity)),
+            Text(l10n.episodeStart(start)),
+            Text(_locations(o, l10n)),
             const SizedBox(height: 12),
+            // GEÇİCİ (Dönemler ekranı Grup 2 ve 3): kapatma ve ilaç ekleme
+            // yeni servislere bağlanana kadar pasif.
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.medication, size: 16),
-                    label: const Text('İlaç Ekle'),
-                    onPressed: () =>
-                        _showAddMedicationSheet(parseInt(episode['id'])),
+                    label: Text(l10n.episodeAddMedication),
+                    onPressed: null,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -229,19 +117,10 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade400,
                     ),
-                    onPressed: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              EpisodeCloseScreen(episode: episode),
-                        ),
-                      );
-                      if (result == true) _loadEpisodes();
-                    },
-                    child: const Text(
-                      'Atağı Kapat',
-                      style: TextStyle(color: Colors.white),
+                    onPressed: null,
+                    child: Text(
+                      l10n.episodeClose,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
@@ -253,19 +132,17 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
     );
   }
 
-  Widget _buildHistoryCard(Map<String, dynamic> episode) {
-    final startTime = _formatDateTime(episode['start_time']);
-    final endTime = episode['ended_at'] != null
-        ? _formatDateTime(episode['ended_at'])
-        : '-';
-    final duration = _formatDuration(episode['duration_minutes']);
-    final locations = _formatLocations(episode['locations'] ?? []);
-    final entries = episode['entries'] as List<dynamic>? ?? [];
-    final maxSeverity = entries.isNotEmpty
-        ? entries
-            .map((e) => parseInt(e['severity']))
-            .reduce((a, b) => a > b ? a : b)
-        : '-';
+  Widget _buildHistoryCard(EpisodeOverview o, AppLocalizations l10n) {
+    final episode = o.episode;
+    final start = _moment(episode.startTime, episode.startUtcOffsetMinutes);
+    final ended = episode.endedAt;
+    final end = ended == null
+        ? '-'
+        : _moment(ended, episode.endUtcOffsetMinutes ?? 0);
+    final minutes = o.durationMinutes;
+    final duration =
+        minutes == null ? '' : formatEpisodeDuration(minutes, l10n);
+    final notes = episode.resolutionNotes;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -279,7 +156,7 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
                 const Text('✅ ', style: TextStyle(fontSize: 18)),
                 Expanded(
                   child: Text(
-                    episode['symptom_name'],
+                    o.symptomName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -289,15 +166,14 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
               ],
             ),
             const SizedBox(height: 8),
-            Text('Maks. şiddet: $maxSeverity/10'),
-            Text('$startTime → $endTime · $duration'),
-            Text('Lokasyon: $locations'),
-            if (episode['resolution_notes'] != null &&
-                episode['resolution_notes'].isNotEmpty)
+            Text(l10n.episodeMaxSeverity(o.maxSeverity?.toString() ?? '-')),
+            Text(l10n.episodeRange(start, end, duration)),
+            Text(_locations(o, l10n)),
+            if (notes.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  '📝 ${episode['resolution_notes']}',
+                  '📝 $notes',
                   style: const TextStyle(fontStyle: FontStyle.italic),
                 ),
               ),
@@ -309,44 +185,56 @@ class _EpisodeListScreenState extends State<EpisodeListScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ataklar'),
+        title: Text(l10n.episodesTitle),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Aktif'),
-            Tab(text: 'Geçmiş'),
+          tabs: [
+            Tab(text: l10n.episodesTabActive),
+            Tab(text: l10n.episodesTabHistory),
           ],
         ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadEpisodes,
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _activeEpisodes.isEmpty
-                      ? const Center(child: Text('Aktif atak yok'))
-                      : ListView.builder(
-                          itemCount: _activeEpisodes.length,
-                          itemBuilder: (_, i) =>
-                              _buildActiveCard(_activeEpisodes[i]),
-                        ),
-                  _historyEpisodes.isEmpty
-                      ? const Center(child: Text('Geçmiş atak yok'))
-                      : ListView.builder(
-                          itemCount: _historyEpisodes.length,
-                          itemBuilder: (_, i) =>
-                              _buildHistoryCard(_historyEpisodes[i]),
-                        ),
-                ],
-              ),
-            ),
+          : _loadFailed
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      l10n.episodesLoadError,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: () => _loadEpisodes(showSpinner: false),
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _activeEpisodes.isEmpty
+                          ? Center(child: Text(l10n.episodesEmptyActive))
+                          : ListView.builder(
+                              itemCount: _activeEpisodes.length,
+                              itemBuilder: (_, i) =>
+                                  _buildActiveCard(_activeEpisodes[i], l10n),
+                            ),
+                      _historyEpisodes.isEmpty
+                          ? Center(child: Text(l10n.episodesEmptyHistory))
+                          : ListView.builder(
+                              itemCount: _historyEpisodes.length,
+                              itemBuilder: (_, i) =>
+                                  _buildHistoryCard(_historyEpisodes[i], l10n),
+                            ),
+                    ],
+                  ),
+                ),
       floatingActionButton: FloatingActionButton(
         onPressed: _loadEpisodes,
-        tooltip: 'Yenile',
+        tooltip: l10n.episodesRefresh,
         child: const Icon(Icons.refresh),
       ),
     );

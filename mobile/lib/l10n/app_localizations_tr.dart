@@ -128,6 +128,72 @@ class AppLocalizationsTr extends AppLocalizations {
       'Semptom kaydedildi ama dönem işlemi yapılamadı.';
 
   @override
+  String get episodesTitle => 'Dönemler';
+
+  @override
+  String get episodesTabActive => 'Aktif';
+
+  @override
+  String get episodesTabHistory => 'Geçmiş';
+
+  @override
+  String get episodesEmptyActive => 'Devam eden dönem yok';
+
+  @override
+  String get episodesEmptyHistory => 'Geçmiş dönem yok';
+
+  @override
+  String get episodesLoadError =>
+      'Dönemler okunamadı. Kayıtlarınız silinmedi; yenilemeyi deneyin.';
+
+  @override
+  String get episodesRefresh => 'Yenile';
+
+  @override
+  String episodeSeverity(String value) {
+    return 'Şiddet: $value/10';
+  }
+
+  @override
+  String episodeMaxSeverity(String value) {
+    return 'Maks. şiddet: $value/10';
+  }
+
+  @override
+  String episodeStart(String time) {
+    return 'Başlangıç: $time';
+  }
+
+  @override
+  String episodeLocation(String locations) {
+    return 'Lokasyon: $locations';
+  }
+
+  @override
+  String get episodeNoLocation => 'Lokasyon belirtilmemiş';
+
+  @override
+  String episodeRange(String start, String end, String duration) {
+    return '$start → $end · $duration';
+  }
+
+  @override
+  String episodeDurationHoursMinutes(int hours, int minutes) {
+    return '$hours saat $minutes dakika';
+  }
+
+  @override
+  String episodeDurationMinutes(int minutes) {
+    return '$minutes dakika';
+  }
+
+  @override
+  String get episodeAddMedication => 'İlaç Ekle';
+
+  @override
+  String get episodeClose => 'Dönemi Kapat';
+
+  @override
   String get dbOpenErrorTitle => 'Veritabanı açılamadı';
 
   @override

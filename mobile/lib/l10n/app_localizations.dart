@@ -304,6 +304,108 @@ abstract class AppLocalizations {
   /// **'Semptom kaydedildi ama dönem işlemi yapılamadı.'**
   String get symptomEpisodeError;
 
+  /// Dönem listesi ekranının başlığı. Dönem = başlangıcı ve sonu olan şikâyet dönemi (eski adıyla atak); kullanıcıya 'atak' denmez.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dönemler'**
+  String get episodesTitle;
+
+  /// No description provided for @episodesTabActive.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aktif'**
+  String get episodesTabActive;
+
+  /// No description provided for @episodesTabHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş'**
+  String get episodesTabHistory;
+
+  /// No description provided for @episodesEmptyActive.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam eden dönem yok'**
+  String get episodesEmptyActive;
+
+  /// No description provided for @episodesEmptyHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş dönem yok'**
+  String get episodesEmptyHistory;
+
+  /// Dönem listesi veritabanından okunamazsa gösterilir.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dönemler okunamadı. Kayıtlarınız silinmedi; yenilemeyi deneyin.'**
+  String get episodesLoadError;
+
+  /// No description provided for @episodesRefresh.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yenile'**
+  String get episodesRefresh;
+
+  /// Devam eden dönem kartında son girişin şiddeti; giriş yoksa '-'.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şiddet: {value}/10'**
+  String episodeSeverity(String value);
+
+  /// Biten dönem kartında girişlerin en yüksek şiddeti; giriş yoksa '-'.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maks. şiddet: {value}/10'**
+  String episodeMaxSeverity(String value);
+
+  /// Devam eden dönem kartında başlangıç zamanı (bugünse saat, başka güne aitse tarihli).
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlangıç: {time}'**
+  String episodeStart(String time);
+
+  /// No description provided for @episodeLocation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lokasyon: {locations}'**
+  String episodeLocation(String locations);
+
+  /// No description provided for @episodeNoLocation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lokasyon belirtilmemiş'**
+  String get episodeNoLocation;
+
+  /// Biten dönem kartında başlangıç → bitiş ve süre.
+  ///
+  /// In tr, this message translates to:
+  /// **'{start} → {end} · {duration}'**
+  String episodeRange(String start, String end, String duration);
+
+  /// No description provided for @episodeDurationHoursMinutes.
+  ///
+  /// In tr, this message translates to:
+  /// **'{hours} saat {minutes} dakika'**
+  String episodeDurationHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @episodeDurationMinutes.
+  ///
+  /// In tr, this message translates to:
+  /// **'{minutes} dakika'**
+  String episodeDurationMinutes(int minutes);
+
+  /// No description provided for @episodeAddMedication.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç Ekle'**
+  String get episodeAddMedication;
+
+  /// No description provided for @episodeClose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dönemi Kapat'**
+  String get episodeClose;
+
   /// No description provided for @dbOpenErrorTitle.
   ///
   /// In tr, this message translates to:

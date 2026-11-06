@@ -17,6 +17,7 @@ import '../data/repositories/symptom_repository.dart';
 import '../domain/services/episode_service.dart';
 import '../domain/services/medication_service.dart';
 import '../domain/services/timeline_service.dart';
+import '../features/episode/episode_overview.dart';
 
 /// `main()` açılmış veritabanıyla bunu geçersiz kılmak zorundadır.
 final databaseProvider = Provider<AppDatabase>(
@@ -87,6 +88,16 @@ final medicationServiceProvider = Provider<MedicationService>(
   (ref) => MedicationService(
     medications: ref.watch(medicationRepositoryProvider),
     logs: ref.watch(medicationLogRepositoryProvider),
+  ),
+);
+
+/// Dönem listesi ekranının okuma modeli (dönem + semptom adı + girişler +
+/// konumlar).
+final episodeOverviewLoaderProvider = Provider<EpisodeOverviewLoader>(
+  (ref) => EpisodeOverviewLoader(
+    episodes: ref.watch(episodeRepositoryProvider),
+    entries: ref.watch(symptomEntryRepositoryProvider),
+    symptoms: ref.watch(symptomRepositoryProvider),
   ),
 );
 

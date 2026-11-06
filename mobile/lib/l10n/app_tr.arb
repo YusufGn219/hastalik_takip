@@ -92,6 +92,92 @@
     "description": "Dönem işlemi (başlatma ya da ekleme) başarısız olursa gösterilir; giriş zaten kayıtlıdır."
   },
 
+  "episodesTitle": "Dönemler",
+  "@episodesTitle": {
+    "description": "Dönem listesi ekranının başlığı. Dönem = başlangıcı ve sonu olan şikâyet dönemi (eski adıyla atak); kullanıcıya 'atak' denmez."
+  },
+  "episodesTabActive": "Aktif",
+  "episodesTabHistory": "Geçmiş",
+  "episodesEmptyActive": "Devam eden dönem yok",
+  "episodesEmptyHistory": "Geçmiş dönem yok",
+  "episodesLoadError": "Dönemler okunamadı. Kayıtlarınız silinmedi; yenilemeyi deneyin.",
+  "@episodesLoadError": {
+    "description": "Dönem listesi veritabanından okunamazsa gösterilir."
+  },
+  "episodesRefresh": "Yenile",
+  "episodeSeverity": "Şiddet: {value}/10",
+  "@episodeSeverity": {
+    "description": "Devam eden dönem kartında son girişin şiddeti; giriş yoksa '-'.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "episodeMaxSeverity": "Maks. şiddet: {value}/10",
+  "@episodeMaxSeverity": {
+    "description": "Biten dönem kartında girişlerin en yüksek şiddeti; giriş yoksa '-'.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "episodeStart": "Başlangıç: {time}",
+  "@episodeStart": {
+    "description": "Devam eden dönem kartında başlangıç zamanı (bugünse saat, başka güne aitse tarihli).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "episodeLocation": "Lokasyon: {locations}",
+  "@episodeLocation": {
+    "placeholders": {
+      "locations": {
+        "type": "String"
+      }
+    }
+  },
+  "episodeNoLocation": "Lokasyon belirtilmemiş",
+  "episodeRange": "{start} → {end} · {duration}",
+  "@episodeRange": {
+    "description": "Biten dönem kartında başlangıç → bitiş ve süre.",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "episodeDurationHoursMinutes": "{hours} saat {minutes} dakika",
+  "@episodeDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "episodeDurationMinutes": "{minutes} dakika",
+  "@episodeDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "episodeAddMedication": "İlaç Ekle",
+  "episodeClose": "Dönemi Kapat",
+
   "dbOpenErrorTitle": "Veritabanı açılamadı",
   "dbOpenErrorBody": "Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.",
   "@dbOpenErrorBody": {
