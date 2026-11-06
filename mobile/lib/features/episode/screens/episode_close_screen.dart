@@ -1,47 +1,79 @@
 import 'package:flutter/material.dart';
-import '../episode_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class EpisodeCloseScreen extends StatefulWidget {
-  final Map<String, dynamic> episode;
+import '../../../app/providers.dart';
+import '../../../domain/errors.dart';
+import '../../../l10n/app_localizations.dart';
+import '../episode_overview.dart';
 
-  const EpisodeCloseScreen({super.key, required this.episode});
+/// Devam eden bir dönemi kapatır. Kapanış zamanı "şimdi"dir; not isteğe
+/// bağlıdır. Başarılıysa `true` ile geri döner (liste kendini yeniler).
+class EpisodeCloseScreen extends ConsumerStatefulWidget {
+  const EpisodeCloseScreen({super.key, required this.overview});
+
+  final EpisodeOverview overview;
 
   @override
-  State<EpisodeCloseScreen> createState() => _EpisodeCloseScreenState();
+  ConsumerState<EpisodeCloseScreen> createState() => _EpisodeCloseScreenState();
 }
 
-class _EpisodeCloseScreenState extends State<EpisodeCloseScreen> {
-  final EpisodeService _episodeService = EpisodeService();
+class _EpisodeCloseScreenState extends ConsumerState<EpisodeCloseScreen> {
   final TextEditingController _notesController = TextEditingController();
   bool _isLoading = false;
   String _message = '';
 
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
   Future<void> _closeEpisode() async {
-    setState(() => _isLoading = true);
+    final l10n = AppLocalizations.of(context);
+    setState(() {
+      _isLoading = true;
+      _message = '';
+    });
     try {
-      await _episodeService.closeEpisode(
-        episodeId: widget.episode['id'],
-        endedAt: DateTime.now(),
-        resolutionNotes: _notesController.text,
-      );
+      // Listedeki kart eski kalmış olabilir; kural kontrolü güncel kayda
+      // yapılsın (kapalı bir dönemin bitişi üzerine yazılmasın).
+      final fresh = await ref
+          .read(episodeRepositoryProvider)
+          .getById(widget.overview.episode.id);
+      if (fresh == null) throw StateError('dönem bulunamadı');
+      await ref.read(episodeServiceProvider).close(
+            fresh,
+            resolutionNotes: _notesController.text.trim(),
+          );
       if (mounted) Navigator.pop(context, true);
-    } catch (e) {
-      setState(() => _message = 'Atak kapatılamadı');
-    } finally {
-      setState(() => _isLoading = false);
+    } on RuleViolation catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _message = switch (e.code) {
+          RuleCodes.episodeAlreadyClosed => l10n.episodeCloseAlreadyClosed,
+          RuleCodes.episodeEndBeforeStart => l10n.episodeCloseEndBeforeStart,
+          _ => l10n.episodeCloseFailed,
+        };
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _message = l10n.episodeCloseFailed;
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final symptomName = widget.episode['symptom_name'];
-    final locations = (widget.episode['locations'] as List<dynamic>? ?? [])
-        .map((l) => l['location'])
-        .join(', ');
+    final l10n = AppLocalizations.of(context);
+    final overview = widget.overview;
+    final locations = overview.locations.map((l) => l.location).join(', ');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Atağı Kapat')),
-      body: Padding(
+      appBar: AppBar(title: Text(l10n.episodeClose)),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,29 +85,29 @@ class _EpisodeCloseScreenState extends State<EpisodeCloseScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      symptomName,
+                      overview.symptomName,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     if (locations.isNotEmpty)
-                      Text('Lokasyon: $locations'),
+                      Text(l10n.episodeLocation(locations)),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Nasıl geçti? (opsiyonel)',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              l10n.episodeCloseNotesLabel,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _notesController,
-              decoration: const InputDecoration(
-                hintText: 'Örn: Uyuyarak geçirdim, ilaç aldım...',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: l10n.episodeCloseNotesHint,
+                border: const OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -88,10 +120,14 @@ class _EpisodeCloseScreenState extends State<EpisodeCloseScreen> {
                 ),
                 onPressed: _isLoading ? null : _closeEpisode,
                 child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text(
-                        'Atağı Kapat',
-                        style: TextStyle(color: Colors.white),
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(
+                        l10n.episodeClose,
+                        style: const TextStyle(color: Colors.white),
                       ),
               ),
             ),

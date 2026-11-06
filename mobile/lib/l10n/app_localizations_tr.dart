@@ -194,6 +194,27 @@ class AppLocalizationsTr extends AppLocalizations {
   String get episodeClose => 'Dönemi Kapat';
 
   @override
+  String get episodeClosed => 'Dönem kapatıldı.';
+
+  @override
+  String get episodeCloseNotesLabel => 'Nasıl geçti? (isteğe bağlı)';
+
+  @override
+  String get episodeCloseNotesHint => 'Örn: Uyuyarak geçirdim, ilaç aldım...';
+
+  @override
+  String get episodeCloseAlreadyClosed =>
+      'Bu dönem zaten kapatılmış. Listeyi yenileyin.';
+
+  @override
+  String get episodeCloseEndBeforeStart =>
+      'Bitiş zamanı başlangıçtan önce olamaz. Cihazın saatini kontrol edin.';
+
+  @override
+  String get episodeCloseFailed =>
+      'Dönem kapatılamadı. Tekrar deneyin; yazdığınız not korunur.';
+
+  @override
   String get dbOpenErrorTitle => 'Veritabanı açılamadı';
 
   @override

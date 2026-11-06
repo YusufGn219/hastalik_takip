@@ -5,6 +5,7 @@ import '../../../app/providers.dart';
 import '../../../l10n/app_localizations.dart';
 import '../episode_format.dart';
 import '../episode_overview.dart';
+import 'episode_close_screen.dart';
 
 class EpisodeListScreen extends ConsumerStatefulWidget {
   const EpisodeListScreen({super.key});
@@ -57,6 +58,19 @@ class _EpisodeListScreenState extends ConsumerState<EpisodeListScreen>
     }
   }
 
+  /// Kapatma ekranını açar; kapatıldıysa listeyi yeniler ve haber verir.
+  Future<void> _openClose(EpisodeOverview o) async {
+    final closed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => EpisodeCloseScreen(overview: o)),
+    );
+    if (closed != true || !mounted) return;
+    await _loadEpisodes(showSpinner: false);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).episodeClosed)),
+    );
+  }
+
   String _moment(DateTime instant, int offsetMinutes) => formatEpisodeMoment(
         instant,
         offsetMinutes,
@@ -100,8 +114,8 @@ class _EpisodeListScreenState extends ConsumerState<EpisodeListScreen>
             Text(l10n.episodeStart(start)),
             Text(_locations(o, l10n)),
             const SizedBox(height: 12),
-            // GEÇİCİ (Dönemler ekranı Grup 2 ve 3): kapatma ve ilaç ekleme
-            // yeni servislere bağlanana kadar pasif.
+            // GEÇİCİ (Dönemler ekranı Grup 3): ilaç ekleme yeni servise
+            // bağlanana kadar pasif.
             Row(
               children: [
                 Expanded(
@@ -117,7 +131,7 @@ class _EpisodeListScreenState extends ConsumerState<EpisodeListScreen>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade400,
                     ),
-                    onPressed: null,
+                    onPressed: () => _openClose(o),
                     child: Text(
                       l10n.episodeClose,
                       style: const TextStyle(color: Colors.white),

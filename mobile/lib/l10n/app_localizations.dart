@@ -406,6 +406,42 @@ abstract class AppLocalizations {
   /// **'Dönemi Kapat'**
   String get episodeClose;
 
+  /// No description provided for @episodeClosed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dönem kapatıldı.'**
+  String get episodeClosed;
+
+  /// No description provided for @episodeCloseNotesLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nasıl geçti? (isteğe bağlı)'**
+  String get episodeCloseNotesLabel;
+
+  /// No description provided for @episodeCloseNotesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn: Uyuyarak geçirdim, ilaç aldım...'**
+  String get episodeCloseNotesHint;
+
+  /// Kapatılmış bir dönem tekrar kapatılmaya çalışılırsa (iş kuralı episode_already_closed).
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dönem zaten kapatılmış. Listeyi yenileyin.'**
+  String get episodeCloseAlreadyClosed;
+
+  /// Şimdiki zaman dönemin başlangıcından önce ya da eşitse (iş kuralı episode_end_before_start); genelde cihaz saati geri alınmıştır.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitiş zamanı başlangıçtan önce olamaz. Cihazın saatini kontrol edin.'**
+  String get episodeCloseEndBeforeStart;
+
+  /// No description provided for @episodeCloseFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dönem kapatılamadı. Tekrar deneyin; yazdığınız not korunur.'**
+  String get episodeCloseFailed;
+
   /// No description provided for @dbOpenErrorTitle.
   ///
   /// In tr, this message translates to:

@@ -6,6 +6,7 @@ import 'package:mobile/data/database/app_database.dart';
 import 'package:mobile/data/database/seed_loader.dart';
 import 'package:mobile/data/repositories/episode_repository.dart';
 import 'package:mobile/data/repositories/symptom_entry_repository.dart';
+import 'package:mobile/domain/services/episode_service.dart';
 import 'package:mobile/features/episode/episode_format.dart';
 import 'package:mobile/features/episode/screens/episode_list_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
@@ -55,6 +56,24 @@ class _FailingEpisodeRepository implements EpisodeRepository {
 
   @override
   Future<void> softDelete(String id) => throw UnimplementedError();
+}
+
+/// Kapatma beklenmedik şekilde hata verir; ekranın genel hata yolunu denemek
+/// için.
+class _FailingCloseService extends EpisodeService {
+  _FailingCloseService(AppDatabase db)
+      : super(
+          episodes: DriftEpisodeRepository(db),
+          entries: DriftSymptomEntryRepository(db),
+        );
+
+  @override
+  Future<void> close(
+    Episode episode, {
+    DateTime? endedAt,
+    String resolutionNotes = '',
+  }) async =>
+      throw StateError('yazılamadı');
 }
 
 Widget _app(List<Override> overrides) => ProviderScope(
@@ -149,7 +168,7 @@ void main() {
 
     testWidgets(
         'devam eden dönem kartı: semptom adı, son giriş şiddeti, bugünse yalnız '
-        'saat, konumlar; düğmeler henüz pasif', (tester) async {
+        'saat, konumlar; İlaç Ekle henüz pasif', (tester) async {
       await openApp(tester);
       final episode =
           await startEpisode(tester, headacheId, utc(2026, 11, 6, 8, 0));
@@ -173,9 +192,19 @@ void main() {
       expect(find.text('Şiddet: 7/10'), findsOneWidget); // son giriş, en yüksek değil
       expect(find.text('Başlangıç: 08:00'), findsOneWidget);
       expect(find.text('Lokasyon: Şakak, Alın'), findsOneWidget);
+      // Kapatma bağlandı (Grup 2); ilaç ekleme Grup 3'e kadar pasif.
       expect(
         tester.widget<ElevatedButton>(
           find.widgetWithText(ElevatedButton, 'Dönemi Kapat'),
+        ).onPressed,
+        isNotNull,
+      );
+      expect(
+        tester.widget<ButtonStyleButton>(
+          find.ancestor(
+            of: find.text('İlaç Ekle'),
+            matching: find.bySubtype<ButtonStyleButton>(),
+          ),
         ).onPressed,
         isNull,
       );
@@ -308,6 +337,166 @@ void main() {
 
       expect(find.textContaining('Dönemler okunamadı'), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+  });
+
+  group('EpisodeListScreen / dönemi kapatma', () {
+    // Başlangıç yerel saatle verilir: bitiş "şimdi" (yerel 10:30) olduğundan
+    // süre makinenin saat diliminden bağımsız çıkar.
+    final start = DateTime(2026, 11, 6, 8, 0);
+
+    Future<Episode> readEpisode(WidgetTester tester, String id) => tester
+        .runAsync(() => DriftEpisodeRepository(db).getById(id))
+        .then((e) => e!);
+
+    Future<void> openClose(WidgetTester tester) async {
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Dönemi Kapat'));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> tapCloseButton(WidgetTester tester) async {
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Dönemi Kapat'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets(
+        'not yazılıp kapatılınca dönem yerel veritabanında kapanır, liste '
+        'yenilenir, Geçmiş\'e geçer ve bilgi çıkar', (tester) async {
+      await openApp(tester);
+      final episode = await startEpisode(tester, headacheId, start);
+      await addEntry(tester, episode, 6, start);
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+
+      await openClose(tester);
+      expect(find.text('Nasıl geçti? (isteğe bağlı)'), findsOneWidget);
+      await tester.enterText(find.byType(TextField), '  ilaçla geçti ');
+      await tapCloseButton(tester);
+
+      final saved = await readEpisode(tester, episode.id);
+      expect(saved.status.name, 'resolved');
+      expect(saved.resolutionNotes, 'ilaçla geçti'); // kırpılmış
+      expect(saved.endedAt!.toUtc(), _now().toUtc()); // "şimdi"
+
+      // Liste ekranına dönüldü, yenilendi.
+      expect(find.text('Dönem kapatıldı.'), findsOneWidget);
+      expect(find.text('Devam eden dönem yok'), findsOneWidget);
+      await openHistoryTab(tester);
+      expect(find.text('Maks. şiddet: 6/10'), findsOneWidget);
+      expect(find.text('08:00 → 10:30 · 2 saat 30 dakika'), findsOneWidget);
+      expect(find.text('📝 ilaçla geçti'), findsOneWidget);
+    });
+
+    testWidgets('not boş bırakılırsa boş not kaydedilir', (tester) async {
+      await openApp(tester);
+      final episode = await startEpisode(tester, headacheId, start);
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+
+      await openClose(tester);
+      await tester.enterText(find.byType(TextField), '   ');
+      await tapCloseButton(tester);
+
+      final saved = await readEpisode(tester, episode.id);
+      expect(saved.status.name, 'resolved');
+      expect(saved.resolutionNotes, '');
+    });
+
+    testWidgets('vazgeçilirse dönem açık kalır ve bilgi çıkmaz',
+        (tester) async {
+      await openApp(tester);
+      final episode = await startEpisode(tester, headacheId, start);
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+
+      await openClose(tester);
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+
+      expect((await readEpisode(tester, episode.id)).status.name, 'ongoing');
+      expect(find.text('Dönem kapatıldı.'), findsNothing);
+      expect(find.text('Baş ağrısı'), findsOneWidget);
+    });
+
+    testWidgets(
+        'şimdi başlangıçtan önceyse (cihaz saati geri) anlaşılır mesaj çıkar, '
+        'dönem açık kalır, yazılan not korunur', (tester) async {
+      await openApp(tester);
+      final episode = await startEpisode(
+        tester,
+        headacheId,
+        DateTime(2026, 11, 6, 12, 0), // "şimdi" 10:30'dan sonra
+      );
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+
+      await openClose(tester);
+      await tester.enterText(find.byType(TextField), 'not');
+      await tapCloseButton(tester);
+
+      expect(
+        find.text('Bitiş zamanı başlangıçtan önce olamaz. Cihazın saatini '
+            'kontrol edin.'),
+        findsOneWidget,
+      );
+      expect((await readEpisode(tester, episode.id)).status.name, 'ongoing');
+      expect(tester.widget<TextField>(find.byType(TextField)).controller!.text,
+          'not');
+      // Tekrar denenebilir.
+      expect(
+        tester
+            .widget<ElevatedButton>(
+                find.widgetWithText(ElevatedButton, 'Dönemi Kapat'))
+            .onPressed,
+        isNotNull,
+      );
+    });
+
+    testWidgets(
+        'kart eskiyse (dönem başka yerden kapanmış) tekrar kapatılmaz, bitiş '
+        've not üzerine yazılmaz', (tester) async {
+      await openApp(tester);
+      final episode = await startEpisode(tester, headacheId, start);
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+
+      // Liste hâlâ "devam ediyor" gösterirken kayıt arkadan kapanır.
+      await resolve(tester, episode, DateTime(2026, 11, 6, 9, 0), 'ilk not');
+
+      await openClose(tester);
+      await tester.enterText(find.byType(TextField), 'ikinci not');
+      await tapCloseButton(tester);
+
+      expect(find.text('Bu dönem zaten kapatılmış. Listeyi yenileyin.'),
+          findsOneWidget);
+      final saved = await readEpisode(tester, episode.id);
+      expect(saved.resolutionNotes, 'ilk not');
+      expect(saved.endedAt!.toUtc(), DateTime(2026, 11, 6, 9, 0).toUtc());
+    });
+
+    testWidgets('beklenmedik hata: genel mesaj, not korunur, tekrar denenebilir',
+        (tester) async {
+      await openApp(tester, [
+        episodeServiceProvider.overrideWithValue(_FailingCloseService(db)),
+      ]);
+      await startEpisode(tester, headacheId, start);
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+
+      await openClose(tester);
+      await tester.enterText(find.byType(TextField), 'yazdığım not');
+      await tapCloseButton(tester);
+
+      expect(find.textContaining('Dönem kapatılamadı'), findsOneWidget);
+      expect(tester.widget<TextField>(find.byType(TextField)).controller!.text,
+          'yazdığım not');
+      expect(
+        tester
+            .widget<ElevatedButton>(
+                find.widgetWithText(ElevatedButton, 'Dönemi Kapat'))
+            .onPressed,
+        isNotNull,
+      );
     });
   });
 

@@ -177,6 +177,18 @@
   },
   "episodeAddMedication": "İlaç Ekle",
   "episodeClose": "Dönemi Kapat",
+  "episodeClosed": "Dönem kapatıldı.",
+  "episodeCloseNotesLabel": "Nasıl geçti? (isteğe bağlı)",
+  "episodeCloseNotesHint": "Örn: Uyuyarak geçirdim, ilaç aldım...",
+  "episodeCloseAlreadyClosed": "Bu dönem zaten kapatılmış. Listeyi yenileyin.",
+  "@episodeCloseAlreadyClosed": {
+    "description": "Kapatılmış bir dönem tekrar kapatılmaya çalışılırsa (iş kuralı episode_already_closed)."
+  },
+  "episodeCloseEndBeforeStart": "Bitiş zamanı başlangıçtan önce olamaz. Cihazın saatini kontrol edin.",
+  "@episodeCloseEndBeforeStart": {
+    "description": "Şimdiki zaman dönemin başlangıcından önce ya da eşitse (iş kuralı episode_end_before_start); genelde cihaz saati geri alınmıştır."
+  },
+  "episodeCloseFailed": "Dönem kapatılamadı. Tekrar deneyin; yazdığınız not korunur.",
 
   "dbOpenErrorTitle": "Veritabanı açılamadı",
   "dbOpenErrorBody": "Şifreli veritabanı açılamadı. Uygulamayı tamamen kapatıp yeniden açmayı deneyin.",
