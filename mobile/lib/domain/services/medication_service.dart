@@ -9,6 +9,14 @@ import '../errors.dart';
 import '../local_day.dart';
 import '../weekdays.dart';
 
+/// Kronik hastalık ve ona bağlı (silinmemiş) ilaçlar.
+class ConditionSummary {
+  const ConditionSummary(this.condition, this.medications);
+
+  final ChronicCondition condition;
+  final List<Medication> medications;
+}
+
 class MedicationService {
   MedicationService({
     required MedicationRepository medications,
@@ -55,6 +63,105 @@ class MedicationService {
       recurringTime: recurringTime,
       recurringDays: days,
     );
+  }
+
+  // ------------------------------------------------------- kronik hastalık
+
+  static const _maxConditionNameLength = 200;
+
+  /// Silinmemiş kronik hastalıklar ve ilaçları; ikisi de Türkçe sıralı.
+  Future<List<ConditionSummary>> conditions() async {
+    final list = await _medications.listConditions();
+    list.sort((a, b) => compareTr(a.name, b.name));
+    final result = <ConditionSummary>[];
+    for (final c in list) {
+      final meds = await _medications.medicationsOfCondition(c.id)
+        ..sort((a, b) => compareTr(a.name, b.name));
+      result.add(ConditionSummary(c, meds));
+    }
+    return result;
+  }
+
+  /// Yeni kronik hastalık ekler. Ad kırpılır; boş, 200 karakterden uzun ya da
+  /// var olan bir adla (harf farkı gözetmeden) aynıysa; ilaçlardan biri yoksa ya
+  /// da silinmişse [RuleViolation] fırlatılır. Hiçbir şey yazılmadan önce
+  /// denetlenir.
+  Future<ChronicCondition> createCondition({
+    required String name,
+    List<String> medicationIds = const [],
+  }) async {
+    final clean = await _validConditionName(name);
+    await _requireMedications(medicationIds);
+    return _medications.createCondition(
+      name: clean,
+      medicationIds: medicationIds,
+    );
+  }
+
+  /// Adı ve ilaç listesini birlikte günceller (aynı denetimler; kendi adı serbest).
+  Future<void> updateCondition({
+    required String id,
+    required String name,
+    required List<String> medicationIds,
+  }) async {
+    await _requireCondition(id);
+    final clean = await _validConditionName(name, exceptId: id);
+    await _requireMedications(medicationIds);
+    await _medications.renameCondition(id, clean);
+    await _medications.setConditionMedications(id, medicationIds);
+  }
+
+  /// Hastalığı siler (silme işareti). İlaçlar ve eski alım kayıtları kalır.
+  Future<void> deleteCondition(String id) async {
+    await _requireCondition(id);
+    await _medications.softDeleteCondition(id);
+  }
+
+  Future<void> _requireCondition(String id) async {
+    final c = await _medications.getCondition(id);
+    if (c == null || c.deletedAt != null) {
+      throw const RuleViolation(
+        RuleCodes.conditionNotFound,
+        'Kronik hastalık bulunamadı.',
+      );
+    }
+  }
+
+  Future<void> _requireMedications(List<String> ids) async {
+    for (final id in ids.toSet()) {
+      final m = await _medications.getById(id);
+      if (m == null || m.deletedAt != null) {
+        throw const RuleViolation(
+          RuleCodes.medicationNotFound,
+          'İlaç bulunamadı.',
+        );
+      }
+    }
+  }
+
+  Future<String> _validConditionName(String name, {String? exceptId}) async {
+    final clean = name.trim();
+    if (clean.isEmpty) {
+      throw const RuleViolation(
+        RuleCodes.conditionNameEmpty,
+        'Hastalık adı boş olamaz.',
+      );
+    }
+    if (clean.length > _maxConditionNameLength) {
+      throw const RuleViolation(
+        RuleCodes.conditionNameTooLong,
+        'Hastalık adı en çok $_maxConditionNameLength karakter olabilir.',
+      );
+    }
+    final key = foldTr(clean);
+    final existing = await _medications.listConditions();
+    if (existing.any((c) => c.id != exceptId && foldTr(c.name) == key)) {
+      throw const RuleViolation(
+        RuleCodes.conditionNameExists,
+        'Bu adla bir kronik hastalık zaten var.',
+      );
+    }
+    return clean;
   }
 
   // ------------------------------------------------------------ kategori

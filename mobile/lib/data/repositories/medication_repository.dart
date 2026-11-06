@@ -53,6 +53,11 @@ abstract class MedicationRepository {
     List<String> medicationIds = const [],
   });
   Future<List<ChronicCondition>> listConditions();
+
+  /// Silinmiş olsa bile kaydı verir (yoksa null).
+  Future<ChronicCondition?> getCondition(String id);
+
+  Future<void> renameCondition(String id, String name);
   Future<List<Medication>> medicationsOfCondition(String conditionId);
   Future<void> setConditionMedications(
     String conditionId,
@@ -224,6 +229,23 @@ class DriftMedicationRepository implements MedicationRepository {
           ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.asc(t.name)]))
         .get();
+  }
+
+  @override
+  Future<ChronicCondition?> getCondition(String id) {
+    return (_db.select(_db.chronicConditions)..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
+  }
+
+  @override
+  Future<void> renameCondition(String id, String name) async {
+    await (_db.update(_db.chronicConditions)..where((t) => t.id.equals(id)))
+        .write(
+      ChronicConditionsCompanion(
+        name: Value(name),
+        updatedAt: Value(_clock()),
+      ),
+    );
   }
 
   @override

@@ -59,6 +59,7 @@ void main() {
         'Semptom girişi': '/symptoms',
         'Dönemler': '/episodes',
         'İlaç / takviye': '/medication-log',
+        'Kronik hastalıklar': '/chronic-conditions',
       }.entries) {
         await tester.tap(find.text(entry.key));
         await tester.pumpAndSettle();
@@ -66,7 +67,7 @@ void main() {
         tester.state<NavigatorState>(find.byType(Navigator)).pop();
         await tester.pumpAndSettle();
       }
-      expect(pushed, hasLength(4));
+      expect(pushed, hasLength(5));
     });
   });
 

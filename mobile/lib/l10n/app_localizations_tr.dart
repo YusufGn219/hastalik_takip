@@ -108,6 +108,92 @@ class AppLocalizationsTr extends AppLocalizations {
   String get medLogCategoryError => 'Kategori kaydedilemedi. Tekrar deneyin.';
 
   @override
+  String get homeConditions => 'Kronik hastalıklar';
+
+  @override
+  String get homeConditionsHint =>
+      'Hastalıklarınızı ve kullandığınız ilaçları yönetin';
+
+  @override
+  String get condTitle => 'Kronik Hastalıklarım';
+
+  @override
+  String get condAddTooltip => 'Hastalık ekle';
+
+  @override
+  String get condEmpty => 'Henüz kronik hastalık eklenmemiş.';
+
+  @override
+  String get condNewTitle => 'Yeni Kronik Hastalık';
+
+  @override
+  String get condEditTitle => 'Hastalığı Düzenle';
+
+  @override
+  String get condNameLabel => 'Hastalık adı';
+
+  @override
+  String get condMedsLabel => 'İlaçlar';
+
+  @override
+  String get condNoMeds => 'İlaç eklenmemiş.';
+
+  @override
+  String get condNoMedsAvailable => 'Seçilecek ilaç yok.';
+
+  @override
+  String get condSave => 'Kaydet';
+
+  @override
+  String get condCancel => 'İptal';
+
+  @override
+  String get condEditTooltip => 'Düzenle';
+
+  @override
+  String get condDeleteTooltip => 'Sil';
+
+  @override
+  String get condDeleteTitle => 'Hastalık silinsin mi?';
+
+  @override
+  String condDeleteBody(String name) {
+    return '\"$name\" silinir; ilaçlarınız ve eski ilaç kayıtlarınız silinmez.';
+  }
+
+  @override
+  String get condDeleteConfirm => 'Sil';
+
+  @override
+  String get condAdded => 'Hastalık eklendi.';
+
+  @override
+  String get condUpdated => 'Hastalık güncellendi.';
+
+  @override
+  String get condDeleted => 'Hastalık silindi.';
+
+  @override
+  String get condLoadError =>
+      'Kronik hastalıklar okunamadı. Ekranı kapatıp yeniden açmayı deneyin.';
+
+  @override
+  String get condErrorEmpty => 'Hastalık adı boş olamaz.';
+
+  @override
+  String get condErrorTooLong => 'Hastalık adı en çok 200 karakter olabilir.';
+
+  @override
+  String get condErrorExists => 'Bu adla bir kronik hastalık zaten var.';
+
+  @override
+  String get condErrorMedication =>
+      'Seçtiğiniz ilaçlardan biri artık yok. Ekranı yenileyip tekrar deneyin.';
+
+  @override
+  String get condErrorGeneric => 'İşlem yapılamadı. Tekrar deneyin.';
+
+  @override
   String get medCatTitle => 'Kategoriler';
 
   @override

@@ -20,4 +20,8 @@ abstract final class RuleCodes {
   static const categoryNameExists = 'category_name_exists';
   static const categoryNotFound = 'category_not_found';
   static const medicationNotFound = 'medication_not_found';
+  static const conditionNameEmpty = 'condition_name_empty';
+  static const conditionNameTooLong = 'condition_name_too_long';
+  static const conditionNameExists = 'condition_name_exists';
+  static const conditionNotFound = 'condition_not_found';
 }

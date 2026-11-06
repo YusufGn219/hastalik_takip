@@ -286,6 +286,168 @@ abstract class AppLocalizations {
   /// **'Kategori kaydedilemedi. Tekrar deneyin.'**
   String get medLogCategoryError;
 
+  /// No description provided for @homeConditions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kronik hastalıklar'**
+  String get homeConditions;
+
+  /// No description provided for @homeConditionsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalıklarınızı ve kullandığınız ilaçları yönetin'**
+  String get homeConditionsHint;
+
+  /// No description provided for @condTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kronik Hastalıklarım'**
+  String get condTitle;
+
+  /// No description provided for @condAddTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalık ekle'**
+  String get condAddTooltip;
+
+  /// No description provided for @condEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz kronik hastalık eklenmemiş.'**
+  String get condEmpty;
+
+  /// No description provided for @condNewTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Kronik Hastalık'**
+  String get condNewTitle;
+
+  /// No description provided for @condEditTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalığı Düzenle'**
+  String get condEditTitle;
+
+  /// No description provided for @condNameLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalık adı'**
+  String get condNameLabel;
+
+  /// No description provided for @condMedsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaçlar'**
+  String get condMedsLabel;
+
+  /// No description provided for @condNoMeds.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç eklenmemiş.'**
+  String get condNoMeds;
+
+  /// No description provided for @condNoMedsAvailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçilecek ilaç yok.'**
+  String get condNoMedsAvailable;
+
+  /// No description provided for @condSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get condSave;
+
+  /// No description provided for @condCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get condCancel;
+
+  /// No description provided for @condEditTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenle'**
+  String get condEditTooltip;
+
+  /// No description provided for @condDeleteTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get condDeleteTooltip;
+
+  /// No description provided for @condDeleteTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalık silinsin mi?'**
+  String get condDeleteTitle;
+
+  /// No description provided for @condDeleteBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'\"{name}\" silinir; ilaçlarınız ve eski ilaç kayıtlarınız silinmez.'**
+  String condDeleteBody(String name);
+
+  /// No description provided for @condDeleteConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get condDeleteConfirm;
+
+  /// No description provided for @condAdded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalık eklendi.'**
+  String get condAdded;
+
+  /// No description provided for @condUpdated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalık güncellendi.'**
+  String get condUpdated;
+
+  /// No description provided for @condDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalık silindi.'**
+  String get condDeleted;
+
+  /// No description provided for @condLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kronik hastalıklar okunamadı. Ekranı kapatıp yeniden açmayı deneyin.'**
+  String get condLoadError;
+
+  /// No description provided for @condErrorEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalık adı boş olamaz.'**
+  String get condErrorEmpty;
+
+  /// No description provided for @condErrorTooLong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalık adı en çok 200 karakter olabilir.'**
+  String get condErrorTooLong;
+
+  /// No description provided for @condErrorExists.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu adla bir kronik hastalık zaten var.'**
+  String get condErrorExists;
+
+  /// No description provided for @condErrorMedication.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçtiğiniz ilaçlardan biri artık yok. Ekranı yenileyip tekrar deneyin.'**
+  String get condErrorMedication;
+
+  /// No description provided for @condErrorGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlem yapılamadı. Tekrar deneyin.'**
+  String get condErrorGeneric;
+
   /// No description provided for @medCatTitle.
   ///
   /// In tr, this message translates to:
