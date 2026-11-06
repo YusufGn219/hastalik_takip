@@ -144,7 +144,6 @@ void main() {
       final repo = DriftMedicationRepository(db);
       final a = await repo.create(
         name: 'Tansiyon ilacı',
-        type: MedicationType.chronic,
         isRecurring: true,
         recurringTime: '09:00',
         recurringDays: ['monday', 'friday'],

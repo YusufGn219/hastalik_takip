@@ -13,6 +13,7 @@ part 'app_database.g.dart';
     Episodes,
     SymptomEntries,
     EpisodeLocationEntries,
+    MedicationCategories,
     Medications,
     ChronicConditions,
     ConditionMedications,
@@ -30,8 +31,14 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   /// Şema sürümü. Tablo/sütun değişince artırılır ve [migration]'a adım eklenir.
+  ///
+  /// Sürüm geçmişi:
+  ///  * 1: ilk şema.
+  ///  * 2: ilaç türü (`medications.type`: kronik/semptomatik) kalktı; yerine
+  ///    kullanıcının kendi kategorileri (`medication_categories` tablosu ve
+  ///    `medications.category_id`) geldi.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -39,6 +46,16 @@ class AppDatabase extends _$AppDatabase {
           await m.createAll();
           for (final statement in _extraIndexes) {
             await customStatement(statement);
+          }
+        },
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            // Eski `type` değerleri kategoriye çevrilmez, atılır (karar:
+            // kategori kullanıcıya özeldir, katalogdan gelmez).
+            await m.createTable(medicationCategories);
+            await m.addColumn(medications, medications.categoryId);
+            await m.dropColumn(medications, 'type');
+            await customStatement(_medicationCategoryNameIndex);
           }
         },
         beforeOpen: (details) async {
@@ -49,7 +66,12 @@ class AppDatabase extends _$AppDatabase {
 
   /// Silme işaretli kayıtları saymayan tekillik kuralları ve sık kullanılan
   /// aralık sorguları için dizinler. (Drift bildirimi kısmi dizini desteklemez.)
+  static const _medicationCategoryNameIndex =
+      'CREATE UNIQUE INDEX uq_medication_categories_name '
+      'ON medication_categories (name) WHERE deleted_at IS NULL';
+
   static const _extraIndexes = <String>[
+    _medicationCategoryNameIndex,
     'CREATE UNIQUE INDEX uq_symptoms_name ON symptoms (name) '
         'WHERE deleted_at IS NULL',
     'CREATE UNIQUE INDEX uq_tags_name ON tags (name) '

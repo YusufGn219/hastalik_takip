@@ -30,8 +30,6 @@
   "medLogPick": "İlaç seç",
   "medLogAddNew": "Yeni ilaç ekle",
   "medLogPickHint": "İlaç seçin...",
-  "medLogTypeChronic": "Kronik",
-  "medLogTypeSymptomatic": "Semptomatik",
   "medLogDoseLabel": "Doz miktarı (isteğe bağlı)",
   "medLogNoteLabel": "Not (isteğe bağlı)",
   "medLogSave": "Kaydet",

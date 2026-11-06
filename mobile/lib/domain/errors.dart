@@ -15,4 +15,9 @@ abstract final class RuleCodes {
   static const episodeEndBeforeStart = 'episode_end_before_start';
   static const episodeAndConditionBoth = 'episode_and_condition_both';
   static const invalidRecurringDay = 'invalid_recurring_day';
+  static const categoryNameEmpty = 'category_name_empty';
+  static const categoryNameTooLong = 'category_name_too_long';
+  static const categoryNameExists = 'category_name_exists';
+  static const categoryNotFound = 'category_not_found';
+  static const medicationNotFound = 'medication_not_found';
 }

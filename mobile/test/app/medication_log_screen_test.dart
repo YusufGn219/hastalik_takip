@@ -127,7 +127,7 @@ void main() {
       // "Çinko": ikili sıra Ç'yi Z'den sonraya atar, Türkçe sırada C'den sonra,
       // D'den önce gelir.
       await tester.runAsync(() => DriftMedicationRepository(db)
-          .create(name: 'Çinko', type: MedicationType.chronic));
+          .create(name: 'Çinko'));
       await openApp(tester, seed: false);
 
       await tester.tap(find.byType(DropdownButtonFormField<String>));
@@ -138,10 +138,7 @@ void main() {
           .map((i) => (i.child as Text).data!)
           .toList();
       expect(names, hasLength(11)); // 10 katalog + Çinko
-      final plain = names.map((n) => n.split(' · ').first).toList();
-      expect(plain.indexOf('Çinko'), lessThan(plain.indexOf('D Vitamini')));
-      expect(names, contains('Çinko · Kronik'));
-      expect(names.where((n) => n.endsWith('· Semptomatik')), isNotEmpty);
+      expect(names.indexOf('Çinko'), lessThan(names.indexOf('D Vitamini')));
     });
 
     testWidgets('liste okunamazsa mesaj çıkar, Kaydet pasif, yazmak mesajı silmez',
@@ -298,7 +295,7 @@ void main() {
     }
 
     testWidgets(
-        'yeni ilaç kullanıcının kendi ilacı (semptomatik) olarak eklenir ve '
+        'yeni ilaç kullanıcının kendi ilacı (kategorisiz) olarak eklenir ve '
         'seçilir', (tester) async {
       await openApp(tester);
 
@@ -306,12 +303,12 @@ void main() {
 
       final meds = await allMedications(tester);
       final added = meds.where((m) => m.name == 'Kulak damlası').single; // kırpılmış
-      expect(added.type, MedicationType.symptomatic);
+      expect(added.categoryId, isNull);
       expect(added.isCatalog, isFalse);
       expect(meds, hasLength(11));
       expect(find.text('Kulak damlası eklendi.'), findsOneWidget);
       // Eklenen ilaç seçili geldi.
-      expect(find.text('Kulak damlası · Semptomatik'), findsOneWidget);
+      expect(find.text('Kulak damlası'), findsOneWidget);
 
       // Seçili ilaçla kayıt yapılabilir.
       await tapSave(tester);

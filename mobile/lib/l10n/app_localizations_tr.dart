@@ -55,12 +55,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get medLogPickHint => 'İlaç seçin...';
 
   @override
-  String get medLogTypeChronic => 'Kronik';
-
-  @override
-  String get medLogTypeSymptomatic => 'Semptomatik';
-
-  @override
   String get medLogDoseLabel => 'Doz miktarı (isteğe bağlı)';
 
   @override

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 
 import '../database/app_database.dart';
-import '../database/enums.dart';
 import 'support.dart';
 
 /// Tekrarlayan ilacın gün listesi (boş/null = her gün).
@@ -19,16 +18,35 @@ abstract class MedicationRepository {
   Future<List<Medication>> listAvailable();
   Future<Medication?> getById(String id);
 
-  /// Yeni ilaç ekler. Bildirim için ayrı sayısal numara atanır.
+  /// Yeni ilaç ekler. Bildirim için ayrı sayısal numara atanır. [categoryId]
+  /// verilirse kategorinin var olup olmadığı burada denetlenmez (servis denetler).
   Future<Medication> create({
     required String name,
-    MedicationType type = MedicationType.symptomatic,
+    String? categoryId,
     bool isRecurring = false,
     String? recurringTime,
     List<String>? recurringDays,
   });
 
   Future<void> softDelete(String id);
+
+  /// Silinmemiş kategoriler, ada göre (ikili sıra; Türkçe sıralama üst katmanda).
+  Future<List<MedicationCategory>> listCategories();
+
+  /// Silinmiş olsa bile kaydı verir (yoksa null); silinmiş mi diye bakmak
+  /// çağıranın işidir.
+  Future<MedicationCategory?> getCategory(String id);
+
+  Future<MedicationCategory> createCategory(String name);
+
+  Future<void> renameCategory(String id, String name);
+
+  /// Kategoriyi siler (silme işareti) ve ona bağlı ilaçları kategorisiz bırakır;
+  /// ilaçların kendisi silinmez. İkisi tek işlemde yapılır.
+  Future<void> softDeleteCategory(String id);
+
+  /// İlacın kategorisini değiştirir; [categoryId] null ise kategorisiz yapar.
+  Future<void> setMedicationCategory(String medicationId, String? categoryId);
 
   Future<ChronicCondition> createCondition({
     required String name,
@@ -69,7 +87,7 @@ class DriftMedicationRepository implements MedicationRepository {
   @override
   Future<Medication> create({
     required String name,
-    MedicationType type = MedicationType.symptomatic,
+    String? categoryId,
     bool isRecurring = false,
     String? recurringTime,
     List<String>? recurringDays,
@@ -86,7 +104,7 @@ class DriftMedicationRepository implements MedicationRepository {
               createdAt: now,
               updatedAt: now,
               name: name,
-              type: Value(type),
+              categoryId: Value(categoryId),
               isRecurring: Value(isRecurring),
               recurringTime: Value(recurringTime),
               recurringDays: Value(
@@ -103,6 +121,80 @@ class DriftMedicationRepository implements MedicationRepository {
     final now = _clock();
     await (_db.update(_db.medications)..where((t) => t.id.equals(id))).write(
       MedicationsCompanion(deletedAt: Value(now), updatedAt: Value(now)),
+    );
+  }
+
+  @override
+  Future<List<MedicationCategory>> listCategories() {
+    return (_db.select(_db.medicationCategories)
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+        .get();
+  }
+
+  @override
+  Future<MedicationCategory?> getCategory(String id) {
+    return (_db.select(_db.medicationCategories)..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
+  }
+
+  @override
+  Future<MedicationCategory> createCategory(String name) {
+    final now = _clock();
+    return _db.into(_db.medicationCategories).insertReturning(
+          MedicationCategoriesCompanion.insert(
+            id: _newId(),
+            createdAt: now,
+            updatedAt: now,
+            name: name,
+          ),
+        );
+  }
+
+  @override
+  Future<void> renameCategory(String id, String name) async {
+    await (_db.update(_db.medicationCategories)..where((t) => t.id.equals(id)))
+        .write(
+      MedicationCategoriesCompanion(
+        name: Value(name),
+        updatedAt: Value(_clock()),
+      ),
+    );
+  }
+
+  @override
+  Future<void> softDeleteCategory(String id) {
+    return _db.transaction(() async {
+      final now = _clock();
+      await (_db.update(_db.medications)..where((t) => t.categoryId.equals(id)))
+          .write(
+        MedicationsCompanion(
+          categoryId: const Value(null),
+          updatedAt: Value(now),
+        ),
+      );
+      await (_db.update(_db.medicationCategories)
+            ..where((t) => t.id.equals(id)))
+          .write(
+        MedicationCategoriesCompanion(
+          deletedAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+    });
+  }
+
+  @override
+  Future<void> setMedicationCategory(
+    String medicationId,
+    String? categoryId,
+  ) async {
+    await (_db.update(_db.medications)..where((t) => t.id.equals(medicationId)))
+        .write(
+      MedicationsCompanion(
+        categoryId: Value(categoryId),
+        updatedAt: Value(_clock()),
+      ),
     );
   }
 

@@ -55,7 +55,6 @@ Future<void> _loadDataset(AppDatabase db, Map<String, dynamic> d) async {
           createdAt: now,
           updatedAt: now,
           name: r['name'] as String,
-          type: Value(MedicationType.values.byName(r['type'] as String)),
           isCatalog: Value(r['is_global'] as bool),
           isRecurring: Value(r['is_recurring'] as bool),
           recurringTime: Value(r['recurring_time'] as String?),

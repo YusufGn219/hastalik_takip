@@ -10,8 +10,8 @@ void main() {
   setUp(() => db = createTestDb());
   tearDown(() => db.close());
 
-  test('şema sürümü 1 ve 17 tablo oluşur', () async {
-    expect(db.schemaVersion, 1);
+  test('şema sürümü 2 ve 18 tablo oluşur', () async {
+    expect(db.schemaVersion, 2);
     final rows = await db
         .customSelect(
           "SELECT name FROM sqlite_master WHERE type='table' "
@@ -26,6 +26,7 @@ void main() {
       'episodes',
       'symptom_entries',
       'episode_location_entries',
+      'medication_categories',
       'medications',
       'chronic_conditions',
       'condition_medications',

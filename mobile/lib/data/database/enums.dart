@@ -5,9 +5,6 @@
 /// Atak / dönem durumu. (Arayüzde "dönem" veya "olay" olarak gösterilir.)
 enum EpisodeStatus { ongoing, resolved }
 
-/// İlaç türü.
-enum MedicationType { chronic, symptomatic }
-
 /// Doz birimi. Python'daki seçenek değerleriyle aynı.
 enum DoseUnit { mg, ml, drop, capsule, tablet }
 

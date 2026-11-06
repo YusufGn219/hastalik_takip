@@ -184,18 +184,6 @@ abstract class AppLocalizations {
   /// **'İlaç seçin...'**
   String get medLogPickHint;
 
-  /// No description provided for @medLogTypeChronic.
-  ///
-  /// In tr, this message translates to:
-  /// **'Kronik'**
-  String get medLogTypeChronic;
-
-  /// No description provided for @medLogTypeSymptomatic.
-  ///
-  /// In tr, this message translates to:
-  /// **'Semptomatik'**
-  String get medLogTypeSymptomatic;
-
   /// No description provided for @medLogDoseLabel.
   ///
   /// In tr, this message translates to:

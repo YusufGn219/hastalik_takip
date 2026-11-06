@@ -5,7 +5,6 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:uuid/uuid.dart';
 
 import 'app_database.dart';
-import 'enums.dart';
 
 /// Uygulamanın içindeki başlangıç dosyalarından (assets/seed/) semptom ve ilaç
 /// kataloğunu veritabanına yükler.
@@ -62,7 +61,6 @@ class SeedLoader {
                 createdAt: now,
                 updatedAt: now,
                 name: m['name'] as String,
-                type: Value(MedicationType.values.byName(m['type'] as String)),
                 isCatalog: const Value(true),
               ),
               mode: InsertMode.insertOrIgnore,

@@ -114,10 +114,7 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
         });
         return;
       }
-      final created = await service.create(
-        name: name.trim(),
-        type: MedicationType.symptomatic,
-      );
+      final created = await service.create(name: name.trim());
       final updated = _sorted(await service.available());
       if (!mounted) return;
       setState(() {
@@ -202,11 +199,6 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
     }
   }
 
-  String _typeLabel(MedicationType type, AppLocalizations l10n) =>
-      type == MedicationType.chronic
-          ? l10n.medLogTypeChronic
-          : l10n.medLogTypeSymptomatic;
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -243,7 +235,7 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
                 for (final m in _medications)
                   DropdownMenuItem<String>(
                     value: m.id,
-                    child: Text('${m.name} · ${_typeLabel(m.type, l10n)}'),
+                    child: Text(m.name),
                   ),
               ],
               onChanged: (val) {

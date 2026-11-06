@@ -3528,6 +3528,375 @@ class EpisodeLocationEntriesCompanion
   }
 }
 
+class $MedicationCategoriesTable extends MedicationCategories
+    with TableInfo<$MedicationCategoriesTable, MedicationCategory> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MedicationCategoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 100,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    name,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'medication_categories';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MedicationCategory> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MedicationCategory map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MedicationCategory(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+    );
+  }
+
+  @override
+  $MedicationCategoriesTable createAlias(String alias) {
+    return $MedicationCategoriesTable(attachedDatabase, alias);
+  }
+}
+
+class MedicationCategory extends DataClass
+    implements Insertable<MedicationCategory> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  /// Boş değilse kayıt silinmiş sayılır (veri fiziksel silinmez).
+  final DateTime? deletedAt;
+  final String name;
+  const MedicationCategory({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.name,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['name'] = Variable<String>(name);
+    return map;
+  }
+
+  MedicationCategoriesCompanion toCompanion(bool nullToAbsent) {
+    return MedicationCategoriesCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      name: Value(name),
+    );
+  }
+
+  factory MedicationCategory.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MedicationCategory(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      name: serializer.fromJson<String>(json['name']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'name': serializer.toJson<String>(name),
+    };
+  }
+
+  MedicationCategory copyWith({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? name,
+  }) => MedicationCategory(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    name: name ?? this.name,
+  );
+  MedicationCategory copyWithCompanion(MedicationCategoriesCompanion data) {
+    return MedicationCategory(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationCategory(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, createdAt, updatedAt, deletedAt, name);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MedicationCategory &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.name == this.name);
+}
+
+class MedicationCategoriesCompanion
+    extends UpdateCompanion<MedicationCategory> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> name;
+  final Value<int> rowid;
+  const MedicationCategoriesCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.name = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MedicationCategoriesCompanion.insert({
+    required String id,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String name,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       name = Value(name);
+  static Insertable<MedicationCategory> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? name,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (name != null) 'name': name,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MedicationCategoriesCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? name,
+    Value<int>? rowid,
+  }) {
+    return MedicationCategoriesCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      name: name ?? this.name,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationCategoriesCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('name: $name, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MedicationsTable extends Medications
     with TableInfo<$MedicationsTable, Medication> {
   @override
@@ -3589,16 +3958,20 @@ class $MedicationsTable extends Medications
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _categoryIdMeta = const VerificationMeta(
+    'categoryId',
+  );
   @override
-  late final GeneratedColumnWithTypeConverter<MedicationType, String> type =
-      GeneratedColumn<String>(
-        'type',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: false,
-        defaultValue: Constant(MedicationType.symptomatic.name),
-      ).withConverter<MedicationType>($MedicationsTable.$convertertype);
+  late final GeneratedColumn<String> categoryId = GeneratedColumn<String>(
+    'category_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES medication_categories (id)',
+    ),
+  );
   static const VerificationMeta _isCatalogMeta = const VerificationMeta(
     'isCatalog',
   );
@@ -3669,7 +4042,7 @@ class $MedicationsTable extends Medications
     updatedAt,
     deletedAt,
     name,
-    type,
+    categoryId,
     isCatalog,
     isRecurring,
     recurringTime,
@@ -3722,6 +4095,12 @@ class $MedicationsTable extends Medications
       );
     } else if (isInserting) {
       context.missing(_nameMeta);
+    }
+    if (data.containsKey('category_id')) {
+      context.handle(
+        _categoryIdMeta,
+        categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta),
+      );
     }
     if (data.containsKey('is_catalog')) {
       context.handle(
@@ -3794,11 +4173,9 @@ class $MedicationsTable extends Medications
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
-      type: $MedicationsTable.$convertertype.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}type'],
-        )!,
+      categoryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category_id'],
       ),
       isCatalog: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
@@ -3827,9 +4204,6 @@ class $MedicationsTable extends Medications
   $MedicationsTable createAlias(String alias) {
     return $MedicationsTable(attachedDatabase, alias);
   }
-
-  static JsonTypeConverter2<MedicationType, String, String> $convertertype =
-      const EnumNameConverter<MedicationType>(MedicationType.values);
 }
 
 class Medication extends DataClass implements Insertable<Medication> {
@@ -3840,7 +4214,10 @@ class Medication extends DataClass implements Insertable<Medication> {
   /// Boş değilse kayıt silinmiş sayılır (veri fiziksel silinmez).
   final DateTime? deletedAt;
   final String name;
-  final MedicationType type;
+
+  /// İsteğe bağlı tek kategori. Boş = kategorisiz (katalog ilaçları böyle
+  /// başlar). Kategori silinince ilaç silinmez, bu alan boşalır.
+  final String? categoryId;
 
   /// Başlangıç kataloğundan gelen ilaç (kullanıcının eklediği değil).
   final bool isCatalog;
@@ -3861,7 +4238,7 @@ class Medication extends DataClass implements Insertable<Medication> {
     required this.updatedAt,
     this.deletedAt,
     required this.name,
-    required this.type,
+    this.categoryId,
     required this.isCatalog,
     required this.isRecurring,
     this.recurringTime,
@@ -3878,10 +4255,8 @@ class Medication extends DataClass implements Insertable<Medication> {
       map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
     map['name'] = Variable<String>(name);
-    {
-      map['type'] = Variable<String>(
-        $MedicationsTable.$convertertype.toSql(type),
-      );
+    if (!nullToAbsent || categoryId != null) {
+      map['category_id'] = Variable<String>(categoryId);
     }
     map['is_catalog'] = Variable<bool>(isCatalog);
     map['is_recurring'] = Variable<bool>(isRecurring);
@@ -3906,7 +4281,9 @@ class Medication extends DataClass implements Insertable<Medication> {
           ? const Value.absent()
           : Value(deletedAt),
       name: Value(name),
-      type: Value(type),
+      categoryId: categoryId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(categoryId),
       isCatalog: Value(isCatalog),
       isRecurring: Value(isRecurring),
       recurringTime: recurringTime == null && nullToAbsent
@@ -3932,9 +4309,7 @@ class Medication extends DataClass implements Insertable<Medication> {
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
       name: serializer.fromJson<String>(json['name']),
-      type: $MedicationsTable.$convertertype.fromJson(
-        serializer.fromJson<String>(json['type']),
-      ),
+      categoryId: serializer.fromJson<String?>(json['categoryId']),
       isCatalog: serializer.fromJson<bool>(json['isCatalog']),
       isRecurring: serializer.fromJson<bool>(json['isRecurring']),
       recurringTime: serializer.fromJson<String?>(json['recurringTime']),
@@ -3951,9 +4326,7 @@ class Medication extends DataClass implements Insertable<Medication> {
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
       'name': serializer.toJson<String>(name),
-      'type': serializer.toJson<String>(
-        $MedicationsTable.$convertertype.toJson(type),
-      ),
+      'categoryId': serializer.toJson<String?>(categoryId),
       'isCatalog': serializer.toJson<bool>(isCatalog),
       'isRecurring': serializer.toJson<bool>(isRecurring),
       'recurringTime': serializer.toJson<String?>(recurringTime),
@@ -3968,7 +4341,7 @@ class Medication extends DataClass implements Insertable<Medication> {
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
     String? name,
-    MedicationType? type,
+    Value<String?> categoryId = const Value.absent(),
     bool? isCatalog,
     bool? isRecurring,
     Value<String?> recurringTime = const Value.absent(),
@@ -3980,7 +4353,7 @@ class Medication extends DataClass implements Insertable<Medication> {
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
     name: name ?? this.name,
-    type: type ?? this.type,
+    categoryId: categoryId.present ? categoryId.value : this.categoryId,
     isCatalog: isCatalog ?? this.isCatalog,
     isRecurring: isRecurring ?? this.isRecurring,
     recurringTime: recurringTime.present
@@ -4000,7 +4373,9 @@ class Medication extends DataClass implements Insertable<Medication> {
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
       name: data.name.present ? data.name.value : this.name,
-      type: data.type.present ? data.type.value : this.type,
+      categoryId: data.categoryId.present
+          ? data.categoryId.value
+          : this.categoryId,
       isCatalog: data.isCatalog.present ? data.isCatalog.value : this.isCatalog,
       isRecurring: data.isRecurring.present
           ? data.isRecurring.value
@@ -4025,7 +4400,7 @@ class Medication extends DataClass implements Insertable<Medication> {
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('name: $name, ')
-          ..write('type: $type, ')
+          ..write('categoryId: $categoryId, ')
           ..write('isCatalog: $isCatalog, ')
           ..write('isRecurring: $isRecurring, ')
           ..write('recurringTime: $recurringTime, ')
@@ -4042,7 +4417,7 @@ class Medication extends DataClass implements Insertable<Medication> {
     updatedAt,
     deletedAt,
     name,
-    type,
+    categoryId,
     isCatalog,
     isRecurring,
     recurringTime,
@@ -4058,7 +4433,7 @@ class Medication extends DataClass implements Insertable<Medication> {
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
           other.name == this.name &&
-          other.type == this.type &&
+          other.categoryId == this.categoryId &&
           other.isCatalog == this.isCatalog &&
           other.isRecurring == this.isRecurring &&
           other.recurringTime == this.recurringTime &&
@@ -4072,7 +4447,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
   final Value<String> name;
-  final Value<MedicationType> type;
+  final Value<String?> categoryId;
   final Value<bool> isCatalog;
   final Value<bool> isRecurring;
   final Value<String?> recurringTime;
@@ -4085,7 +4460,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
     this.name = const Value.absent(),
-    this.type = const Value.absent(),
+    this.categoryId = const Value.absent(),
     this.isCatalog = const Value.absent(),
     this.isRecurring = const Value.absent(),
     this.recurringTime = const Value.absent(),
@@ -4099,7 +4474,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     required DateTime updatedAt,
     this.deletedAt = const Value.absent(),
     required String name,
-    this.type = const Value.absent(),
+    this.categoryId = const Value.absent(),
     this.isCatalog = const Value.absent(),
     this.isRecurring = const Value.absent(),
     this.recurringTime = const Value.absent(),
@@ -4116,7 +4491,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
     Expression<String>? name,
-    Expression<String>? type,
+    Expression<String>? categoryId,
     Expression<bool>? isCatalog,
     Expression<bool>? isRecurring,
     Expression<String>? recurringTime,
@@ -4130,7 +4505,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
       if (name != null) 'name': name,
-      if (type != null) 'type': type,
+      if (categoryId != null) 'category_id': categoryId,
       if (isCatalog != null) 'is_catalog': isCatalog,
       if (isRecurring != null) 'is_recurring': isRecurring,
       if (recurringTime != null) 'recurring_time': recurringTime,
@@ -4146,7 +4521,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
     Value<String>? name,
-    Value<MedicationType>? type,
+    Value<String?>? categoryId,
     Value<bool>? isCatalog,
     Value<bool>? isRecurring,
     Value<String?>? recurringTime,
@@ -4160,7 +4535,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
       name: name ?? this.name,
-      type: type ?? this.type,
+      categoryId: categoryId ?? this.categoryId,
       isCatalog: isCatalog ?? this.isCatalog,
       isRecurring: isRecurring ?? this.isRecurring,
       recurringTime: recurringTime ?? this.recurringTime,
@@ -4188,10 +4563,8 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
-    if (type.present) {
-      map['type'] = Variable<String>(
-        $MedicationsTable.$convertertype.toSql(type.value),
-      );
+    if (categoryId.present) {
+      map['category_id'] = Variable<String>(categoryId.value);
     }
     if (isCatalog.present) {
       map['is_catalog'] = Variable<bool>(isCatalog.value);
@@ -4222,7 +4595,7 @@ class MedicationsCompanion extends UpdateCompanion<Medication> {
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('name: $name, ')
-          ..write('type: $type, ')
+          ..write('categoryId: $categoryId, ')
           ..write('isCatalog: $isCatalog, ')
           ..write('isRecurring: $isRecurring, ')
           ..write('recurringTime: $recurringTime, ')
@@ -9276,6 +9649,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SymptomEntriesTable symptomEntries = $SymptomEntriesTable(this);
   late final $EpisodeLocationEntriesTable episodeLocationEntries =
       $EpisodeLocationEntriesTable(this);
+  late final $MedicationCategoriesTable medicationCategories =
+      $MedicationCategoriesTable(this);
   late final $MedicationsTable medications = $MedicationsTable(this);
   late final $ChronicConditionsTable chronicConditions =
       $ChronicConditionsTable(this);
@@ -9300,6 +9675,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     episodes,
     symptomEntries,
     episodeLocationEntries,
+    medicationCategories,
     medications,
     chronicConditions,
     conditionMedications,
@@ -11965,6 +12341,324 @@ typedef $$EpisodeLocationEntriesTableProcessedTableManager =
       EpisodeLocationEntry,
       PrefetchHooks Function({bool episodeId})
     >;
+typedef $$MedicationCategoriesTableCreateCompanionBuilder =
+    MedicationCategoriesCompanion Function({
+      required String id,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String name,
+      Value<int> rowid,
+    });
+typedef $$MedicationCategoriesTableUpdateCompanionBuilder =
+    MedicationCategoriesCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> name,
+      Value<int> rowid,
+    });
+
+final class $$MedicationCategoriesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MedicationCategoriesTable,
+          MedicationCategory
+        > {
+  $$MedicationCategoriesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<$MedicationsTable, List<Medication>>
+  _medicationsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.medications,
+    aliasName: 'medication_categories__id__medications__category_id',
+  );
+
+  $$MedicationsTableProcessedTableManager get medicationsRefs {
+    final manager = $$MedicationsTableTableManager(
+      $_db,
+      $_db.medications,
+    ).filter((f) => f.categoryId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_medicationsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$MedicationCategoriesTableFilterComposer
+    extends Composer<_$AppDatabase, $MedicationCategoriesTable> {
+  $$MedicationCategoriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> medicationsRefs(
+    Expression<bool> Function($$MedicationsTableFilterComposer f) f,
+  ) {
+    final $$MedicationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.categoryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableFilterComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$MedicationCategoriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MedicationCategoriesTable> {
+  $$MedicationCategoriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MedicationCategoriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MedicationCategoriesTable> {
+  $$MedicationCategoriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  Expression<T> medicationsRefs<T extends Object>(
+    Expression<T> Function($$MedicationsTableAnnotationComposer a) f,
+  ) {
+    final $$MedicationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.categoryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$MedicationCategoriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MedicationCategoriesTable,
+          MedicationCategory,
+          $$MedicationCategoriesTableFilterComposer,
+          $$MedicationCategoriesTableOrderingComposer,
+          $$MedicationCategoriesTableAnnotationComposer,
+          $$MedicationCategoriesTableCreateCompanionBuilder,
+          $$MedicationCategoriesTableUpdateCompanionBuilder,
+          (MedicationCategory, $$MedicationCategoriesTableReferences),
+          MedicationCategory,
+          PrefetchHooks Function({bool medicationsRefs})
+        > {
+  $$MedicationCategoriesTableTableManager(
+    _$AppDatabase db,
+    $MedicationCategoriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MedicationCategoriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MedicationCategoriesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$MedicationCategoriesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MedicationCategoriesCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                name: name,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String name,
+                Value<int> rowid = const Value.absent(),
+              }) => MedicationCategoriesCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                name: name,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MedicationCategoriesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({medicationsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (medicationsRefs) db.medications],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (medicationsRefs)
+                    await $_getPrefetchedData<
+                      MedicationCategory,
+                      $MedicationCategoriesTable,
+                      Medication
+                    >(
+                      currentTable: table,
+                      referencedTable: $$MedicationCategoriesTableReferences
+                          ._medicationsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$MedicationCategoriesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).medicationsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.categoryId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MedicationCategoriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MedicationCategoriesTable,
+      MedicationCategory,
+      $$MedicationCategoriesTableFilterComposer,
+      $$MedicationCategoriesTableOrderingComposer,
+      $$MedicationCategoriesTableAnnotationComposer,
+      $$MedicationCategoriesTableCreateCompanionBuilder,
+      $$MedicationCategoriesTableUpdateCompanionBuilder,
+      (MedicationCategory, $$MedicationCategoriesTableReferences),
+      MedicationCategory,
+      PrefetchHooks Function({bool medicationsRefs})
+    >;
 typedef $$MedicationsTableCreateCompanionBuilder =
     MedicationsCompanion Function({
       required String id,
@@ -11972,7 +12666,7 @@ typedef $$MedicationsTableCreateCompanionBuilder =
       required DateTime updatedAt,
       Value<DateTime?> deletedAt,
       required String name,
-      Value<MedicationType> type,
+      Value<String?> categoryId,
       Value<bool> isCatalog,
       Value<bool> isRecurring,
       Value<String?> recurringTime,
@@ -11987,7 +12681,7 @@ typedef $$MedicationsTableUpdateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
       Value<String> name,
-      Value<MedicationType> type,
+      Value<String?> categoryId,
       Value<bool> isCatalog,
       Value<bool> isRecurring,
       Value<String?> recurringTime,
@@ -11999,6 +12693,24 @@ typedef $$MedicationsTableUpdateCompanionBuilder =
 final class $$MedicationsTableReferences
     extends BaseReferences<_$AppDatabase, $MedicationsTable, Medication> {
   $$MedicationsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $MedicationCategoriesTable _categoryIdTable(_$AppDatabase db) => db
+      .medicationCategories
+      .createAlias('medications__category_id__medication_categories__id');
+
+  $$MedicationCategoriesTableProcessedTableManager? get categoryId {
+    final $_column = $_itemColumn<String>('category_id');
+    if ($_column == null) return null;
+    final manager = $$MedicationCategoriesTableTableManager(
+      $_db,
+      $_db.medicationCategories,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_categoryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
 
   static MultiTypedResultKey<
     $ConditionMedicationsTable,
@@ -12078,12 +12790,6 @@ class $$MedicationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<MedicationType, MedicationType, String>
-  get type => $composableBuilder(
-    column: $table.type,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
-  );
-
   ColumnFilters<bool> get isCatalog => $composableBuilder(
     column: $table.isCatalog,
     builder: (column) => ColumnFilters(column),
@@ -12108,6 +12814,29 @@ class $$MedicationsTableFilterComposer
     column: $table.notificationId,
     builder: (column) => ColumnFilters(column),
   );
+
+  $$MedicationCategoriesTableFilterComposer get categoryId {
+    final $$MedicationCategoriesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoryId,
+      referencedTable: $db.medicationCategories,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationCategoriesTableFilterComposer(
+            $db: $db,
+            $table: $db.medicationCategories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
   Expression<bool> conditionMedicationsRefs(
     Expression<bool> Function($$ConditionMedicationsTableFilterComposer f) f,
@@ -12194,11 +12923,6 @@ class $$MedicationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get type => $composableBuilder(
-    column: $table.type,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<bool> get isCatalog => $composableBuilder(
     column: $table.isCatalog,
     builder: (column) => ColumnOrderings(column),
@@ -12223,6 +12947,30 @@ class $$MedicationsTableOrderingComposer
     column: $table.notificationId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$MedicationCategoriesTableOrderingComposer get categoryId {
+    final $$MedicationCategoriesTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.categoryId,
+          referencedTable: $db.medicationCategories,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicationCategoriesTableOrderingComposer(
+                $db: $db,
+                $table: $db.medicationCategories,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
 }
 
 class $$MedicationsTableAnnotationComposer
@@ -12249,9 +12997,6 @@ class $$MedicationsTableAnnotationComposer
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<MedicationType, String> get type =>
-      $composableBuilder(column: $table.type, builder: (column) => column);
-
   GeneratedColumn<bool> get isCatalog =>
       $composableBuilder(column: $table.isCatalog, builder: (column) => column);
 
@@ -12274,6 +13019,30 @@ class $$MedicationsTableAnnotationComposer
     column: $table.notificationId,
     builder: (column) => column,
   );
+
+  $$MedicationCategoriesTableAnnotationComposer get categoryId {
+    final $$MedicationCategoriesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.categoryId,
+          referencedTable: $db.medicationCategories,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MedicationCategoriesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.medicationCategories,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
 
   Expression<T> conditionMedicationsRefs<T extends Object>(
     Expression<T> Function($$ConditionMedicationsTableAnnotationComposer a) f,
@@ -12341,6 +13110,7 @@ class $$MedicationsTableTableManager
           (Medication, $$MedicationsTableReferences),
           Medication,
           PrefetchHooks Function({
+            bool categoryId,
             bool conditionMedicationsRefs,
             bool medicationLogsRefs,
           })
@@ -12363,7 +13133,7 @@ class $$MedicationsTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
                 Value<String> name = const Value.absent(),
-                Value<MedicationType> type = const Value.absent(),
+                Value<String?> categoryId = const Value.absent(),
                 Value<bool> isCatalog = const Value.absent(),
                 Value<bool> isRecurring = const Value.absent(),
                 Value<String?> recurringTime = const Value.absent(),
@@ -12376,7 +13146,7 @@ class $$MedicationsTableTableManager
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
                 name: name,
-                type: type,
+                categoryId: categoryId,
                 isCatalog: isCatalog,
                 isRecurring: isRecurring,
                 recurringTime: recurringTime,
@@ -12391,7 +13161,7 @@ class $$MedicationsTableTableManager
                 required DateTime updatedAt,
                 Value<DateTime?> deletedAt = const Value.absent(),
                 required String name,
-                Value<MedicationType> type = const Value.absent(),
+                Value<String?> categoryId = const Value.absent(),
                 Value<bool> isCatalog = const Value.absent(),
                 Value<bool> isRecurring = const Value.absent(),
                 Value<String?> recurringTime = const Value.absent(),
@@ -12404,7 +13174,7 @@ class $$MedicationsTableTableManager
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
                 name: name,
-                type: type,
+                categoryId: categoryId,
                 isCatalog: isCatalog,
                 isRecurring: isRecurring,
                 recurringTime: recurringTime,
@@ -12421,14 +13191,51 @@ class $$MedicationsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({conditionMedicationsRefs = false, medicationLogsRefs = false}) {
+              ({
+                categoryId = false,
+                conditionMedicationsRefs = false,
+                medicationLogsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (conditionMedicationsRefs) db.conditionMedications,
                     if (medicationLogsRefs) db.medicationLogs,
                   ],
-                  addJoins: null,
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (categoryId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.categoryId,
+                                    referencedTable:
+                                        $$MedicationsTableReferences
+                                            ._categoryIdTable(db),
+                                    referencedColumn:
+                                        $$MedicationsTableReferences
+                                            ._categoryIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (conditionMedicationsRefs)
@@ -12494,6 +13301,7 @@ typedef $$MedicationsTableProcessedTableManager =
       (Medication, $$MedicationsTableReferences),
       Medication,
       PrefetchHooks Function({
+        bool categoryId,
         bool conditionMedicationsRefs,
         bool medicationLogsRefs,
       })
@@ -16220,6 +17028,8 @@ class $AppDatabaseManager {
         _db,
         _db.episodeLocationEntries,
       );
+  $$MedicationCategoriesTableTableManager get medicationCategories =>
+      $$MedicationCategoriesTableTableManager(_db, _db.medicationCategories);
   $$MedicationsTableTableManager get medications =>
       $$MedicationsTableTableManager(_db, _db.medications);
   $$ChronicConditionsTableTableManager get chronicConditions =>

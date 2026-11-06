@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/data/database/app_database.dart';
-import 'package:mobile/data/database/enums.dart';
 import 'package:mobile/data/database/seed_loader.dart';
 import 'package:mobile/data/repositories/medication_repository.dart';
 import 'package:mobile/data/repositories/symptom_repository.dart';
@@ -24,10 +23,7 @@ void main() {
     final meds = await DriftMedicationRepository(db).listAvailable();
     expect(meds.length, 10);
     expect(meds.every((m) => m.isCatalog), isTrue);
-    expect(
-      meds.where((m) => m.type == MedicationType.chronic).length,
-      5,
-    );
+    expect(meds.every((m) => m.categoryId == null), isTrue);
   });
 
   test('yükleme tekrarlanabilir ve kimlikler sabit', () async {

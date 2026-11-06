@@ -109,10 +109,20 @@ class EpisodeLocationEntries extends Table with BaseColumns {
 
 // ---------------------------------------------------------------- ilaç
 
+/// Kullanıcının kendi ilaç kategorileri (ör. "Ağrı", "Vitamin"). Katalogla
+/// gelmez: her kullanıcı kendininkini oluşturur. Adı silinmemiş kayıtlar
+/// arasında tekildir (kısmi dizin `app_database.dart`'ta).
+class MedicationCategories extends Table with BaseColumns {
+  TextColumn get name => text().withLength(min: 1, max: 100)();
+}
+
 class Medications extends Table with BaseColumns {
   TextColumn get name => text().withLength(min: 1, max: 100)();
-  TextColumn get type => textEnum<MedicationType>()
-      .withDefault(Constant(MedicationType.symptomatic.name))();
+
+  /// İsteğe bağlı tek kategori. Boş = kategorisiz (katalog ilaçları böyle
+  /// başlar). Kategori silinince ilaç silinmez, bu alan boşalır.
+  TextColumn get categoryId =>
+      text().nullable().references(MedicationCategories, #id)();
 
   /// Başlangıç kataloğundan gelen ilaç (kullanıcının eklediği değil).
   BoolColumn get isCatalog => boolean().withDefault(const Constant(false))();
