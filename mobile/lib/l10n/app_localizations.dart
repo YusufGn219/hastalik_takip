@@ -244,6 +244,144 @@ abstract class AppLocalizations {
   /// **'İlaç adı'**
   String get medLogNewName;
 
+  /// No description provided for @medLogCategoryLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori (isteğe bağlı)'**
+  String get medLogCategoryLabel;
+
+  /// No description provided for @medLogNoCategory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategorisiz'**
+  String get medLogNoCategory;
+
+  /// No description provided for @medLogNewCategory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni kategori oluştur…'**
+  String get medLogNewCategory;
+
+  /// No description provided for @medLogNewCategoryName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni kategori adı'**
+  String get medLogNewCategoryName;
+
+  /// No description provided for @medLogManageCategories.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategoriler'**
+  String get medLogManageCategories;
+
+  /// No description provided for @medLogCategoryChanged.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori güncellendi.'**
+  String get medLogCategoryChanged;
+
+  /// No description provided for @medLogCategoryError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori kaydedilemedi. Tekrar deneyin.'**
+  String get medLogCategoryError;
+
+  /// No description provided for @medCatTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategoriler'**
+  String get medCatTitle;
+
+  /// No description provided for @medCatEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz kategori yok. Aşağıdan ekleyebilirsiniz.'**
+  String get medCatEmpty;
+
+  /// No description provided for @medCatNameLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori adı'**
+  String get medCatNameLabel;
+
+  /// No description provided for @medCatAdd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ekle'**
+  String get medCatAdd;
+
+  /// No description provided for @medCatRename.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adı değiştir'**
+  String get medCatRename;
+
+  /// No description provided for @medCatRenameTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori adı'**
+  String get medCatRenameTitle;
+
+  /// No description provided for @medCatSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get medCatSave;
+
+  /// No description provided for @medCatDelete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get medCatDelete;
+
+  /// No description provided for @medCatClose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapat'**
+  String get medCatClose;
+
+  /// No description provided for @medCatDeleteTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori silinsin mi?'**
+  String get medCatDeleteTitle;
+
+  /// No description provided for @medCatDeleteBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'\"{name}\" silinir; bu kategorideki ilaçlar silinmez, kategorisiz kalır.'**
+  String medCatDeleteBody(String name);
+
+  /// No description provided for @medCatErrorEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori adı boş olamaz.'**
+  String get medCatErrorEmpty;
+
+  /// No description provided for @medCatErrorTooLong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori adı en çok 100 karakter olabilir.'**
+  String get medCatErrorTooLong;
+
+  /// No description provided for @medCatErrorExists.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu adla bir kategori zaten var.'**
+  String get medCatErrorExists;
+
+  /// No description provided for @medCatErrorGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlem yapılamadı. Tekrar deneyin.'**
+  String get medCatErrorGeneric;
+
+  /// No description provided for @medCatLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategoriler okunamadı.'**
+  String get medCatLoadError;
+
   /// No description provided for @medLogCancel.
   ///
   /// In tr, this message translates to:

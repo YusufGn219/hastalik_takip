@@ -87,6 +87,77 @@ class AppLocalizationsTr extends AppLocalizations {
   String get medLogNewName => 'İlaç adı';
 
   @override
+  String get medLogCategoryLabel => 'Kategori (isteğe bağlı)';
+
+  @override
+  String get medLogNoCategory => 'Kategorisiz';
+
+  @override
+  String get medLogNewCategory => 'Yeni kategori oluştur…';
+
+  @override
+  String get medLogNewCategoryName => 'Yeni kategori adı';
+
+  @override
+  String get medLogManageCategories => 'Kategoriler';
+
+  @override
+  String get medLogCategoryChanged => 'Kategori güncellendi.';
+
+  @override
+  String get medLogCategoryError => 'Kategori kaydedilemedi. Tekrar deneyin.';
+
+  @override
+  String get medCatTitle => 'Kategoriler';
+
+  @override
+  String get medCatEmpty => 'Henüz kategori yok. Aşağıdan ekleyebilirsiniz.';
+
+  @override
+  String get medCatNameLabel => 'Kategori adı';
+
+  @override
+  String get medCatAdd => 'Ekle';
+
+  @override
+  String get medCatRename => 'Adı değiştir';
+
+  @override
+  String get medCatRenameTitle => 'Kategori adı';
+
+  @override
+  String get medCatSave => 'Kaydet';
+
+  @override
+  String get medCatDelete => 'Sil';
+
+  @override
+  String get medCatClose => 'Kapat';
+
+  @override
+  String get medCatDeleteTitle => 'Kategori silinsin mi?';
+
+  @override
+  String medCatDeleteBody(String name) {
+    return '\"$name\" silinir; bu kategorideki ilaçlar silinmez, kategorisiz kalır.';
+  }
+
+  @override
+  String get medCatErrorEmpty => 'Kategori adı boş olamaz.';
+
+  @override
+  String get medCatErrorTooLong => 'Kategori adı en çok 100 karakter olabilir.';
+
+  @override
+  String get medCatErrorExists => 'Bu adla bir kategori zaten var.';
+
+  @override
+  String get medCatErrorGeneric => 'İşlem yapılamadı. Tekrar deneyin.';
+
+  @override
+  String get medCatLoadError => 'Kategoriler okunamadı.';
+
+  @override
   String get medLogCancel => 'İptal';
 
   @override

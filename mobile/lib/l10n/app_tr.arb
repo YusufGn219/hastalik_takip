@@ -40,6 +40,36 @@
   "medLogAddError": "İlaç eklenemedi. Tekrar deneyin.",
   "medLogNewTitle": "Yeni İlaç Ekle",
   "medLogNewName": "İlaç adı",
+  "medLogCategoryLabel": "Kategori (isteğe bağlı)",
+  "medLogNoCategory": "Kategorisiz",
+  "medLogNewCategory": "Yeni kategori oluştur…",
+  "medLogNewCategoryName": "Yeni kategori adı",
+  "medLogManageCategories": "Kategoriler",
+  "medLogCategoryChanged": "Kategori güncellendi.",
+  "medLogCategoryError": "Kategori kaydedilemedi. Tekrar deneyin.",
+  "medCatTitle": "Kategoriler",
+  "medCatEmpty": "Henüz kategori yok. Aşağıdan ekleyebilirsiniz.",
+  "medCatNameLabel": "Kategori adı",
+  "medCatAdd": "Ekle",
+  "medCatRename": "Adı değiştir",
+  "medCatRenameTitle": "Kategori adı",
+  "medCatSave": "Kaydet",
+  "medCatDelete": "Sil",
+  "medCatClose": "Kapat",
+  "medCatDeleteTitle": "Kategori silinsin mi?",
+  "medCatDeleteBody": "\"{name}\" silinir; bu kategorideki ilaçlar silinmez, kategorisiz kalır.",
+  "@medCatDeleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "medCatErrorEmpty": "Kategori adı boş olamaz.",
+  "medCatErrorTooLong": "Kategori adı en çok 100 karakter olabilir.",
+  "medCatErrorExists": "Bu adla bir kategori zaten var.",
+  "medCatErrorGeneric": "İşlem yapılamadı. Tekrar deneyin.",
+  "medCatLoadError": "Kategoriler okunamadı.",
   "medLogCancel": "İptal",
   "medLogAdd": "Ekle",
   "medLogAdded": "{name} eklendi.",

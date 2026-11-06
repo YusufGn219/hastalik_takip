@@ -11,7 +11,9 @@ import '../../../core/utils/turkish_text.dart';
 import '../../../data/database/app_database.dart';
 import '../../../data/database/enums.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../domain/errors.dart';
 import '../../episode/episode_format.dart';
+import 'category_dialogs.dart';
 
 class MedicationLogScreen extends ConsumerStatefulWidget {
   const MedicationLogScreen({super.key});
@@ -26,6 +28,7 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
   final _notesController = TextEditingController();
 
   List<Medication> _medications = [];
+  List<MedicationCategory> _categories = [];
   String? _selectedId;
   DoseUnit _unit = DoseUnit.tablet;
   bool _isSaving = false;
@@ -58,10 +61,13 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
 
   Future<void> _loadMedications() async {
     try {
-      final list = await ref.read(medicationServiceProvider).available();
+      final service = ref.read(medicationServiceProvider);
+      final list = await service.available();
+      final categories = await service.categories();
       if (!mounted) return;
       setState(() {
         _medications = _sorted(list);
+        _categories = categories;
         _loadFailed = false;
       });
     } catch (_) {
@@ -83,19 +89,62 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
     }
   }
 
+  /// Açılır listede ve etiketlerde ilaç adı; kategorisi varsa "Parol · Ağrı".
+  String _medicationLabel(Medication m) {
+    final category =
+        _categories.where((c) => c.id == m.categoryId).firstOrNull;
+    return category == null ? m.name : '${m.name} · ${category.name}';
+  }
+
+  Medication? get _selectedMedication =>
+      _medications.where((m) => m.id == _selectedId).firstOrNull;
+
   Future<void> _showAddMedicationDialog() async {
-    final name = await showDialog<String>(
+    final result = await showDialog<_NewMedication>(
       context: context,
-      builder: (ctx) => const _AddMedicationDialog(),
+      builder: (ctx) => _AddMedicationDialog(categories: _categories),
     );
-    if (name == null || !mounted) return;
-    await _addMedication(name);
+    if (result == null || !mounted) return;
+    await _addMedication(result);
+  }
+
+  Future<void> _showCategoryManager() async {
+    await showDialog<void>(
+      context: context,
+      builder: (_) => const CategoryManagerDialog(),
+    );
+    if (!mounted) return;
+    await _loadMedications(); // silinen kategoriler ilaç etiketlerinden düşer
+  }
+
+  /// Seçili ilacın kategorisini değiştirir (null = kategorisiz).
+  Future<void> _changeCategory(String medicationId, String? categoryId) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      await ref
+          .read(medicationServiceProvider)
+          .setCategory(medicationId, categoryId);
+      await _loadMedications();
+      if (!mounted) return;
+      setState(() {
+        _isSuccess = true;
+        _message = l10n.medLogCategoryChanged;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isSuccess = false;
+        _message = l10n.medLogCategoryError;
+      });
+    }
   }
 
   /// Aynı adlı ilaç (büyük/küçük harf ve fazla boşluk önemsiz) zaten varsa yeni
   /// satır açmaz, mevcut olanı seçer; yoksa kullanıcının kendi ilacı olarak
-  /// (semptomatik) ekler.
-  Future<void> _addMedication(String name) async {
+  /// (isteğe bağlı kategoriyle) ekler. Yeni kategori adı verildiyse önce o
+  /// oluşturulur; aynı adlı kategori varsa o kullanılır.
+  Future<void> _addMedication(_NewMedication input) async {
+    final name = input.name;
     final l10n = AppLocalizations.of(context);
     final service = ref.read(medicationServiceProvider);
     try {
@@ -114,22 +163,37 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
         });
         return;
       }
-      final created = await service.create(name: name.trim());
+      var categoryId = input.categoryId;
+      final newCategory = input.newCategoryName?.trim();
+      if (newCategory != null && newCategory.isNotEmpty) {
+        final key = foldTr(newCategory);
+        final known = (await service.categories())
+            .where((c) => foldTr(c.name) == key)
+            .firstOrNull;
+        categoryId =
+            known?.id ?? (await service.createCategory(newCategory)).id;
+      }
+      final created =
+          await service.create(name: name.trim(), categoryId: categoryId);
+      final categories = await service.categories();
       final updated = _sorted(await service.available());
       if (!mounted) return;
       setState(() {
         _medications = updated;
+        _categories = categories;
         _selectedId = created.id;
         _formVersion++;
         _loadFailed = false;
         _isSuccess = true;
         _message = l10n.medLogAdded(created.name);
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       setState(() {
         _isSuccess = false;
-        _message = l10n.medLogAddError;
+        _message = e is RuleViolation && e.code.startsWith('category_name')
+            ? categoryErrorText(e, l10n)
+            : l10n.medLogAddError;
       });
     }
   }
@@ -218,10 +282,19 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
                   l10n.medLogPick,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                TextButton.icon(
-                  icon: const Icon(Icons.add),
-                  label: Text(l10n.medLogAddNew),
-                  onPressed: _showAddMedicationDialog,
+                Wrap(
+                  children: [
+                    TextButton.icon(
+                      icon: const Icon(Icons.label_outline),
+                      label: Text(l10n.medLogManageCategories),
+                      onPressed: _showCategoryManager,
+                    ),
+                    TextButton.icon(
+                      icon: const Icon(Icons.add),
+                      label: Text(l10n.medLogAddNew),
+                      onPressed: _showAddMedicationDialog,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -235,7 +308,7 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
                 for (final m in _medications)
                   DropdownMenuItem<String>(
                     value: m.id,
-                    child: Text(m.name),
+                    child: Text(_medicationLabel(m)),
                   ),
               ],
               onChanged: (val) {
@@ -244,6 +317,31 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
               },
               decoration: const InputDecoration(border: OutlineInputBorder()),
             ),
+            if (_selectedMedication != null) ...[
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String?>(
+                key: ValueKey(
+                    'cat-$_selectedId-${_selectedMedication!.categoryId}'),
+                initialValue: _categories
+                        .any((c) => c.id == _selectedMedication!.categoryId)
+                    ? _selectedMedication!.categoryId
+                    : null,
+                isExpanded: true,
+                items: [
+                  DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text(l10n.medLogNoCategory),
+                  ),
+                  for (final c in _categories)
+                    DropdownMenuItem<String?>(value: c.id, child: Text(c.name)),
+                ],
+                onChanged: (val) => _changeCategory(_selectedId!, val),
+                decoration: InputDecoration(
+                  labelText: l10n.medLogCategoryLabel,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             Row(
               children: [
@@ -312,28 +410,58 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
   }
 }
 
-/// "Yeni ilaç ekle" penceresi. Adı döndürür (kırpılmış, boş değil); iptalde
-/// null. Denetleyiciyi kendisi serbest bırakır.
+/// "Yeni ilaç ekle" penceresinin sonucu.
+class _NewMedication {
+  const _NewMedication(this.name, {this.categoryId, this.newCategoryName});
+
+  final String name;
+  final String? categoryId;
+
+  /// Doluysa pencereden yeni kategori oluşturulması istenmiştir.
+  final String? newCategoryName;
+}
+
+/// "Yeni ilaç ekle" penceresi. Ad (kırpılmış, boş değil) ve isteğe bağlı
+/// kategoriyi döndürür; iptalde null. Denetleyicileri kendisi serbest bırakır.
 class _AddMedicationDialog extends StatefulWidget {
-  const _AddMedicationDialog();
+  const _AddMedicationDialog({required this.categories});
+
+  final List<MedicationCategory> categories;
 
   @override
   State<_AddMedicationDialog> createState() => _AddMedicationDialogState();
 }
 
 class _AddMedicationDialogState extends State<_AddMedicationDialog> {
+  /// "Yeni kategori oluştur" satırının değeri (kimlikler UUID'dir, çakışmaz).
+  static const _newCategoryMarker = '__new_category__';
+
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _newCategoryController = TextEditingController();
+  String? _categoryChoice; // null = kategorisiz, kategori kimliği ya da işaret
+
+  bool get _creatingCategory => _categoryChoice == _newCategoryMarker;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _newCategoryController.dispose();
     super.dispose();
   }
 
   void _submit() {
     final name = _nameController.text.trim();
     if (name.isEmpty) return;
-    Navigator.pop(context, name);
+    final newName = _newCategoryController.text.trim();
+    Navigator.pop(
+      context,
+      _NewMedication(
+        name,
+        categoryId: _creatingCategory ? null : _categoryChoice,
+        newCategoryName:
+            _creatingCategory && newName.isNotEmpty ? newName : null,
+      ),
+    );
   }
 
   @override
@@ -341,16 +469,58 @@ class _AddMedicationDialogState extends State<_AddMedicationDialog> {
     final l10n = AppLocalizations.of(context);
     return AlertDialog(
       title: Text(l10n.medLogNewTitle),
-      content: TextField(
-        controller: _nameController,
-        autofocus: true,
-        textCapitalization: TextCapitalization.sentences,
-        // Veritabanı alanı en çok 100 karakter alır.
-        inputFormatters: [LengthLimitingTextInputFormatter(100)],
-        onSubmitted: (_) => _submit(),
-        decoration: InputDecoration(
-          labelText: l10n.medLogNewName,
-          border: const OutlineInputBorder(),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              autofocus: true,
+              textCapitalization: TextCapitalization.sentences,
+              // Veritabanı alanı en çok 100 karakter alır.
+              inputFormatters: [LengthLimitingTextInputFormatter(100)],
+              onSubmitted: (_) => _submit(),
+              decoration: InputDecoration(
+                labelText: l10n.medLogNewName,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String?>(
+              initialValue: _categoryChoice,
+              isExpanded: true,
+              items: [
+                DropdownMenuItem<String?>(
+                  value: null,
+                  child: Text(l10n.medLogNoCategory),
+                ),
+                for (final c in widget.categories)
+                  DropdownMenuItem<String?>(value: c.id, child: Text(c.name)),
+                DropdownMenuItem<String?>(
+                  value: _newCategoryMarker,
+                  child: Text(l10n.medLogNewCategory),
+                ),
+              ],
+              onChanged: (val) => setState(() => _categoryChoice = val),
+              decoration: InputDecoration(
+                labelText: l10n.medLogCategoryLabel,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            if (_creatingCategory) ...[
+              const SizedBox(height: 12),
+              TextField(
+                controller: _newCategoryController,
+                textCapitalization: TextCapitalization.sentences,
+                inputFormatters: [LengthLimitingTextInputFormatter(100)],
+                onSubmitted: (_) => _submit(),
+                decoration: InputDecoration(
+                  labelText: l10n.medLogNewCategoryName,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
       actions: [
