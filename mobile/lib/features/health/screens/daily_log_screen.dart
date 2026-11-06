@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../../app/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/repositories/support.dart';
@@ -46,9 +47,23 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     super.dispose();
   }
 
-  /// 8.0 → "8", 7.5 → "7.5": alanda gereksiz ondalık görünmesin.
-  String _numText(double v) =>
-      v == v.roundToDouble() ? v.toInt().toString() : v.toString();
+  /// 8.0 → "8", 7.5 → "7,5" (yerel ondalık ayracıyla): alanda gereksiz ondalık
+  /// görünmesin ve yazılan "7,5" geri "7.5" olmasın. Değer yuvarlanmaz.
+  String _numText(double v) {
+    if (v == v.roundToDouble()) return v.toInt().toString();
+    final separator = NumberFormat.decimalPattern(
+      Localizations.localeOf(context).toString(),
+    ).symbols.DECIMAL_SEP;
+    return v.toString().replaceAll('.', separator);
+  }
+
+  /// Doğrulama uyarısı, kullanıcı alanı düzeltmeye başlayınca kalkar. Bugünün
+  /// kaydı okunamadığında çıkan uyarı (kaydetme kapalı) kalır.
+  void _clearValidationError() {
+    if (_errorMessage != null && !_loadFailed) {
+      setState(() => _errorMessage = null);
+    }
+  }
 
   /// Bugünün (yerel gün) kaydı varsa alanları onun değerleriyle doldurur.
   Future<void> _loadTodayLog() async {
@@ -204,6 +219,7 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
                     hint: '7.5',
                     suffix: 'saat',
                     controller: _sleepController,
+                    onChanged: _clearValidationError,
                     isDark: isDark,
                   ),
                 ),
@@ -217,6 +233,7 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
                     hint: '2.0',
                     suffix: 'litre',
                     controller: _waterController,
+                    onChanged: _clearValidationError,
                     isDark: isDark,
                   ),
                 ),
@@ -514,6 +531,7 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     required String hint,
     required String suffix,
     required TextEditingController controller,
+    required VoidCallback onChanged,
     required bool isDark,
   }) {
     return Container(
@@ -550,6 +568,7 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
           const SizedBox(height: 10),
           TextField(
             controller: controller,
+            onChanged: (_) => onChanged(),
             keyboardType:
                 const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(

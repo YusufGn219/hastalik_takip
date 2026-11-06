@@ -151,11 +151,31 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Kaydı Güncelle'), findsOneWidget);
-      expect(_fieldText(tester, 0), '7.5');
+      expect(_fieldText(tester, 0), '7,5'); // yerel ondalık ayracı, "7.5" değil
       expect(_fieldText(tester, 1), '2'); // 2.0 değil
       expect(_fieldText(tester, 2), 'baş ağrısı yoktu');
       expect(find.text('4 / 5'), findsOneWidget); // ruh hali
       expect(find.text('2 / 5'), findsOneWidget); // enerji
+    });
+
+    testWidgets('ondalık değer yuvarlanmadan, yerel ayraçla gösterilir',
+        (tester) async {
+      await tester.runAsync(() => DriftDailyLogRepository(db).upsert(
+            logDate: '2026-11-06',
+            sleepHours: 7.25,
+            waterIntake: 1.1234,
+            mood: 3,
+            energyLevel: 3,
+          ));
+
+      await tester.pumpWidget(_app(overrides()));
+      await tester.runAsync(() => Future<void>.delayed(
+            const Duration(milliseconds: 50),
+          ));
+      await tester.pumpAndSettle();
+
+      expect(_fieldText(tester, 0), '7,25');
+      expect(_fieldText(tester, 1), '1,1234'); // 1,123 olmamalı (veri kaybı)
     });
 
     testWidgets('başka güne ait kayıt bugün için gösterilmez', (tester) async {
@@ -191,6 +211,11 @@ void main() {
       expect(find.textContaining('Bugünün kaydı okunamadı'), findsOneWidget);
       final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
       expect(button.onPressed, isNull);
+
+      // Alana yazmak okuma uyarısını silmez: kaydetme kapalıyken uyarı gerekli.
+      await _enter(tester, 0, '7');
+      await tester.pump();
+      expect(find.textContaining('Bugünün kaydı okunamadı'), findsOneWidget);
     });
   });
 
@@ -237,6 +262,26 @@ void main() {
 
       expect(await allLogs(tester), isEmpty);
       expect(find.text('Günlük Kayıt'), findsOneWidget); // ekran açık kaldı
+    });
+
+    testWidgets('doğrulama uyarısı, alan düzeltilmeye başlanınca kalkar',
+        (tester) async {
+      await tester.pumpWidget(_hosted(overrides()));
+      await _openScreen(tester);
+
+      await _tapSave(tester); // ikisi de boş
+      expect(find.textContaining('Uyku süresini'), findsOneWidget);
+      await _enter(tester, 0, '7');
+      await tester.pump();
+      expect(find.textContaining('Uyku süresini'), findsNothing);
+
+      await _tapSave(tester); // su boş
+      expect(find.textContaining('Su tüketimini'), findsOneWidget);
+      await _enter(tester, 1, '2');
+      await tester.pump();
+      expect(find.textContaining('Su tüketimini'), findsNothing);
+
+      expect(await allLogs(tester), isEmpty); // düzeltilene kadar yazılmadı
     });
 
     testWidgets('sınır dışı değerler reddedilir (uyku 0-24, su 0-10)',
