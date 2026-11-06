@@ -194,6 +194,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get episodeClose => 'Dönemi Kapat';
 
   @override
+  String episodeIntakeWithDose(String name, String dose, String time) {
+    return 'İlaç: $name ($dose) · $time';
+  }
+
+  @override
+  String episodeIntakeNoDose(String name, String time) {
+    return 'İlaç: $name · $time';
+  }
+
+  @override
   String get episodeMedicationTitle => 'Döneme İlaç Ekle';
 
   @override

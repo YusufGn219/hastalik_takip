@@ -6,6 +6,7 @@ import '../../../core/utils/turkish_text.dart';
 import '../../../data/database/app_database.dart';
 import '../../../data/database/enums.dart';
 import '../../../l10n/app_localizations.dart';
+import '../episode_format.dart';
 
 /// Devam eden döneme ilaç alımı ekleyen alt pencere. Başarılıysa `true` ile
 /// kapanır (liste ekranı bilgi gösterir).
@@ -70,14 +71,6 @@ class _EpisodeMedicationSheetState
       });
     }
   }
-
-  String _unitLabel(DoseUnit unit, AppLocalizations l10n) => switch (unit) {
-    DoseUnit.tablet => l10n.doseUnitTablet,
-    DoseUnit.mg => l10n.doseUnitMg,
-    DoseUnit.ml => l10n.doseUnitMl,
-    DoseUnit.drop => l10n.doseUnitDrop,
-    DoseUnit.capsule => l10n.doseUnitCapsule,
-  };
 
   /// Boş = doz yok (null). Dolu ama sayı değilse ya da 0'dan büyük değilse
   /// `false`. Ondalık virgül kabul edilir.
@@ -213,7 +206,7 @@ class _EpisodeMedicationSheetState
                         for (final u in DoseUnit.values)
                           DropdownMenuItem(
                             value: u,
-                            child: Text(_unitLabel(u, l10n)),
+                            child: Text(doseUnitLabel(u, l10n)),
                           ),
                       ],
                       onChanged: (val) => setState(() => _unit = val ?? _unit),

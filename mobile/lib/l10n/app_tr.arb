@@ -177,6 +177,33 @@
   },
   "episodeAddMedication": "İlaç Ekle",
   "episodeClose": "Dönemi Kapat",
+  "episodeIntakeWithDose": "İlaç: {name} ({dose}) · {time}",
+  "@episodeIntakeWithDose": {
+    "description": "Dönem kartında döneme bağlı ilaç alımı; dose örn. '1,5 damla', time saat ya da tarihli saat.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "dose": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "episodeIntakeNoDose": "İlaç: {name} · {time}",
+  "@episodeIntakeNoDose": {
+    "description": "Dönem kartında doz yazılmamış ilaç alımı.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "episodeMedicationTitle": "Döneme İlaç Ekle",
   "episodeMedicationHint": "İlaç seçin...",
   "episodeMedicationNone": "Kayıtlı ilaç yok.",

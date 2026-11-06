@@ -794,6 +794,134 @@ void main() {
     });
   });
 
+  group('EpisodeListScreen / kartta ilaç alımları', () {
+    final start = utc(2026, 11, 6, 8, 0);
+    final parolId = SeedLoader.medicationId('parol');
+    final aspirinId = SeedLoader.medicationId('aspirin');
+
+    Future<MedicationLog> logIntake(
+      WidgetTester tester,
+      Episode episode,
+      String medicationId,
+      DateTime at, {
+      double? dose,
+      DoseUnit unit = DoseUnit.tablet,
+    }) =>
+        tester
+            .runAsync(() => DriftMedicationLogRepository(db).create(
+                  medicationId: medicationId,
+                  takenAt: at,
+                  doseAmount: dose,
+                  doseUnit: unit,
+                  episodeId: episode.id,
+                ))
+            .then((v) => v!);
+
+    Future<void> refresh(WidgetTester tester) async {
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('ilaç alınmamış dönemde ilaç satırı yok', (tester) async {
+      await openApp(tester);
+      await startEpisode(tester, headacheId, start);
+      await refresh(tester);
+
+      expect(find.textContaining('İlaç: '), findsNothing);
+    });
+
+    testWidgets(
+        'devam eden kartta alımlar eskiden yeniye: doz ve birim, doz yoksa '
+        'yalnız ad ve saat', (tester) async {
+      await openApp(tester);
+      final episode = await startEpisode(tester, headacheId, start);
+      // Önce yeni olan eklenir: sıra eklenme sırasına değil zamana bağlı.
+      await logIntake(tester, episode, aspirinId, utc(2026, 11, 6, 9, 15));
+      await logIntake(tester, episode, parolId, utc(2026, 11, 6, 8, 30),
+          dose: 1.5, unit: DoseUnit.drop);
+      await refresh(tester);
+
+      expect(find.text('İlaç: Parol (1,5 damla) · 08:30'), findsOneWidget);
+      expect(find.text('İlaç: Aspirin · 09:15'), findsOneWidget);
+      final parol =
+          tester.getTopLeft(find.text('İlaç: Parol (1,5 damla) · 08:30')).dy;
+      final aspirin = tester.getTopLeft(find.text('İlaç: Aspirin · 09:15')).dy;
+      expect(parol, lessThan(aspirin));
+    });
+
+    testWidgets('tam sayı doz ondalıksız yazılır ("2 tablet", "500 mg")',
+        (tester) async {
+      await openApp(tester);
+      final episode = await startEpisode(tester, headacheId, start);
+      await logIntake(tester, episode, parolId, utc(2026, 11, 6, 8, 30),
+          dose: 2);
+      await logIntake(tester, episode, aspirinId, utc(2026, 11, 6, 9, 0),
+          dose: 500, unit: DoseUnit.mg);
+      await refresh(tester);
+
+      expect(find.text('İlaç: Parol (2 tablet) · 08:30'), findsOneWidget);
+      expect(find.text('İlaç: Aspirin (500 mg) · 09:00'), findsOneWidget);
+    });
+
+    testWidgets('başka güne ait alım tarihli yazılır', (tester) async {
+      await openApp(tester);
+      final episode =
+          await startEpisode(tester, headacheId, utc(2026, 11, 5, 21, 0));
+      await logIntake(tester, episode, parolId, utc(2026, 11, 5, 22, 10),
+          dose: 1);
+      await refresh(tester);
+
+      expect(find.text('İlaç: Parol (1 tablet) · 5 Kas 22:10'), findsOneWidget);
+    });
+
+    testWidgets('silinmiş alım gösterilmez', (tester) async {
+      await openApp(tester);
+      final episode = await startEpisode(tester, headacheId, start);
+      final log = await logIntake(
+          tester, episode, parolId, utc(2026, 11, 6, 8, 30));
+      await tester.runAsync(
+          () => DriftMedicationLogRepository(db).softDelete(log.id));
+      await refresh(tester);
+
+      expect(find.textContaining('İlaç: '), findsNothing);
+    });
+
+    testWidgets('biten dönemin geçmiş kartında da görünür', (tester) async {
+      await openApp(tester);
+      final episode = await startEpisode(tester, headacheId, start);
+      await logIntake(tester, episode, parolId, utc(2026, 11, 6, 8, 30),
+          dose: 1.5, unit: DoseUnit.ml);
+      await resolve(tester, episode, utc(2026, 11, 6, 10, 0));
+      await refresh(tester);
+      await openHistoryTab(tester);
+
+      expect(find.text('İlaç: Parol (1,5 ml) · 08:30'), findsOneWidget);
+    });
+
+    testWidgets(
+        'İlaç Ekle penceresinden kaydedince alım kartta kendiliğinden belirir',
+        (tester) async {
+      await openApp(tester);
+      await startEpisode(tester, headacheId, start);
+      await refresh(tester);
+      expect(find.textContaining('İlaç: '), findsNothing);
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'İlaç Ekle'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Parol').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '1,5');
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Kaydet'));
+      await tester.pumpAndSettle();
+
+      // Elle yenilenmedi; "şimdi" yerel 10:30.
+      expect(find.text('İlaç: Parol (1,5 tablet) · 10:30'), findsOneWidget);
+      expect(find.text('İlaç döneme eklendi.'), findsOneWidget);
+    });
+  });
+
   group('formatEpisodeMoment', () {
     // "Şimdi": 6 Kasım 2026 yerel.
     final now = DateTime(2026, 11, 6, 10, 30);

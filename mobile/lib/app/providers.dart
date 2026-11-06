@@ -98,6 +98,8 @@ final episodeOverviewLoaderProvider = Provider<EpisodeOverviewLoader>(
     episodes: ref.watch(episodeRepositoryProvider),
     entries: ref.watch(symptomEntryRepositoryProvider),
     symptoms: ref.watch(symptomRepositoryProvider),
+    medicationLogs: ref.watch(medicationLogRepositoryProvider),
+    medications: ref.watch(medicationRepositoryProvider),
   ),
 );
 

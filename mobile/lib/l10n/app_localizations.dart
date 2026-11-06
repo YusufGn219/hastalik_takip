@@ -406,6 +406,18 @@ abstract class AppLocalizations {
   /// **'Dönemi Kapat'**
   String get episodeClose;
 
+  /// Dönem kartında döneme bağlı ilaç alımı; dose örn. '1,5 damla', time saat ya da tarihli saat.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç: {name} ({dose}) · {time}'**
+  String episodeIntakeWithDose(String name, String dose, String time);
+
+  /// Dönem kartında doz yazılmamış ilaç alımı.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç: {name} · {time}'**
+  String episodeIntakeNoDose(String name, String time);
+
   /// No description provided for @episodeMedicationTitle.
   ///
   /// In tr, this message translates to:

@@ -72,14 +72,16 @@ class _EpisodeListScreenState extends ConsumerState<EpisodeListScreen>
     );
   }
 
-  /// İlaç penceresini açar; kaydedildiyse haber verir (liste değişmez: kartta
-  /// ilaç gösterilmiyor).
+  /// İlaç penceresini açar; kaydedildiyse listeyi yeniler (alım kartta görünür)
+  /// ve haber verir.
   Future<void> _openAddMedication(EpisodeOverview o) async {
     final saved = await showEpisodeMedicationSheet(
       context,
       episodeId: o.episode.id,
     );
     if (saved != true || !mounted) return;
+    await _loadEpisodes(showSpinner: false);
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context).episodeMedicationSaved)),
     );
@@ -91,6 +93,16 @@ class _EpisodeListScreenState extends ConsumerState<EpisodeListScreen>
         ref.read(clockProvider)(),
         Localizations.localeOf(context).toString(),
       );
+
+  /// Döneme bağlı ilaç alımları, kartta birer satır (eskiden yeniye).
+  List<Widget> _intakeLines(EpisodeOverview o, AppLocalizations l10n) {
+    final now = ref.read(clockProvider)();
+    final locale = Localizations.localeOf(context).toString();
+    return [
+      for (final m in o.medications)
+        Text(formatEpisodeIntake(m, now, l10n, locale)),
+    ];
+  }
 
   String _locations(EpisodeOverview o, AppLocalizations l10n) {
     if (o.locations.isEmpty) return l10n.episodeNoLocation;
@@ -127,6 +139,7 @@ class _EpisodeListScreenState extends ConsumerState<EpisodeListScreen>
             Text(l10n.episodeSeverity(severity)),
             Text(l10n.episodeStart(start)),
             Text(_locations(o, l10n)),
+            ..._intakeLines(o, l10n),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -195,6 +208,7 @@ class _EpisodeListScreenState extends ConsumerState<EpisodeListScreen>
             Text(l10n.episodeMaxSeverity(o.maxSeverity?.toString() ?? '-')),
             Text(l10n.episodeRange(start, end, duration)),
             Text(_locations(o, l10n)),
+            ..._intakeLines(o, l10n),
             if (notes.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
