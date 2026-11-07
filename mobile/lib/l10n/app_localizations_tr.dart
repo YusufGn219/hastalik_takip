@@ -204,6 +204,30 @@ class AppLocalizationsTr extends AppLocalizations {
       'Rutin kapatıldı ama hatırlatma iptal edilemedi.';
 
   @override
+  String get reminderPermTitle => 'Bildirim izni';
+
+  @override
+  String get reminderPermBody =>
+      'İlaç saatinde hatırlatma gelmesi için Vitapuls\'ın bildirim göstermesine izin vermeniz gerekir. Bildirimde ilaç adı yazmaz.';
+
+  @override
+  String get reminderPermContinue => 'Devam';
+
+  @override
+  String get reminderPermLater => 'Şimdi değil';
+
+  @override
+  String get reminderOffBanner =>
+      'Bildirimler kapalı: doz saatinde hatırlatma gelmez. Telefonun Ayarlar > Uygulamalar > Vitapuls > Bildirimler bölümünden açabilirsiniz.';
+
+  @override
+  String get reminderInexactBanner =>
+      'Hatırlatmalar tam saatinde değil, birkaç dakika sapmayla gelebilir.';
+
+  @override
+  String get reminderExactButton => 'Tam saatte gelmesi için izin ver';
+
+  @override
   String get reminderTitle => 'Vitapuls';
 
   @override

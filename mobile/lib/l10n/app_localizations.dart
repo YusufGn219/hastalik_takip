@@ -460,6 +460,48 @@ abstract class AppLocalizations {
   /// **'Rutin kapatıldı ama hatırlatma iptal edilemedi.'**
   String get routineClosedNoReminder;
 
+  /// No description provided for @reminderPermTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim izni'**
+  String get reminderPermTitle;
+
+  /// No description provided for @reminderPermBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç saatinde hatırlatma gelmesi için Vitapuls\'ın bildirim göstermesine izin vermeniz gerekir. Bildirimde ilaç adı yazmaz.'**
+  String get reminderPermBody;
+
+  /// No description provided for @reminderPermContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam'**
+  String get reminderPermContinue;
+
+  /// No description provided for @reminderPermLater.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi değil'**
+  String get reminderPermLater;
+
+  /// No description provided for @reminderOffBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimler kapalı: doz saatinde hatırlatma gelmez. Telefonun Ayarlar > Uygulamalar > Vitapuls > Bildirimler bölümünden açabilirsiniz.'**
+  String get reminderOffBanner;
+
+  /// No description provided for @reminderInexactBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatmalar tam saatinde değil, birkaç dakika sapmayla gelebilir.'**
+  String get reminderInexactBanner;
+
+  /// No description provided for @reminderExactButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tam saatte gelmesi için izin ver'**
+  String get reminderExactButton;
+
   /// No description provided for @reminderTitle.
   ///
   /// In tr, this message translates to:

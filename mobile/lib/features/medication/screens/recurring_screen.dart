@@ -2,7 +2,7 @@
 // "Atladım"), tüm rutinler (kullanıcının bağladığı kronik hastalığa göre gruplu),
 // rutin ekleme (birden fazla doz saati) ve kapatma. Yerel veritabanına
 // MedicationService ve DoseService üzerinden yazar. Hatırlatma bildirimi bu
-// ekranda planlanmaz (Sprint 4 Grup 3).
+// ekranda planlanmaz (Sprint 4 Grup 3); izin durumu burada gösterilir.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +13,7 @@ import '../../../data/database/app_database.dart';
 import '../../../domain/errors.dart';
 import '../../../domain/services/dose_service.dart';
 import '../../../domain/services/medication_service.dart';
+import '../../../domain/services/reminder_service.dart';
 import '../../../domain/weekdays.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -89,7 +90,12 @@ class RecurringScreen extends ConsumerStatefulWidget {
   ConsumerState<RecurringScreen> createState() => _RecurringScreenState();
 }
 
-class _RecurringScreenState extends ConsumerState<RecurringScreen> {
+class _RecurringScreenState extends ConsumerState<RecurringScreen>
+    with WidgetsBindingObserver {
+  /// İzin sorusu ekran açıkken bir kez sorulur (kapalıysa uyarı kartı kalır).
+  bool _askedThisSession = false;
+
+  ReminderStatus? _status;
   List<Dose> _doses = [];
   List<RoutineGroup> _groups = [];
   List<Medication> _freeMedications = [];
@@ -99,7 +105,127 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Kullanıcı ayarlardan dönünce izin durumu değişmiş olabilir.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refreshStatus(rescheduleIfBetter: true);
+  }
+
+  /// İzin durumunu okur. Düzeldiyse (bildirim açıldı / tam alarm verildi)
+  /// hatırlatmalar yeni duruma göre baştan kurulur.
+  Future<void> _refreshStatus({bool rescheduleIfBetter = false}) async {
+    try {
+      final reminders = ref.read(reminderServiceProvider);
+      final status = await reminders.status();
+      final old = _status;
+      if (rescheduleIfBetter &&
+          old != null &&
+          status != old &&
+          (status.notificationsEnabled || status.exactAllowed)) {
+        await reminders.rescheduleAll();
+      }
+      if (!mounted) return;
+      setState(() => _status = status);
+    } catch (_) {
+      // Durum okunamazsa uyarı kartı gösterilmez.
+    }
+  }
+
+  /// Rutin kaydedildikten sonra: bildirim kapalıysa kısa açıklamayla izin ister.
+  Future<void> _askPermissionIfNeeded() async {
+    final reminders = ref.read(reminderServiceProvider);
+    try {
+      final status = await reminders.status();
+      if (status.notificationsEnabled || _askedThisSession || !mounted) {
+        await _refreshStatus();
+        return;
+      }
+      _askedThisSession = true;
+      final l10n = AppLocalizations.of(context);
+      final go = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l10n.reminderPermTitle),
+          content: Text(l10n.reminderPermBody),
+          actions: [
+            TextButton(
+              key: const ValueKey('perm-later'),
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l10n.reminderPermLater),
+            ),
+            FilledButton(
+              key: const ValueKey('perm-continue'),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(l10n.reminderPermContinue),
+            ),
+          ],
+        ),
+      );
+      if (go == true) {
+        // Planlama izinsiz de yapılır (izin yalnız gösterimi etkiler); yeniden kurmak gerekmez.
+        await reminders.requestNotifications();
+      }
+    } catch (_) {
+      // İzin akışı hata verirse rutin yine kayıtlıdır; uyarı kartı durumu gösterir.
+    }
+    await _refreshStatus();
+  }
+
+  Widget? _permissionBanner(AppLocalizations l10n) {
+    final s = _status;
+    if (s == null || _groups.isEmpty) return null;
+    if (!s.notificationsEnabled) {
+      return Card(
+        key: const ValueKey('reminder-off-banner'),
+        color: Colors.orange.shade50,
+        margin: const EdgeInsets.only(bottom: 16),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              const Icon(Icons.notifications_off, color: Colors.orange),
+              const SizedBox(width: 12),
+              Expanded(child: Text(l10n.reminderOffBanner)),
+            ],
+          ),
+        ),
+      );
+    }
+    if (!s.exactAllowed) {
+      return Card(
+        key: const ValueKey('reminder-inexact-banner'),
+        color: Colors.orange.shade50,
+        margin: const EdgeInsets.only(bottom: 16),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.reminderInexactBanner),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                key: const ValueKey('reminder-exact-button'),
+                style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
+                onPressed: () =>
+                    ref.read(reminderServiceProvider).requestExact(),
+                child: Text(l10n.reminderExactButton),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    return null;
   }
 
   Future<void> _load() async {
@@ -122,6 +248,7 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
         _loadFailed = false;
         _isLoading = false;
       });
+      await _refreshStatus();
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -152,6 +279,7 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
       _snack(l10n.routineAddedNoReminder, error: true);
     }
     await _load();
+    await _askPermissionIfNeeded();
   }
 
   Future<void> _confirmClose(Routine r) async {
@@ -360,6 +488,7 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
               : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
+                    ?_permissionBanner(l10n),
                     _heading(l10n.routineTodayTitle),
                     if (_doses.isEmpty)
                       Text(l10n.routineTodayEmpty,

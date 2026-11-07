@@ -38,6 +38,28 @@ class ReminderTexts {
   final String channelDescription;
 }
 
+/// Hatırlatmaların çalışması için gereken izinlerin durumu.
+class ReminderStatus {
+  const ReminderStatus({
+    required this.notificationsEnabled,
+    required this.exactAllowed,
+  });
+
+  final bool notificationsEnabled;
+
+  /// false ise bildirimler "civarı" (birkaç dakika sapmayla) gelir.
+  final bool exactAllowed;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ReminderStatus &&
+      other.notificationsEnabled == notificationsEnabled &&
+      other.exactAllowed == exactAllowed;
+
+  @override
+  int get hashCode => Object.hash(notificationsEnabled, exactAllowed);
+}
+
 class ReminderService {
   ReminderService({
     required MedicationRepository medications,
@@ -65,6 +87,17 @@ class ReminderService {
         for (var d = 0; d < maxDoses; d++)
           for (var day = 0; day < 7; day++) idFor(notificationId, d, day),
       ];
+
+  Future<ReminderStatus> status() async => ReminderStatus(
+        notificationsEnabled: await _gateway.areNotificationsEnabled(),
+        exactAllowed: await _gateway.canScheduleExact(),
+      );
+
+  /// Sistem izin penceresini açar; izin verildiyse true.
+  Future<bool> requestNotifications() => _gateway.requestNotificationPermission();
+
+  /// Tam alarm ayar ekranını açar.
+  Future<void> requestExact() => _gateway.requestExactAlarmPermission();
 
   /// Hepsini silip tüm rutinleri baştan kurar: açılışta (saat dilimi
   /// değişmiş olabilir, kayıtlar güncel olsun) ve gerektiğinde çağrılır.

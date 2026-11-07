@@ -37,4 +37,14 @@ abstract class NotificationGateway {
 
   /// Tam alarm izni var mı (Android 12+'da kullanıcı sistem ayarından verir).
   Future<bool> canScheduleExact();
+
+  /// Uygulamanın bildirim göstermesine izin var mı (Android 13+'da kullanıcı izni).
+  Future<bool> areNotificationsEnabled();
+
+  /// Bildirim iznini sistem penceresiyle ister; verildiyse true.
+  Future<bool> requestNotificationPermission();
+
+  /// Tam alarm izni için sistem ayar ekranını açar (sonuç ekrandan dönünce
+  /// `canScheduleExact` ile okunur).
+  Future<void> requestExactAlarmPermission();
 }

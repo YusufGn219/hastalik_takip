@@ -101,4 +101,26 @@ class NotificationService implements NotificationGateway {
         AndroidFlutterLocalNotificationsPlugin>();
     return await android?.canScheduleExactNotifications() ?? false;
   }
+
+  AndroidFlutterLocalNotificationsPlugin? get _android =>
+      _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+
+  @override
+  Future<bool> areNotificationsEnabled() async {
+    await initialize();
+    return await _android?.areNotificationsEnabled() ?? false;
+  }
+
+  @override
+  Future<bool> requestNotificationPermission() async {
+    await initialize();
+    return await _android?.requestNotificationsPermission() ?? false;
+  }
+
+  @override
+  Future<void> requestExactAlarmPermission() async {
+    await initialize();
+    await _android?.requestExactAlarmsPermission();
+  }
 }

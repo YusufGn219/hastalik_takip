@@ -558,6 +558,110 @@ void main() {
     });
   });
 
+  group('izinler', () {
+    Future<void> addParol(WidgetTester tester) async {
+      await openAddDialog(tester);
+      await choose(tester, 'Parol');
+      await tester.tap(find.byKey(const ValueKey('day-monday')));
+      await tester.pumpAndSettle();
+      await tapSave(tester);
+    }
+
+    testWidgets('bildirim kapalıysa kayıttan sonra açıklama sorulur, sonra '
+        'sistem izni istenir', (tester) async {
+      gateway.notificationsEnabled = false;
+      await openApp(tester);
+      await addParol(tester);
+
+      expect(find.text('Bildirim izni'), findsOneWidget);
+      expect(gateway.notificationRequests, 0); // açıklamadan önce sistem sorusu yok
+      await tester.tap(find.byKey(const ValueKey('perm-continue')));
+      await tester.pumpAndSettle();
+
+      expect(gateway.notificationRequests, 1);
+      expect(gateway.active, hasLength(1));
+      expect(find.byKey(const ValueKey('reminder-off-banner')), findsNothing);
+    });
+
+    testWidgets('"Şimdi değil" dersek sistem sorusu açılmaz, uyarı kartı kalır',
+        (tester) async {
+      gateway.notificationsEnabled = false;
+      await openApp(tester);
+      await addParol(tester);
+      await tester.tap(find.byKey(const ValueKey('perm-later')));
+      await tester.pumpAndSettle();
+
+      expect(gateway.notificationRequests, 0);
+      expect(find.byKey(const ValueKey('reminder-off-banner')), findsOneWidget);
+      expect(find.textContaining('Bildirimler kapalı'), findsOneWidget);
+    });
+
+    testWidgets('sistem izni reddedilirse uyarı kartı görünür, rutin kayıtlı',
+        (tester) async {
+      gateway.notificationsEnabled = false;
+      gateway.grantOnRequest = false;
+      await openApp(tester);
+      await addParol(tester);
+      await tester.tap(find.byKey(const ValueKey('perm-continue')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('reminder-off-banner')), findsOneWidget);
+      expect(await run(tester, () => service.routines()), hasLength(1));
+    });
+
+    testWidgets('izin zaten varsa hiçbir soru çıkmaz', (tester) async {
+      await openApp(tester);
+      await addParol(tester);
+
+      expect(find.text('Bildirim izni'), findsNothing);
+      expect(gateway.notificationRequests, 0);
+      expect(find.byKey(const ValueKey('reminder-off-banner')), findsNothing);
+      expect(find.byKey(const ValueKey('reminder-inexact-banner')), findsNothing);
+    });
+
+    testWidgets('tam alarm yoksa uyarı ve düğme; düğme ayar ekranını ister',
+        (tester) async {
+      await seedAnd(tester, () async {
+        await service.setRoutine(
+            medicationId: parol, times: ['08:30'], days: ['friday']);
+      });
+      gateway.exact = false;
+      await openApp(tester);
+
+      expect(find.byKey(const ValueKey('reminder-inexact-banner')),
+          findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('reminder-exact-button')));
+      await tester.pumpAndSettle();
+      expect(gateway.exactRequests, 1);
+    });
+
+    testWidgets('rutin yokken uyarı kartı gösterilmez', (tester) async {
+      gateway.notificationsEnabled = false;
+      await openApp(tester);
+      expect(find.byKey(const ValueKey('reminder-off-banner')), findsNothing);
+    });
+
+    testWidgets('ayarlardan dönünce izin açılmışsa hatırlatmalar kurulur',
+        (tester) async {
+      await seedAnd(tester, () async {
+        await service.setRoutine(
+            medicationId: parol, times: ['08:30'], days: ['friday']);
+      });
+      gateway.notificationsEnabled = false;
+      await openApp(tester);
+      expect(find.byKey(const ValueKey('reminder-off-banner')), findsOneWidget);
+      expect(gateway.active, isEmpty);
+
+      gateway.notificationsEnabled = true; // kullanıcı ayarlardan açtı
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('reminder-off-banner')), findsNothing);
+      expect(gateway.active, hasLength(1));
+    });
+  });
+
   group('hatırlatma bağlantısı', () {
     testWidgets('kaydedince ilacın doz bildirimleri kurulur', (tester) async {
       await openApp(tester);

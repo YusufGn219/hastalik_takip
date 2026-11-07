@@ -41,4 +41,25 @@ class FakeNotificationGateway implements NotificationGateway {
 
   @override
   Future<bool> canScheduleExact() async => exact;
+
+  /// Bildirim izni durumu ve sistem penceresinde verilecek cevap.
+  bool notificationsEnabled = true;
+  bool grantOnRequest = true;
+  int notificationRequests = 0;
+  int exactRequests = 0;
+
+  @override
+  Future<bool> areNotificationsEnabled() async => notificationsEnabled;
+
+  @override
+  Future<bool> requestNotificationPermission() async {
+    notificationRequests++;
+    if (grantOnRequest) notificationsEnabled = true;
+    return notificationsEnabled;
+  }
+
+  @override
+  Future<void> requestExactAlarmPermission() async {
+    exactRequests++;
+  }
 }
