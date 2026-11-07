@@ -1,101 +1,104 @@
+// Gerçek bildirim uygulaması (flutter_local_notifications). İzin İSTEMEZ: izinler
+// kullanıcı ilk rutini kaydederken sorulur (Sprint 4 Grup 3). Saat dilimi sabit
+// değildir, cihazın gerçek saat dilimi kullanılır.
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 
-class NotificationService {
-  static final FlutterLocalNotificationsPlugin _plugin =
+import 'next_instance.dart';
+import 'notification_gateway.dart';
+
+class NotificationService implements NotificationGateway {
+  NotificationService._();
+
+  static final NotificationService instance = NotificationService._();
+
+  final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
+  bool _ready = false;
 
-  static Future<void> initialize() async {
+  /// Eklentiyi ve saat dilimini hazırlar; ikinci çağrı bir şey yapmaz. Hiçbir
+  /// izin istemez.
+  Future<void> initialize() async {
+    if (_ready) return;
     tz_data.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
-
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidSettings);
-
-    await _plugin.initialize(initSettings);
-
-    await _plugin
-        .resolvePlatformSpecificImplementation
-            <AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestExactAlarmsPermission();
-  }
-
-  static Future<void> scheduleRecurringNotification({
-    required int id,
-    required String medicationName,
-    required String time,
-    required List<String> days,
-  }) async {
-    final timeParts = time.split(':');
-    final hour = int.parse(timeParts[0]);
-    final minute = int.parse(timeParts[1]);
-
-    const androidDetails = AndroidNotificationDetails(
-      'recurring_medication',
-      'Rutin İlaç Hatırlatmaları',
-      channelDescription: 'Günlük ilaç hatırlatmaları',
-      importance: Importance.high,
-      priority: Priority.high,
+    tz.setLocalLocation(await _deviceLocation());
+    await _plugin.initialize(
+      const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      ),
     );
+    _ready = true;
+  }
 
-    const notificationDetails = NotificationDetails(android: androidDetails);
-
-    final dayMap = {
-      'monday': DateTime.monday,
-      'tuesday': DateTime.tuesday,
-      'wednesday': DateTime.wednesday,
-      'thursday': DateTime.thursday,
-      'friday': DateTime.friday,
-      'saturday': DateTime.saturday,
-      'sunday': DateTime.sunday,
-    };
-
-    for (int i = 0; i < days.length; i++) {
-      final weekday = dayMap[days[i]];
-      if (weekday == null) continue;
-
-      await _plugin.zonedSchedule(
-        id * 10 + i,
-        '💊 $medicationName zamanı!',
-        'Günlük ilacınızı almayı unutmayın.',
-        _nextInstanceOfWeekdayAndTime(weekday, hour, minute),
-        notificationDetails,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-      );
+  /// Telefonun saat dilimi. Adı tanınmazsa, şimdiki UTC farkı aynı olan bir bölge
+  /// seçilir; o da bulunamazsa UTC (uygulama her açılışta yeniden kurar).
+  Future<tz.Location> _deviceLocation() async {
+    try {
+      final info = await FlutterTimezone.getLocalTimezone();
+      return tz.getLocation(info.identifier);
+    } catch (_) {
+      final offset = DateTime.now().timeZoneOffset;
+      for (final loc in tz.timeZoneDatabase.locations.values) {
+        if (tz.TZDateTime.now(loc).timeZoneOffset == offset) return loc;
+      }
+      return tz.UTC;
     }
   }
 
-  static tz.TZDateTime _nextInstanceOfWeekdayAndTime(
-      int weekday, int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduled = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
+  @override
+  Future<void> schedule(DoseReminder r) async {
+    await initialize();
+    final when = nextWeeklyInstance(
+      tz.TZDateTime.now(tz.local),
+      r.weekday,
+      r.hour,
+      r.minute,
     );
-
-    while (scheduled.weekday != weekday || scheduled.isBefore(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
-    }
-
-    return scheduled;
+    await _plugin.zonedSchedule(
+      r.id,
+      r.title,
+      r.body,
+      when,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'dose_reminders',
+          r.channelName,
+          channelDescription: r.channelDescription,
+          importance: Importance.high,
+          priority: Priority.high,
+          // Kilit ekranında içerik gizli (metin zaten sağlık verisi içermez).
+          visibility: NotificationVisibility.private,
+        ),
+      ),
+      androidScheduleMode: r.exact
+          ? AndroidScheduleMode.exactAllowWhileIdle
+          : AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+    );
   }
 
-  static Future<void> cancelNotification(int id) async {
-    for (int i = 0; i < 7; i++) {
-      await _plugin.cancel(id * 10 + i);
-    }
+  @override
+  Future<void> cancel(int id) async {
+    await initialize();
+    await _plugin.cancel(id);
   }
 
-  static Future<void> cancelAllNotifications() async {
+  @override
+  Future<void> cancelAll() async {
+    await initialize();
     await _plugin.cancelAll();
+  }
+
+  @override
+  Future<bool> canScheduleExact() async {
+    await initialize();
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    return await android?.canScheduleExactNotifications() ?? false;
   }
 }

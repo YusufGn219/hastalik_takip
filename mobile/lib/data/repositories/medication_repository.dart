@@ -72,6 +72,11 @@ abstract class MedicationRepository {
     List<String>? recurringDays,
   });
 
+  /// Bildirim numarası yoksa (başlangıç kataloğundan gelen ilaçlar numarasız
+  /// eklenir) sıradaki boş numarayı atar; varsa dokunmaz. Güncel ilacı verir,
+  /// ilaç yoksa null.
+  Future<Medication?> ensureNotificationId(String medicationId);
+
   Future<ChronicCondition> createCondition({
     required String name,
     List<String> medicationIds = const [],
@@ -225,6 +230,22 @@ class DriftMedicationRepository implements MedicationRepository {
         updatedAt: Value(_clock()),
       ),
     );
+  }
+
+  @override
+  Future<Medication?> ensureNotificationId(String medicationId) {
+    return _db.transaction(() async {
+      final m = await getById(medicationId);
+      if (m == null || m.notificationId != null) return m;
+      final maxId = _db.medications.notificationId.max();
+      final row =
+          await (_db.selectOnly(_db.medications)..addColumns([maxId])).getSingle();
+      final next = (row.read(maxId) ?? 0) + 1;
+      // Güncelleme zamanı değişmez: kullanıcı verisi değil, iç numara.
+      await (_db.update(_db.medications)..where((t) => t.id.equals(medicationId)))
+          .write(MedicationsCompanion(notificationId: Value(next)));
+      return getById(medicationId);
+    });
   }
 
   @override

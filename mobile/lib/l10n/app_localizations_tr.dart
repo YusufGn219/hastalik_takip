@@ -196,6 +196,27 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get routineAddedNoReminder =>
+      'Rutin eklendi ama hatırlatma kurulamadı.';
+
+  @override
+  String get routineClosedNoReminder =>
+      'Rutin kapatıldı ama hatırlatma iptal edilemedi.';
+
+  @override
+  String get reminderTitle => 'Vitapuls';
+
+  @override
+  String get reminderBody => 'İlaç saatiniz geldi';
+
+  @override
+  String get reminderChannelName => 'İlaç hatırlatmaları';
+
+  @override
+  String get reminderChannelDescription =>
+      'Rutin ilaç dozlarının saatinde gelen hatırlatmalar';
+
+  @override
   String get routineErrorTimes => 'En az bir doz saati seçin.';
 
   @override

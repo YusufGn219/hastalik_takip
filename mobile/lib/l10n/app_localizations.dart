@@ -448,6 +448,42 @@ abstract class AppLocalizations {
   /// **'{name} atlandı olarak kaydedildi.'**
   String routineSkippedSaved(String name);
 
+  /// No description provided for @routineAddedNoReminder.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin eklendi ama hatırlatma kurulamadı.'**
+  String get routineAddedNoReminder;
+
+  /// No description provided for @routineClosedNoReminder.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin kapatıldı ama hatırlatma iptal edilemedi.'**
+  String get routineClosedNoReminder;
+
+  /// No description provided for @reminderTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vitapuls'**
+  String get reminderTitle;
+
+  /// No description provided for @reminderBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç saatiniz geldi'**
+  String get reminderBody;
+
+  /// No description provided for @reminderChannelName.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç hatırlatmaları'**
+  String get reminderChannelName;
+
+  /// No description provided for @reminderChannelDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin ilaç dozlarının saatinde gelen hatırlatmalar'**
+  String get reminderChannelDescription;
+
   /// No description provided for @routineErrorTimes.
   ///
   /// In tr, this message translates to:

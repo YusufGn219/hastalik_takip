@@ -137,7 +137,8 @@ class Medications extends Table with BaseColumns {
   TextColumn get recurringDays => text().nullable()();
 
   /// Yerel bildirim için ayrı sayısal numara (UUID bildirim kimliği olamaz).
-  /// Bildirim kimliği = notificationId * 10 + gün.
+  /// Bildirim kimliği = notificationId * 100 + doz sırası * 10 + gün (doz sırası
+  /// saat listesindeki yer 0..9, gün pazartesi 0 .. pazar 6; bkz. ReminderService).
   IntColumn get notificationId => integer().nullable()();
 }
 

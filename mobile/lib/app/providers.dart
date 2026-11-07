@@ -4,8 +4,12 @@
 // böylece ekranlar tek satırla (`ref.watch(episodeServiceProvider)`) servise
 // ulaşır ve testler bellek içi veritabanı verebilir.
 
+import 'dart:ui' show Locale;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/notifications/notification_gateway.dart';
+import '../core/notifications/notification_service.dart';
 import '../data/database/app_database.dart';
 import '../data/repositories/daily_log_repository.dart';
 import '../data/repositories/dose_skip_repository.dart';
@@ -18,7 +22,9 @@ import '../data/repositories/symptom_repository.dart';
 import '../domain/services/dose_service.dart';
 import '../domain/services/episode_service.dart';
 import '../domain/services/medication_service.dart';
+import '../domain/services/reminder_service.dart';
 import '../domain/services/timeline_service.dart';
+import '../l10n/app_localizations.dart';
 import '../features/episode/episode_overview.dart';
 
 /// `main()` açılmış veritabanıyla bunu geçersiz kılmak zorundadır.
@@ -97,6 +103,25 @@ final medicationServiceProvider = Provider<MedicationService>(
   (ref) => MedicationService(
     medications: ref.watch(medicationRepositoryProvider),
     logs: ref.watch(medicationLogRepositoryProvider),
+  ),
+);
+
+/// Telefonun bildirim sistemi; testlerde sahtesiyle geçersiz kılınır.
+final notificationGatewayProvider = Provider<NotificationGateway>(
+  (ref) => NotificationService.instance,
+);
+
+/// Doz hatırlatmalarının metinleri (şimdilik yalnız Türkçe).
+final reminderTextsProvider = Provider<ReminderTexts>(
+  (ref) => ReminderTexts.fromL10n(lookupAppLocalizations(const Locale('tr'))),
+);
+
+/// Rutin dozların hatırlatma bildirimleri (her dozun kendi saatinde).
+final reminderServiceProvider = Provider<ReminderService>(
+  (ref) => ReminderService(
+    medications: ref.watch(medicationRepositoryProvider),
+    gateway: ref.watch(notificationGatewayProvider),
+    texts: ref.watch(reminderTextsProvider),
   ),
 );
 

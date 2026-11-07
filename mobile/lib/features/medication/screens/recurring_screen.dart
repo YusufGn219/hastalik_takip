@@ -68,6 +68,9 @@ String routineErrorText(Object error, AppLocalizations l10n) {
   return l10n.routineErrorGeneric;
 }
 
+/// Ekleme penceresinin sonucu: rutin kaydedildi; hatırlatma kurulabildi ya da kurulamadı.
+enum _SaveOutcome { saved, savedWithoutReminder }
+
 /// Pencerede ilaç seçilmeden Kaydet'e basıldığını işaretler (serviste hata yok).
 const Object _noMedicationChosen = 'ilac-secilmedi';
 
@@ -137,12 +140,17 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
 
   Future<void> _showAddDialog() async {
     final l10n = AppLocalizations.of(context);
-    final saved = await showDialog<bool>(
+    final outcome = await showDialog<_SaveOutcome>(
       context: context,
       builder: (_) => _RoutineDialog(medications: _freeMedications),
     );
-    if (saved != true || !mounted) return;
-    _snack(l10n.routineAdded);
+    if (outcome == null || !mounted) return;
+    if (outcome == _SaveOutcome.saved) {
+      _snack(l10n.routineAdded);
+    } else {
+      // Rutin kayıtlı; yalnız hatırlatma kurulamadı (uygulama her açılışta yeniden dener).
+      _snack(l10n.routineAddedNoReminder, error: true);
+    }
     await _load();
   }
 
@@ -168,8 +176,17 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
     if (ok != true || !mounted) return;
     try {
       await ref.read(medicationServiceProvider).clearRoutine(r.medication.id);
+      var reminderOk = true;
+      try {
+        await ref.read(reminderServiceProvider).cancelFor(r.medication.id);
+      } catch (_) {
+        reminderOk = false;
+      }
       if (!mounted) return;
-      _snack(l10n.routineClosed);
+      _snack(
+        reminderOk ? l10n.routineClosed : l10n.routineClosedNoReminder,
+        error: !reminderOk,
+      );
     } catch (e) {
       if (!mounted) return;
       _snack(routineErrorText(e, l10n), error: true);
@@ -439,8 +456,18 @@ class _RoutineDialogState extends ConsumerState<_RoutineDialog> {
             times: _sortedTimes,
             days: _days.toList(),
           );
+      // Rutin kaydedildi; hatırlatma kurulamazsa rutin yine de kayıtlı kalır.
+      var reminderOk = true;
+      try {
+        await ref.read(reminderServiceProvider).rescheduleFor(_medicationId!);
+      } catch (_) {
+        reminderOk = false;
+      }
       if (!mounted) return;
-      Navigator.pop(context, true);
+      Navigator.pop(
+        context,
+        reminderOk ? _SaveOutcome.saved : _SaveOutcome.savedWithoutReminder,
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -553,7 +580,7 @@ class _RoutineDialogState extends ConsumerState<_RoutineDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: _saving ? null : () => Navigator.pop(context, false),
+          onPressed: _saving ? null : () => Navigator.pop(context),
           child: Text(l10n.routineCancel),
         ),
         FilledButton(

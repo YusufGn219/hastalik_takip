@@ -1,3 +1,5 @@
+import 'dart:ui' show Locale;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +10,8 @@ import 'core/theme/app_theme.dart';
 import 'data/database/app_database.dart';
 import 'data/database/database_opener.dart';
 import 'data/database/seed_loader.dart';
+import 'data/repositories/medication_repository.dart';
+import 'domain/services/reminder_service.dart';
 import 'features/analytics/screens/analytics_screen.dart';
 import 'features/auth/onboarding_screen.dart';
 import 'features/auth/screens/login_screen.dart';
@@ -30,7 +34,12 @@ import 'l10n/app_localizations.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await NotificationService.initialize();
+  // Bildirim altyapısı hazırlanır ama izin İSTENMEZ (izinler ilk rutinde sorulur).
+  try {
+    await NotificationService.instance.initialize();
+  } catch (e) {
+    debugPrint('Bildirim altyapısı başlatılamadı: ${e.runtimeType}');
+  }
 
   final prefs = await SharedPreferences.getInstance();
 
@@ -44,12 +53,14 @@ Future<void> main() async {
     return;
   }
 
+  await _rescheduleReminders(db);
+
   runApp(
     AppRoot(
       database: db,
       prefs: prefs,
       openDatabase: _openSeededDatabase,
-      eraseStorage: eraseDatabaseStorage,
+      eraseStorage: _eraseEverything,
       overrides: [
         biometricAuthenticatorProvider.overrideWithValue(LocalAuthBiometric()),
         screenSecurityProvider.overrideWithValue(MethodChannelScreenSecurity()),
@@ -57,6 +68,31 @@ Future<void> main() async {
       child: const MyApp(),
     ),
   );
+}
+
+/// Tüm rutin hatırlatmalarını baştan kurar (cihazın saat dilimi değişmiş olabilir,
+/// kayıtlar güncel olsun). Hata uygulamayı durdurmaz.
+Future<void> _rescheduleReminders(AppDatabase db) async {
+  try {
+    await ReminderService(
+      medications: DriftMedicationRepository(db),
+      gateway: NotificationService.instance,
+      texts: ReminderTexts.fromL10n(lookupAppLocalizations(const Locale('tr'))),
+    ).rescheduleAll();
+  } catch (e) {
+    debugPrint('Hatırlatmalar yeniden kurulamadı: ${e.runtimeType}');
+  }
+}
+
+/// "Tüm veriyi sil" son çaresi: planlı bildirimler de silinir (yoksa silinen
+/// veriye ait hatırlatmalar gelmeye devam ederdi), sonra veritabanı dosyaları.
+Future<void> _eraseEverything() async {
+  try {
+    await NotificationService.instance.cancelAll();
+  } catch (e) {
+    debugPrint('Bildirimler iptal edilemedi: ${e.runtimeType}');
+  }
+  await eraseDatabaseStorage();
 }
 
 /// Veritabanını açar ve başlangıç verisini yükler; yüklenemezse kapatıp hatayı atar.

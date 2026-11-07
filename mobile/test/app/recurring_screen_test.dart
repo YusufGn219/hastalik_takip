@@ -10,10 +10,12 @@ import 'package:mobile/data/repositories/medication_log_repository.dart';
 import 'package:mobile/data/repositories/medication_repository.dart';
 import 'package:mobile/domain/services/dose_service.dart';
 import 'package:mobile/domain/services/medication_service.dart';
+import 'package:mobile/domain/services/reminder_service.dart';
 import 'package:mobile/features/medication/screens/recurring_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 import '../data/test_support.dart';
+import '../support/fake_notification_gateway.dart';
 
 /// Saat: 2026-11-06 Cuma 10:30.
 DateTime _now() => DateTime(2026, 11, 6, 10, 30);
@@ -69,8 +71,10 @@ void main() {
   late DriftDoseSkipRepository skipRepo;
   late MedicationService service;
   late DoseService doses;
+  late FakeNotificationGateway gateway;
 
   setUp(() {
+    gateway = FakeNotificationGateway();
     db = createTestDb();
     repo = DriftMedicationRepository(db);
     logRepo = DriftMedicationLogRepository(db);
@@ -103,6 +107,7 @@ void main() {
       overrides: [
         databaseProvider.overrideWithValue(db),
         clockProvider.overrideWithValue(_now),
+        notificationGatewayProvider.overrideWithValue(gateway),
         ...?extra,
       ],
       child: MaterialApp(
@@ -552,6 +557,80 @@ void main() {
       expect(find.text('08:30 · Cum'), findsOneWidget);
     });
   });
+
+  group('hatırlatma bağlantısı', () {
+    testWidgets('kaydedince ilacın doz bildirimleri kurulur', (tester) async {
+      await openApp(tester);
+      await openAddDialog(tester);
+      await choose(tester, 'Parol');
+      await tester.tap(find.byKey(const ValueKey('day-monday')));
+      await tester.tap(find.byKey(const ValueKey('day-friday')));
+      await tester.pumpAndSettle();
+      await tapSave(tester);
+
+      expect(find.text('Rutin eklendi.'), findsOneWidget);
+      expect(gateway.active, hasLength(2));
+      expect(gateway.active.values.map((r) => r.weekday).toSet(),
+          {DateTime.monday, DateTime.friday});
+      expect(gateway.active.values.every((r) => r.hour == 8 && r.minute == 0),
+          isTrue);
+    });
+
+    testWidgets('kurulamazsa rutin yine kayıtlı kalır, uyarı gösterilir',
+        (tester) async {
+      gateway.failSchedule = StateError('izin yok');
+      await openApp(tester);
+      await openAddDialog(tester);
+      await choose(tester, 'Parol');
+      await tester.tap(find.byKey(const ValueKey('day-monday')));
+      await tester.pumpAndSettle();
+      await tapSave(tester);
+
+      expect(find.text('Rutin eklendi.'), findsNothing);
+      expect(find.text('Rutin eklendi ama hatırlatma kurulamadı.'),
+          findsOneWidget);
+      expect(await run(tester, () => service.routines()), hasLength(1));
+    });
+
+    testWidgets('rutin kapatılınca bildirimler iptal edilir', (tester) async {
+      await seedAnd(tester, () async {
+        await service.setRoutine(
+            medicationId: parol, times: ['08:30'], days: ['friday']);
+        await _reminders(repo, gateway).rescheduleFor(parol);
+      });
+      await openApp(tester);
+      gateway.cancelCalls.clear();
+
+      await tester.tap(find.byTooltip('Rutini kapat'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Kapat'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rutin kapatıldı.'), findsOneWidget);
+      expect(gateway.cancelCalls, hasLength(70));
+    });
+
+    testWidgets('iptal edilemezse kapatma yine olur, uyarı gösterilir',
+        (tester) async {
+      await seedAnd(tester, () async {
+        await service.setRoutine(
+            medicationId: parol, times: ['08:30'], days: ['friday']);
+        await _reminders(repo, gateway).rescheduleFor(parol);
+      });
+      await openApp(tester);
+      gateway.failCancel = StateError('hata');
+
+      await tester.tap(find.byTooltip('Rutini kapat'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Kapat'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rutin kapatıldı.'), findsNothing);
+      expect(find.text('Rutin kapatıldı ama hatırlatma iptal edilemedi.'),
+          findsOneWidget);
+      expect(await run(tester, () => service.routines()), isEmpty);
+    });
+  });
 }
 
 /// "Tansiyon" hastalığının kimliği (grup kartının anahtarı için).
@@ -562,3 +641,11 @@ Future<String> _condId(WidgetTester tester) async {
       .runAsync(() => container.read(medicationServiceProvider).conditions());
   return list!.firstWhere((s) => s.condition.name == 'Tansiyon').condition.id;
 }
+
+ReminderService _reminders(
+        DriftMedicationRepository repo, FakeNotificationGateway gateway) =>
+    ReminderService(
+      medications: repo,
+      gateway: gateway,
+      texts: ReminderTexts.fromL10n(lookupAppLocalizations(const Locale('tr'))),
+    );

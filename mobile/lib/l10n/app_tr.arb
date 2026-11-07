@@ -88,6 +88,12 @@
       }
     }
   },
+  "routineAddedNoReminder": "Rutin eklendi ama hatırlatma kurulamadı.",
+  "routineClosedNoReminder": "Rutin kapatıldı ama hatırlatma iptal edilemedi.",
+  "reminderTitle": "Vitapuls",
+  "reminderBody": "İlaç saatiniz geldi",
+  "reminderChannelName": "İlaç hatırlatmaları",
+  "reminderChannelDescription": "Rutin ilaç dozlarının saatinde gelen hatırlatmalar",
   "routineErrorTimes": "En az bir doz saati seçin.",
   "routineErrorTooManyTimes": "Günde en çok 10 doz saati olabilir.",
   "routineErrorDoseTaken": "Bu doz zaten alındı olarak kaydedilmiş.",
