@@ -19,6 +19,7 @@ import '../data/repositories/medication_repository.dart';
 import '../data/repositories/support.dart';
 import '../data/repositories/symptom_entry_repository.dart';
 import '../data/repositories/symptom_repository.dart';
+import '../domain/services/dose_adherence_service.dart';
 import '../domain/services/dose_service.dart';
 import '../domain/services/episode_service.dart';
 import '../domain/services/medication_service.dart';
@@ -165,5 +166,14 @@ final timelineDayLoaderProvider = Provider<TimelineDayLoader>(
     symptoms: ref.watch(symptomRepositoryProvider),
     medications: ref.watch(medicationRepositoryProvider),
     episodes: ref.watch(episodeOverviewLoaderProvider),
+  ),
+);
+
+/// Doz bazlı ilaç uyumu (alındı / atlandı / kaydedilmedi).
+final doseAdherenceServiceProvider = Provider<DoseAdherenceService>(
+  (ref) => DoseAdherenceService(
+    doses: ref.watch(doseServiceProvider),
+    logs: ref.watch(medicationLogRepositoryProvider),
+    clock: ref.watch(clockProvider),
   ),
 );
