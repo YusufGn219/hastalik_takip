@@ -24,6 +24,7 @@ import '../domain/services/episode_service.dart';
 import '../domain/services/medication_service.dart';
 import '../domain/services/reminder_service.dart';
 import '../domain/services/timeline_service.dart';
+import '../features/timeline/timeline_day.dart';
 import '../l10n/app_localizations.dart';
 import '../features/episode/episode_overview.dart';
 
@@ -153,5 +154,16 @@ final timelineServiceProvider = Provider<TimelineService>(
     dailyLogs: ref.watch(dailyLogRepositoryProvider),
     entries: ref.watch(symptomEntryRepositoryProvider),
     medications: ref.watch(medicationServiceProvider),
+    doseSkips: ref.watch(doseSkipRepositoryProvider),
+  ),
+);
+
+/// Zaman çizelgesi ekranı için günün kayıtlarını adlarıyla toplar.
+final timelineDayLoaderProvider = Provider<TimelineDayLoader>(
+  (ref) => TimelineDayLoader(
+    timeline: ref.watch(timelineServiceProvider),
+    symptoms: ref.watch(symptomRepositoryProvider),
+    medications: ref.watch(medicationRepositoryProvider),
+    episodes: ref.watch(episodeOverviewLoaderProvider),
   ),
 );

@@ -827,6 +827,94 @@ class AppLocalizationsTr extends AppLocalizations {
   String get lockSettingsTitle => 'Uygulama kilidi';
 
   @override
+  String get homeTimeline => 'Zaman çizelgesi';
+
+  @override
+  String get homeTimelineHint => 'Günün kayıtlarını sırayla görün';
+
+  @override
+  String get timelineTitle => 'Zaman çizelgesi';
+
+  @override
+  String get timelinePrevDay => 'Önceki gün';
+
+  @override
+  String get timelineNextDay => 'Sonraki gün';
+
+  @override
+  String get timelineGoToday => 'Bugüne dön';
+
+  @override
+  String get timelineToday => 'Bugün';
+
+  @override
+  String get timelineLoadError =>
+      'Zaman çizelgesi okunamadı. Verileriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.';
+
+  @override
+  String get timelineActiveTitle => 'Devam eden dönemler';
+
+  @override
+  String get timelineDailyTitle => 'Günlük kayıt';
+
+  @override
+  String get timelineNoDailyLog => 'Bu gün için günlük kayıt yok.';
+
+  @override
+  String get timelineAddDailyLog => 'Günlük kayıt ekle';
+
+  @override
+  String timelineSleep(String value) {
+    return 'Uyku: $value saat';
+  }
+
+  @override
+  String timelineWater(String value) {
+    return 'Su: $value litre';
+  }
+
+  @override
+  String timelineMood(int value) {
+    return 'Ruh hali: $value/5';
+  }
+
+  @override
+  String timelineEnergy(int value) {
+    return 'Enerji: $value/5';
+  }
+
+  @override
+  String get timelineEventsTitle => 'Kayıtlar';
+
+  @override
+  String get timelineEventsEmpty => 'Bu gün için semptom ya da ilaç kaydı yok.';
+
+  @override
+  String timelineSymptomLine(String name, int severity) {
+    return '$name · Şiddet $severity/10';
+  }
+
+  @override
+  String timelineIntakeLine(String name) {
+    return '$name alındı';
+  }
+
+  @override
+  String timelineIntakeDoseLine(String name, String dose) {
+    return '$name ($dose) alındı';
+  }
+
+  @override
+  String timelineScheduledDose(String time) {
+    return '$time dozu';
+  }
+
+  @override
+  String timelineSkippedLine(String name) {
+    return '$name atlandı';
+  }
+
+  @override
   String get lockSettingsOffHint =>
       'Kapalı. Açılışta PIN ya da parmak izi istenmez.';
 

@@ -1570,6 +1570,144 @@ abstract class AppLocalizations {
   /// **'Uygulama kilidi'**
   String get lockSettingsTitle;
 
+  /// No description provided for @homeTimeline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zaman çizelgesi'**
+  String get homeTimeline;
+
+  /// No description provided for @homeTimelineHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün kayıtlarını sırayla görün'**
+  String get homeTimelineHint;
+
+  /// No description provided for @timelineTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zaman çizelgesi'**
+  String get timelineTitle;
+
+  /// No description provided for @timelinePrevDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki gün'**
+  String get timelinePrevDay;
+
+  /// No description provided for @timelineNextDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki gün'**
+  String get timelineNextDay;
+
+  /// No description provided for @timelineGoToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugüne dön'**
+  String get timelineGoToday;
+
+  /// No description provided for @timelineToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün'**
+  String get timelineToday;
+
+  /// No description provided for @timelineLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zaman çizelgesi okunamadı. Verileriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.'**
+  String get timelineLoadError;
+
+  /// No description provided for @timelineActiveTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam eden dönemler'**
+  String get timelineActiveTitle;
+
+  /// No description provided for @timelineDailyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük kayıt'**
+  String get timelineDailyTitle;
+
+  /// No description provided for @timelineNoDailyLog.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu gün için günlük kayıt yok.'**
+  String get timelineNoDailyLog;
+
+  /// No description provided for @timelineAddDailyLog.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük kayıt ekle'**
+  String get timelineAddDailyLog;
+
+  /// No description provided for @timelineSleep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku: {value} saat'**
+  String timelineSleep(String value);
+
+  /// No description provided for @timelineWater.
+  ///
+  /// In tr, this message translates to:
+  /// **'Su: {value} litre'**
+  String timelineWater(String value);
+
+  /// No description provided for @timelineMood.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh hali: {value}/5'**
+  String timelineMood(int value);
+
+  /// No description provided for @timelineEnergy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Enerji: {value}/5'**
+  String timelineEnergy(int value);
+
+  /// No description provided for @timelineEventsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıtlar'**
+  String get timelineEventsTitle;
+
+  /// No description provided for @timelineEventsEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu gün için semptom ya da ilaç kaydı yok.'**
+  String get timelineEventsEmpty;
+
+  /// No description provided for @timelineSymptomLine.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} · Şiddet {severity}/10'**
+  String timelineSymptomLine(String name, int severity);
+
+  /// No description provided for @timelineIntakeLine.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} alındı'**
+  String timelineIntakeLine(String name);
+
+  /// No description provided for @timelineIntakeDoseLine.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} ({dose}) alındı'**
+  String timelineIntakeDoseLine(String name, String dose);
+
+  /// No description provided for @timelineScheduledDose.
+  ///
+  /// In tr, this message translates to:
+  /// **'{time} dozu'**
+  String timelineScheduledDose(String time);
+
+  /// No description provided for @timelineSkippedLine.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} atlandı'**
+  String timelineSkippedLine(String name);
+
   /// No description provided for @lockSettingsOffHint.
   ///
   /// In tr, this message translates to:

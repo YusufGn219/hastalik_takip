@@ -28,7 +28,7 @@ import 'features/medication/screens/medication_log_screen.dart';
 import 'features/medication/screens/recurring_screen.dart';
 import 'features/profile/screens/change_password_screen.dart';
 import 'features/profile/screens/profile_screen.dart';
-import 'features/timeline/screens/timeline_screen.dart';
+import 'features/timeline/screens/day_timeline_screen.dart';
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
@@ -129,7 +129,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         // Aşağıdakiler henüz eski sunucu koduna bağlı; Sprint 3-6'da yeni
         // servislere bağlanır ya da kaldırılır.
-        '/timeline': (context) => const TimelineScreen(),
+        '/timeline': (context) => const DayTimelineScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/daily-log': (context) => const DailyLogScreen(),
