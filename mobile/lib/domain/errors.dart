@@ -24,4 +24,6 @@ abstract final class RuleCodes {
   static const conditionNameTooLong = 'condition_name_too_long';
   static const conditionNameExists = 'condition_name_exists';
   static const conditionNotFound = 'condition_not_found';
+  static const routineTimeInvalid = 'routine_time_invalid';
+  static const routineDaysEmpty = 'routine_days_empty';
 }

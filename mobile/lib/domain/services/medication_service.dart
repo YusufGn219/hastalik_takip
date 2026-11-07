@@ -17,6 +17,29 @@ class ConditionSummary {
   final List<Medication> medications;
 }
 
+/// Rutini kurulmuş bir ilaç: saat ("HH:mm") ve haftanın günleri.
+class Routine {
+  const Routine(this.medication, this.time, this.days);
+
+  final Medication medication;
+
+  /// "HH:mm"; eski kayıtlardaki saniyeli yazım ("08:30:00") kırpılır. Saat
+  /// yazılmamış eski kayıtta boş metin.
+  final String time;
+
+  /// [weekdayKeys] sırasında gün adları. Kayıtta gün yoksa her gün sayılır.
+  final List<String> days;
+}
+
+/// Rutinlerin kullanıcının kendi bağladığı kronik hastalığa göre grubu.
+/// [condition] null ise hiçbir hastalığa bağlı olmayan ilaçlardır ("Diğer").
+class RoutineGroup {
+  const RoutineGroup(this.condition, this.routines);
+
+  final ChronicCondition? condition;
+  final List<Routine> routines;
+}
+
 class MedicationService {
   MedicationService({
     required MedicationRepository medications,
@@ -162,6 +185,100 @@ class MedicationService {
       );
     }
     return clean;
+  }
+
+  // --------------------------------------------------------------- rutin
+
+  static final _timePattern = RegExp(r'^([01]\d|2[0-3]):[0-5]\d$');
+
+  /// Mevcut ilacın üzerine rutin (saat + günler) kurar; yeni ilaç açılmaz. Bir
+  /// ilacın tek rutini olur, yeniden kurmak eskisini değiştirir. [time] "HH:mm"
+  /// olmalı; en az bir gün seçilmeli, günler geçerli olmalı (tekrarlar tek sayılır,
+  /// hafta sırasına dizilir). Hiçbir şey yazılmadan önce denetlenir.
+  Future<void> setRoutine({
+    required String medicationId,
+    required String time,
+    required List<String> days,
+  }) async {
+    await _requireMedications([medicationId]);
+    if (!_timePattern.hasMatch(time)) {
+      throw RuleViolation(
+        RuleCodes.routineTimeInvalid,
+        'Geçersiz saat: $time (HH:mm olmalı).',
+      );
+    }
+    if (days.isEmpty) {
+      throw const RuleViolation(
+        RuleCodes.routineDaysEmpty,
+        'En az bir gün seçilmeli.',
+      );
+    }
+    for (final d in days) {
+      if (!weekdayIndex.containsKey(d)) {
+        throw RuleViolation(
+          RuleCodes.invalidRecurringDay,
+          'Geçersiz gün adı: $d',
+        );
+      }
+    }
+    final unique = days.toSet();
+    await _medications.setRecurrence(
+      medicationId,
+      isRecurring: true,
+      recurringTime: time,
+      recurringDays: weekdayKeys.where(unique.contains).toList(),
+    );
+  }
+
+  /// İlacın rutinini kapatır (saat ve günler temizlenir). İlaç ve eski alım
+  /// kayıtları silinmez.
+  Future<void> clearRoutine(String medicationId) async {
+    await _requireMedications([medicationId]);
+    await _medications.setRecurrence(medicationId, isRecurring: false);
+  }
+
+  /// Rutini olan (silinmemiş) ilaçlar: saate, sonra Türkçe ada göre.
+  Future<List<Routine>> routines() async {
+    final result = <Routine>[];
+    for (final m in await _medications.listAvailable()) {
+      if (!m.isRecurring) continue;
+      final time = m.recurringTime ?? '';
+      final saved = recurringDaysOf(m);
+      result.add(Routine(
+        m,
+        time.length > 5 ? time.substring(0, 5) : time,
+        saved == null || saved.isEmpty
+            ? List.of(weekdayKeys)
+            : weekdayKeys.where(saved.contains).toList(),
+      ));
+    }
+    result.sort((a, b) {
+      final byTime = a.time.compareTo(b.time);
+      return byTime != 0
+          ? byTime
+          : compareTr(a.medication.name, b.medication.name);
+    });
+    return result;
+  }
+
+  /// Rutinler, kullanıcının bağladığı kronik hastalığa göre gruplanmış:
+  /// hastalıklar Türkçe sıralı, hiçbirine bağlı olmayanlar sonda (condition null).
+  /// İki hastalığa bağlı ilaç iki grupta da görünür; boş grup yazılmaz.
+  Future<List<RoutineGroup>> routineGroups() async {
+    final all = await routines();
+    final groups = <RoutineGroup>[];
+    final grouped = <String>{};
+    for (final s in await conditions()) {
+      final ids = {for (final m in s.medications) m.id};
+      final mine = all.where((r) => ids.contains(r.medication.id)).toList();
+      if (mine.isEmpty) continue;
+      groups.add(RoutineGroup(s.condition, mine));
+      grouped.addAll(mine.map((r) => r.medication.id));
+    }
+    final rest =
+        all.where((r) => !grouped.contains(r.medication.id)).toList();
+    if (rest.isNotEmpty) groups.add(RoutineGroup(null, rest));
+    return groups;
   }
 
   // ------------------------------------------------------------ kategori

@@ -48,6 +48,15 @@ abstract class MedicationRepository {
   /// İlacın kategorisini değiştirir; [categoryId] null ise kategorisiz yapar.
   Future<void> setMedicationCategory(String medicationId, String? categoryId);
 
+  /// İlacın rutin (tekrar) ayarını yazar. [isRecurring] false ise saat ve günler
+  /// de temizlenir. Bildirim numarası ve diğer alanlar değişmez.
+  Future<void> setRecurrence(
+    String medicationId, {
+    required bool isRecurring,
+    String? recurringTime,
+    List<String>? recurringDays,
+  });
+
   Future<ChronicCondition> createCondition({
     required String name,
     List<String> medicationIds = const [],
@@ -198,6 +207,28 @@ class DriftMedicationRepository implements MedicationRepository {
         .write(
       MedicationsCompanion(
         categoryId: Value(categoryId),
+        updatedAt: Value(_clock()),
+      ),
+    );
+  }
+
+  @override
+  Future<void> setRecurrence(
+    String medicationId, {
+    required bool isRecurring,
+    String? recurringTime,
+    List<String>? recurringDays,
+  }) async {
+    await (_db.update(_db.medications)..where((t) => t.id.equals(medicationId)))
+        .write(
+      MedicationsCompanion(
+        isRecurring: Value(isRecurring),
+        recurringTime: Value(isRecurring ? recurringTime : null),
+        recurringDays: Value(
+          isRecurring && recurringDays != null
+              ? jsonEncode(recurringDays)
+              : null,
+        ),
         updatedAt: Value(_clock()),
       ),
     );
