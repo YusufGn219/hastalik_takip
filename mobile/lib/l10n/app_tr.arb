@@ -49,6 +49,59 @@
   "medLogCategoryError": "Kategori kaydedilemedi. Tekrar deneyin.",
   "homeConditions": "Kronik hastalıklar",
   "homeConditionsHint": "Hastalıklarınızı ve kullandığınız ilaçları yönetin",
+  "homeRoutines": "Rutin ilaçlar",
+  "homeRoutinesHint": "Her gün ya da belirli günlerde alacağınız ilaçlar",
+  "routineTitle": "Rutinlerim",
+  "routineAddTooltip": "Rutin ekle",
+  "routineTodayTitle": "Bugünün rutinleri",
+  "routineTodayEmpty": "Bugün için rutin yok.",
+  "routineAllTitle": "Tüm rutinler",
+  "routineAllEmpty": "Henüz rutin tanımlanmamış.",
+  "routineOtherGroup": "Diğer",
+  "routineEveryDay": "Her gün",
+  "routineTaken": "Aldım",
+  "routineTakenSaved": "{name} alındı olarak kaydedildi.",
+  "@routineTakenSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "routineNewTitle": "Yeni rutin",
+  "routineMedLabel": "İlaç",
+  "routineMedHint": "İlaç seçin",
+  "routineNoMedsAvailable": "Rutin kurulacak ilaç yok. Önce İlaç / takviye ekranından ilaç ekleyin ya da var olan rutinlerden birini kapatın.",
+  "routineTimeLabel": "Saat",
+  "routineDaysLabel": "Günler",
+  "routineSave": "Kaydet",
+  "routineCancel": "İptal",
+  "routineAdded": "Rutin eklendi.",
+  "routineCloseTooltip": "Rutini kapat",
+  "routineCloseTitle": "Rutin kapatılsın mı?",
+  "routineCloseBody": "\"{name}\" rutini kapatılır; ilacınız ve eski ilaç kayıtlarınız silinmez.",
+  "@routineCloseBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "routineCloseConfirm": "Kapat",
+  "routineClosed": "Rutin kapatıldı.",
+  "routineLoadError": "Rutinler okunamadı. Ekranı kapatıp yeniden açmayı deneyin.",
+  "routineErrorNoMed": "Önce bir ilaç seçin.",
+  "routineErrorDays": "En az bir gün seçin.",
+  "routineErrorTime": "Saat geçerli değil.",
+  "routineErrorMedication": "Seçtiğiniz ilaç artık yok. Ekranı yenileyip tekrar deneyin.",
+  "routineErrorGeneric": "İşlem yapılamadı. Tekrar deneyin.",
+  "dayMonShort": "Pzt",
+  "dayTueShort": "Sal",
+  "dayWedShort": "Çar",
+  "dayThuShort": "Per",
+  "dayFriShort": "Cum",
+  "daySatShort": "Cmt",
+  "daySunShort": "Paz",
   "condTitle": "Kronik Hastalıklarım",
   "condAddTooltip": "Hastalık ekle",
   "condEmpty": "Henüz kronik hastalık eklenmemiş.",

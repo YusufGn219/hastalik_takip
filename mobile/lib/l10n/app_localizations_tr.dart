@@ -115,6 +115,131 @@ class AppLocalizationsTr extends AppLocalizations {
       'Hastalıklarınızı ve kullandığınız ilaçları yönetin';
 
   @override
+  String get homeRoutines => 'Rutin ilaçlar';
+
+  @override
+  String get homeRoutinesHint =>
+      'Her gün ya da belirli günlerde alacağınız ilaçlar';
+
+  @override
+  String get routineTitle => 'Rutinlerim';
+
+  @override
+  String get routineAddTooltip => 'Rutin ekle';
+
+  @override
+  String get routineTodayTitle => 'Bugünün rutinleri';
+
+  @override
+  String get routineTodayEmpty => 'Bugün için rutin yok.';
+
+  @override
+  String get routineAllTitle => 'Tüm rutinler';
+
+  @override
+  String get routineAllEmpty => 'Henüz rutin tanımlanmamış.';
+
+  @override
+  String get routineOtherGroup => 'Diğer';
+
+  @override
+  String get routineEveryDay => 'Her gün';
+
+  @override
+  String get routineTaken => 'Aldım';
+
+  @override
+  String routineTakenSaved(String name) {
+    return '$name alındı olarak kaydedildi.';
+  }
+
+  @override
+  String get routineNewTitle => 'Yeni rutin';
+
+  @override
+  String get routineMedLabel => 'İlaç';
+
+  @override
+  String get routineMedHint => 'İlaç seçin';
+
+  @override
+  String get routineNoMedsAvailable =>
+      'Rutin kurulacak ilaç yok. Önce İlaç / takviye ekranından ilaç ekleyin ya da var olan rutinlerden birini kapatın.';
+
+  @override
+  String get routineTimeLabel => 'Saat';
+
+  @override
+  String get routineDaysLabel => 'Günler';
+
+  @override
+  String get routineSave => 'Kaydet';
+
+  @override
+  String get routineCancel => 'İptal';
+
+  @override
+  String get routineAdded => 'Rutin eklendi.';
+
+  @override
+  String get routineCloseTooltip => 'Rutini kapat';
+
+  @override
+  String get routineCloseTitle => 'Rutin kapatılsın mı?';
+
+  @override
+  String routineCloseBody(String name) {
+    return '\"$name\" rutini kapatılır; ilacınız ve eski ilaç kayıtlarınız silinmez.';
+  }
+
+  @override
+  String get routineCloseConfirm => 'Kapat';
+
+  @override
+  String get routineClosed => 'Rutin kapatıldı.';
+
+  @override
+  String get routineLoadError =>
+      'Rutinler okunamadı. Ekranı kapatıp yeniden açmayı deneyin.';
+
+  @override
+  String get routineErrorNoMed => 'Önce bir ilaç seçin.';
+
+  @override
+  String get routineErrorDays => 'En az bir gün seçin.';
+
+  @override
+  String get routineErrorTime => 'Saat geçerli değil.';
+
+  @override
+  String get routineErrorMedication =>
+      'Seçtiğiniz ilaç artık yok. Ekranı yenileyip tekrar deneyin.';
+
+  @override
+  String get routineErrorGeneric => 'İşlem yapılamadı. Tekrar deneyin.';
+
+  @override
+  String get dayMonShort => 'Pzt';
+
+  @override
+  String get dayTueShort => 'Sal';
+
+  @override
+  String get dayWedShort => 'Çar';
+
+  @override
+  String get dayThuShort => 'Per';
+
+  @override
+  String get dayFriShort => 'Cum';
+
+  @override
+  String get daySatShort => 'Cmt';
+
+  @override
+  String get daySunShort => 'Paz';
+
+  @override
   String get condTitle => 'Kronik Hastalıklarım';
 
   @override

@@ -298,6 +298,240 @@ abstract class AppLocalizations {
   /// **'Hastalıklarınızı ve kullandığınız ilaçları yönetin'**
   String get homeConditionsHint;
 
+  /// No description provided for @homeRoutines.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin ilaçlar'**
+  String get homeRoutines;
+
+  /// No description provided for @homeRoutinesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her gün ya da belirli günlerde alacağınız ilaçlar'**
+  String get homeRoutinesHint;
+
+  /// No description provided for @routineTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutinlerim'**
+  String get routineTitle;
+
+  /// No description provided for @routineAddTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin ekle'**
+  String get routineAddTooltip;
+
+  /// No description provided for @routineTodayTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün rutinleri'**
+  String get routineTodayTitle;
+
+  /// No description provided for @routineTodayEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün için rutin yok.'**
+  String get routineTodayEmpty;
+
+  /// No description provided for @routineAllTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm rutinler'**
+  String get routineAllTitle;
+
+  /// No description provided for @routineAllEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz rutin tanımlanmamış.'**
+  String get routineAllEmpty;
+
+  /// No description provided for @routineOtherGroup.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get routineOtherGroup;
+
+  /// No description provided for @routineEveryDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her gün'**
+  String get routineEveryDay;
+
+  /// No description provided for @routineTaken.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aldım'**
+  String get routineTaken;
+
+  /// No description provided for @routineTakenSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} alındı olarak kaydedildi.'**
+  String routineTakenSaved(String name);
+
+  /// No description provided for @routineNewTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni rutin'**
+  String get routineNewTitle;
+
+  /// No description provided for @routineMedLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç'**
+  String get routineMedLabel;
+
+  /// No description provided for @routineMedHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç seçin'**
+  String get routineMedHint;
+
+  /// No description provided for @routineNoMedsAvailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin kurulacak ilaç yok. Önce İlaç / takviye ekranından ilaç ekleyin ya da var olan rutinlerden birini kapatın.'**
+  String get routineNoMedsAvailable;
+
+  /// No description provided for @routineTimeLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saat'**
+  String get routineTimeLabel;
+
+  /// No description provided for @routineDaysLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günler'**
+  String get routineDaysLabel;
+
+  /// No description provided for @routineSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get routineSave;
+
+  /// No description provided for @routineCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get routineCancel;
+
+  /// No description provided for @routineAdded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin eklendi.'**
+  String get routineAdded;
+
+  /// No description provided for @routineCloseTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutini kapat'**
+  String get routineCloseTooltip;
+
+  /// No description provided for @routineCloseTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin kapatılsın mı?'**
+  String get routineCloseTitle;
+
+  /// No description provided for @routineCloseBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'\"{name}\" rutini kapatılır; ilacınız ve eski ilaç kayıtlarınız silinmez.'**
+  String routineCloseBody(String name);
+
+  /// No description provided for @routineCloseConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapat'**
+  String get routineCloseConfirm;
+
+  /// No description provided for @routineClosed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin kapatıldı.'**
+  String get routineClosed;
+
+  /// No description provided for @routineLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutinler okunamadı. Ekranı kapatıp yeniden açmayı deneyin.'**
+  String get routineLoadError;
+
+  /// No description provided for @routineErrorNoMed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önce bir ilaç seçin.'**
+  String get routineErrorNoMed;
+
+  /// No description provided for @routineErrorDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'En az bir gün seçin.'**
+  String get routineErrorDays;
+
+  /// No description provided for @routineErrorTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saat geçerli değil.'**
+  String get routineErrorTime;
+
+  /// No description provided for @routineErrorMedication.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçtiğiniz ilaç artık yok. Ekranı yenileyip tekrar deneyin.'**
+  String get routineErrorMedication;
+
+  /// No description provided for @routineErrorGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlem yapılamadı. Tekrar deneyin.'**
+  String get routineErrorGeneric;
+
+  /// No description provided for @dayMonShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pzt'**
+  String get dayMonShort;
+
+  /// No description provided for @dayTueShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sal'**
+  String get dayTueShort;
+
+  /// No description provided for @dayWedShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çar'**
+  String get dayWedShort;
+
+  /// No description provided for @dayThuShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Per'**
+  String get dayThuShort;
+
+  /// No description provided for @dayFriShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cum'**
+  String get dayFriShort;
+
+  /// No description provided for @daySatShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cmt'**
+  String get daySatShort;
+
+  /// No description provided for @daySunShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paz'**
+  String get daySunShort;
+
   /// No description provided for @condTitle.
   ///
   /// In tr, this message translates to:

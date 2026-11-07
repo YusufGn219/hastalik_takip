@@ -42,6 +42,9 @@ void main() {
     });
 
     testWidgets('her satır doğru ekrana yönlendirir', (tester) async {
+      tester.view.physicalSize = const Size(800, 1800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
       final pushed = <String?>[];
       await tester.pumpWidget(_localized(
         const HomeScreen(),
@@ -60,6 +63,7 @@ void main() {
         'Dönemler': '/episodes',
         'İlaç / takviye': '/medication-log',
         'Kronik hastalıklar': '/chronic-conditions',
+        'Rutin ilaçlar': '/recurring',
       }.entries) {
         await tester.tap(find.text(entry.key));
         await tester.pumpAndSettle();
@@ -67,7 +71,7 @@ void main() {
         tester.state<NavigatorState>(find.byType(Navigator)).pop();
         await tester.pumpAndSettle();
       }
-      expect(pushed, hasLength(5));
+      expect(pushed, hasLength(6));
     });
   });
 

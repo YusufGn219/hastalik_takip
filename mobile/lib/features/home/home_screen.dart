@@ -66,6 +66,14 @@ class HomeScreen extends StatelessWidget {
               hint: l10n.homeConditionsHint,
               route: '/chronic-conditions',
             ),
+            _HomeTile(
+              icon: Icons.repeat,
+              color: AppColors.medication,
+              background: AppColors.medicationBg,
+              title: l10n.homeRoutines,
+              hint: l10n.homeRoutinesHint,
+              route: '/recurring',
+            ),
             // GEÇİCİ: ayarlar ekranı gelene kadar kilidi buradan yönetiyoruz.
             const AppLockSettingsCard(),
           ],
