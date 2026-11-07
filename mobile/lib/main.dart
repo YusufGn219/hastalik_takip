@@ -12,7 +12,7 @@ import 'data/database/database_opener.dart';
 import 'data/database/seed_loader.dart';
 import 'data/repositories/medication_repository.dart';
 import 'domain/services/reminder_service.dart';
-import 'features/analytics/screens/analytics_screen.dart';
+import 'features/analytics/screens/analytics_dashboard_screen.dart';
 import 'features/auth/onboarding_screen.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
@@ -138,7 +138,7 @@ class MyApp extends StatelessWidget {
         '/medication-log': (context) => const MedicationLogScreen(),
         '/chronic-conditions': (context) => const ChronicConditionScreen(),
         '/recurring': (context) => const RecurringScreen(),
-        '/analytics': (context) => const AnalyticsScreen(),
+        '/analytics': (context) => const AnalyticsDashboardScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/change-password': (context) => const ChangePasswordScreen(),

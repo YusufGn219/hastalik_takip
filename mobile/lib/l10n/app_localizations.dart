@@ -1708,6 +1708,234 @@ abstract class AppLocalizations {
   /// **'{name} atlandı'**
   String timelineSkippedLine(String name);
 
+  /// No description provided for @homeAnalytics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Analizler'**
+  String get homeAnalytics;
+
+  /// No description provided for @homeAnalyticsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom, günlük ve ilaç eğilimleriniz'**
+  String get homeAnalyticsHint;
+
+  /// No description provided for @analyticsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Analizler'**
+  String get analyticsTitle;
+
+  /// No description provided for @analyticsTabSymptoms.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptomlar'**
+  String get analyticsTabSymptoms;
+
+  /// No description provided for @analyticsTabDaily.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük'**
+  String get analyticsTabDaily;
+
+  /// No description provided for @analyticsTabEffect.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç etkisi'**
+  String get analyticsTabEffect;
+
+  /// No description provided for @analyticsTabAdherence.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyum'**
+  String get analyticsTabAdherence;
+
+  /// No description provided for @analyticsDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} gün'**
+  String analyticsDays(int n);
+
+  /// No description provided for @analyticsLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Analizler okunamadı. Verileriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.'**
+  String get analyticsLoadError;
+
+  /// No description provided for @analyticsSymptomFrequency.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom sıklığı'**
+  String get analyticsSymptomFrequency;
+
+  /// No description provided for @analyticsSeverityTrend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük ortalama şiddet'**
+  String get analyticsSeverityTrend;
+
+  /// No description provided for @analyticsNoSymptoms.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dönemde semptom kaydı yok'**
+  String get analyticsNoSymptoms;
+
+  /// No description provided for @analyticsNotEnoughData.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeterli veri yok'**
+  String get analyticsNotEnoughData;
+
+  /// No description provided for @analyticsCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} kez'**
+  String analyticsCount(int n);
+
+  /// No description provided for @analyticsAvg.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ort: {value}'**
+  String analyticsAvg(String value);
+
+  /// No description provided for @analyticsDailyAverages.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ortalamalar (son {n} gün)'**
+  String analyticsDailyAverages(int n);
+
+  /// No description provided for @analyticsSleep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku'**
+  String get analyticsSleep;
+
+  /// No description provided for @analyticsWater.
+  ///
+  /// In tr, this message translates to:
+  /// **'Su'**
+  String get analyticsWater;
+
+  /// No description provided for @analyticsMood.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh hali'**
+  String get analyticsMood;
+
+  /// No description provided for @analyticsEnergy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Enerji'**
+  String get analyticsEnergy;
+
+  /// No description provided for @analyticsHours.
+  ///
+  /// In tr, this message translates to:
+  /// **'{value} saat'**
+  String analyticsHours(String value);
+
+  /// No description provided for @analyticsLiters.
+  ///
+  /// In tr, this message translates to:
+  /// **'{value} litre'**
+  String analyticsLiters(String value);
+
+  /// No description provided for @analyticsOutOf5.
+  ///
+  /// In tr, this message translates to:
+  /// **'{value} / 5'**
+  String analyticsOutOf5(String value);
+
+  /// No description provided for @analyticsMoodEnergyTrend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh hali ve enerji eğilimi'**
+  String get analyticsMoodEnergyTrend;
+
+  /// No description provided for @analyticsNoDaily.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dönemde günlük kayıt yok'**
+  String get analyticsNoDaily;
+
+  /// No description provided for @analyticsEffectTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç öncesi / sonrası şiddet'**
+  String get analyticsEffectTitle;
+
+  /// No description provided for @analyticsNoEffect.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dönemde ilaç-semptom eşleşmesi yok'**
+  String get analyticsNoEffect;
+
+  /// No description provided for @analyticsUsed.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n} kez kullanıldı'**
+  String analyticsUsed(int n);
+
+  /// No description provided for @analyticsBefore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önce'**
+  String get analyticsBefore;
+
+  /// No description provided for @analyticsAfter.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonra'**
+  String get analyticsAfter;
+
+  /// No description provided for @analyticsReliefMinutes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ortalama etki: {n} dakika'**
+  String analyticsReliefMinutes(int n);
+
+  /// No description provided for @analyticsAdherenceTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin ilaç uyumu'**
+  String get analyticsAdherenceTitle;
+
+  /// No description provided for @analyticsNoAdherence.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rutin ilaç tanımlanmamış'**
+  String get analyticsNoAdherence;
+
+  /// No description provided for @analyticsNoAdherenceData.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz veri yok'**
+  String get analyticsNoAdherenceData;
+
+  /// No description provided for @analyticsAdherenceLine.
+  ///
+  /// In tr, this message translates to:
+  /// **'{taken} alındı · {skipped} atlandı · {unrecorded} kaydedilmedi'**
+  String analyticsAdherenceLine(int taken, int skipped, int unrecorded);
+
+  /// No description provided for @analyticsExtra.
+  ///
+  /// In tr, this message translates to:
+  /// **'Plansız alım: {n}'**
+  String analyticsExtra(int n);
+
+  /// No description provided for @analyticsAdherenceNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayım, ilacın ilk kayıtlı dozundan başlar. Rutini sonradan değiştirdiyseniz geçmiş günler bugünkü rutininize göre hesaplanır.'**
+  String get analyticsAdherenceNote;
+
+  /// No description provided for @analyticsDisclaimer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu sayılar yalnız kendi kayıtlarınızdan hesaplanır; tıbbi tavsiye değildir.'**
+  String get analyticsDisclaimer;
+
   /// No description provided for @lockSettingsOffHint.
   ///
   /// In tr, this message translates to:

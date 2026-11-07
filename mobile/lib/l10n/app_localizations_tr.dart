@@ -915,6 +915,145 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get homeAnalytics => 'Analizler';
+
+  @override
+  String get homeAnalyticsHint => 'Semptom, günlük ve ilaç eğilimleriniz';
+
+  @override
+  String get analyticsTitle => 'Analizler';
+
+  @override
+  String get analyticsTabSymptoms => 'Semptomlar';
+
+  @override
+  String get analyticsTabDaily => 'Günlük';
+
+  @override
+  String get analyticsTabEffect => 'İlaç etkisi';
+
+  @override
+  String get analyticsTabAdherence => 'Uyum';
+
+  @override
+  String analyticsDays(int n) {
+    return '$n gün';
+  }
+
+  @override
+  String get analyticsLoadError =>
+      'Analizler okunamadı. Verileriniz silinmedi; ekranı kapatıp yeniden açmayı deneyin.';
+
+  @override
+  String get analyticsSymptomFrequency => 'Semptom sıklığı';
+
+  @override
+  String get analyticsSeverityTrend => 'Günlük ortalama şiddet';
+
+  @override
+  String get analyticsNoSymptoms => 'Bu dönemde semptom kaydı yok';
+
+  @override
+  String get analyticsNotEnoughData => 'Yeterli veri yok';
+
+  @override
+  String analyticsCount(int n) {
+    return '$n kez';
+  }
+
+  @override
+  String analyticsAvg(String value) {
+    return 'Ort: $value';
+  }
+
+  @override
+  String analyticsDailyAverages(int n) {
+    return 'Ortalamalar (son $n gün)';
+  }
+
+  @override
+  String get analyticsSleep => 'Uyku';
+
+  @override
+  String get analyticsWater => 'Su';
+
+  @override
+  String get analyticsMood => 'Ruh hali';
+
+  @override
+  String get analyticsEnergy => 'Enerji';
+
+  @override
+  String analyticsHours(String value) {
+    return '$value saat';
+  }
+
+  @override
+  String analyticsLiters(String value) {
+    return '$value litre';
+  }
+
+  @override
+  String analyticsOutOf5(String value) {
+    return '$value / 5';
+  }
+
+  @override
+  String get analyticsMoodEnergyTrend => 'Ruh hali ve enerji eğilimi';
+
+  @override
+  String get analyticsNoDaily => 'Bu dönemde günlük kayıt yok';
+
+  @override
+  String get analyticsEffectTitle => 'İlaç öncesi / sonrası şiddet';
+
+  @override
+  String get analyticsNoEffect => 'Bu dönemde ilaç-semptom eşleşmesi yok';
+
+  @override
+  String analyticsUsed(int n) {
+    return '$n kez kullanıldı';
+  }
+
+  @override
+  String get analyticsBefore => 'Önce';
+
+  @override
+  String get analyticsAfter => 'Sonra';
+
+  @override
+  String analyticsReliefMinutes(int n) {
+    return 'Ortalama etki: $n dakika';
+  }
+
+  @override
+  String get analyticsAdherenceTitle => 'Rutin ilaç uyumu';
+
+  @override
+  String get analyticsNoAdherence => 'Rutin ilaç tanımlanmamış';
+
+  @override
+  String get analyticsNoAdherenceData => 'Henüz veri yok';
+
+  @override
+  String analyticsAdherenceLine(int taken, int skipped, int unrecorded) {
+    return '$taken alındı · $skipped atlandı · $unrecorded kaydedilmedi';
+  }
+
+  @override
+  String analyticsExtra(int n) {
+    return 'Plansız alım: $n';
+  }
+
+  @override
+  String get analyticsAdherenceNote =>
+      'Sayım, ilacın ilk kayıtlı dozundan başlar. Rutini sonradan değiştirdiyseniz geçmiş günler bugünkü rutininize göre hesaplanır.';
+
+  @override
+  String get analyticsDisclaimer =>
+      'Bu sayılar yalnız kendi kayıtlarınızdan hesaplanır; tıbbi tavsiye değildir.';
+
+  @override
   String get lockSettingsOffHint =>
       'Kapalı. Açılışta PIN ya da parmak izi istenmez.';
 

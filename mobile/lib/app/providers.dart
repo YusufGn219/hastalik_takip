@@ -19,12 +19,14 @@ import '../data/repositories/medication_repository.dart';
 import '../data/repositories/support.dart';
 import '../data/repositories/symptom_entry_repository.dart';
 import '../data/repositories/symptom_repository.dart';
+import '../domain/services/analytics_service.dart';
 import '../domain/services/dose_adherence_service.dart';
 import '../domain/services/dose_service.dart';
 import '../domain/services/episode_service.dart';
 import '../domain/services/medication_service.dart';
 import '../domain/services/reminder_service.dart';
 import '../domain/services/timeline_service.dart';
+import '../features/analytics/analytics_overview.dart';
 import '../features/timeline/timeline_day.dart';
 import '../l10n/app_localizations.dart';
 import '../features/episode/episode_overview.dart';
@@ -175,5 +177,25 @@ final doseAdherenceServiceProvider = Provider<DoseAdherenceService>(
     doses: ref.watch(doseServiceProvider),
     logs: ref.watch(medicationLogRepositoryProvider),
     clock: ref.watch(clockProvider),
+  ),
+);
+
+/// Semptom, günlük ve ilaç etkisi hesapları.
+final analyticsServiceProvider = Provider<AnalyticsService>(
+  (ref) => AnalyticsService(
+    entries: ref.watch(symptomEntryRepositoryProvider),
+    symptoms: ref.watch(symptomRepositoryProvider),
+    medicationLogs: ref.watch(medicationLogRepositoryProvider),
+    medications: ref.watch(medicationRepositoryProvider),
+    dailyLogs: ref.watch(dailyLogRepositoryProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+/// Analiz ekranı için dört hesabı birlikte okur.
+final analyticsOverviewLoaderProvider = Provider<AnalyticsOverviewLoader>(
+  (ref) => AnalyticsOverviewLoader(
+    analytics: ref.watch(analyticsServiceProvider),
+    adherence: ref.watch(doseAdherenceServiceProvider),
   ),
 );

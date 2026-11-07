@@ -65,6 +65,7 @@ void main() {
         'Kronik hastalıklar': '/chronic-conditions',
         'Rutin ilaçlar': '/recurring',
         'Zaman çizelgesi': '/timeline',
+        'Analizler': '/analytics',
       }.entries) {
         await tester.tap(find.text(entry.key));
         await tester.pumpAndSettle();
@@ -72,7 +73,7 @@ void main() {
         tester.state<NavigatorState>(find.byType(Navigator)).pop();
         await tester.pumpAndSettle();
       }
-      expect(pushed, hasLength(7));
+      expect(pushed, hasLength(8));
     });
   });
 
