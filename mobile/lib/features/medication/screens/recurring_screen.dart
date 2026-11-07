@@ -188,7 +188,8 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
 
   Widget _subtitle(Routine r, AppLocalizations l10n) {
     final days = routineDaysText(r.days, l10n);
-    return Text(r.time.isEmpty ? days : '${r.time} · $days');
+    final times = r.times.join(', ');
+    return Text(times.isEmpty ? days : '$times · $days');
   }
 
   @override
@@ -236,7 +237,7 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
                           child: ListTile(
                             leading: const Icon(Icons.medication),
                             title: Text(r.medication.name),
-                            subtitle: Text(r.time),
+                            subtitle: Text(r.times.join(', ')),
                             // Tema düğmeye tam genişlik ister; ListTile'ın trailing
                             // alanı sınırsız genişlik verdiği için sıfırlanmalı.
                             trailing: ElevatedButton(
@@ -325,7 +326,7 @@ class _RoutineDialogState extends ConsumerState<_RoutineDialog> {
     try {
       await ref.read(medicationServiceProvider).setRoutine(
             medicationId: _medicationId!,
-            time: _hhmm(_time),
+            times: [_hhmm(_time)],
             days: _days.toList(),
           );
       if (!mounted) return;

@@ -12,6 +12,21 @@ List<String>? recurringDaysOf(Medication m) {
   return (jsonDecode(raw) as List).cast<String>();
 }
 
+/// Rutin ilacın doz saatleri: sıralı, tekil 'HH:mm' listesi. Kayıt virgüllü
+/// liste ("08:00,20:00") ya da eski tek saat ("08:30", "08:30:00") olabilir;
+/// saniye kırpılır. Saat yoksa boş liste.
+List<String> recurringTimesOf(Medication m) {
+  final raw = m.recurringTime;
+  if (raw == null) return const [];
+  final times = <String>{};
+  for (final part in raw.split(',')) {
+    final t = part.trim();
+    if (t.isEmpty) continue;
+    times.add(t.length > 5 ? t.substring(0, 5) : t);
+  }
+  return times.toList()..sort();
+}
+
 /// İlaçlar ve kronik hastalıklar.
 abstract class MedicationRepository {
   /// Silinmemiş tüm ilaçlar (katalog + kullanıcının kendi ilaçları), ada göre.

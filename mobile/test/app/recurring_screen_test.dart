@@ -119,9 +119,9 @@ void main() {
         (tester) async {
       await seedAnd(tester, () async {
         await service.setRoutine(
-            medicationId: parol, time: '08:30', days: ['monday', 'friday']);
+            medicationId: parol, times: ['08:30'], days: ['monday', 'friday']);
         await service.setRoutine(
-            medicationId: vitD, time: '21:00', days: ['monday']);
+            medicationId: vitD, times: ['21:00'], days: ['monday']);
       });
       await openApp(tester);
 
@@ -149,9 +149,9 @@ void main() {
         (tester) async {
       await seedAnd(tester, () async {
         await service.setRoutine(
-            medicationId: parol, time: '08:30', days: ['friday']);
+            medicationId: parol, times: ['08:30'], days: ['friday']);
         await service.setRoutine(
-            medicationId: vitD, time: '09:00', days: ['friday']);
+            medicationId: vitD, times: ['09:00'], days: ['friday']);
         await service.createCondition(
             name: 'Tansiyon', medicationIds: [parol]);
       });
@@ -199,7 +199,7 @@ void main() {
       final routines = await run(tester, () => service.routines());
       expect(routines, hasLength(1));
       expect(routines.single.medication.id, parol);
-      expect(routines.single.time, '08:00');
+      expect(routines.single.times, ['08:00']);
       expect(routines.single.days, ['monday', 'friday']);
       expect((await run(tester, () => repo.listAvailable())).length, before);
       expect(find.text('08:00 · Pzt, Cum'), findsOneWidget); // liste yenilendi
@@ -250,7 +250,7 @@ void main() {
         'uyarı çıkar, Kaydet kapalı', (tester) async {
       await seedAnd(tester, () async {
         await service.setRoutine(
-            medicationId: parol, time: '08:30', days: ['monday']);
+            medicationId: parol, times: ['08:30'], days: ['monday']);
       });
       await openApp(tester);
       await openAddDialog(tester);
@@ -266,7 +266,7 @@ void main() {
       await run(tester, () async {
         for (final m in await service.available()) {
           await service.setRoutine(
-              medicationId: m.id, time: '08:30', days: ['monday']);
+              medicationId: m.id, times: ['08:30'], days: ['monday']);
         }
       });
       // Ekranı yeniden aç (liste yeniden okunsun).
@@ -297,7 +297,7 @@ void main() {
     testWidgets('şimdiki zamanla alım kaydı yazar', (tester) async {
       await seedAnd(tester, () async {
         await service.setRoutine(
-            medicationId: parol, time: '08:30', days: ['friday']);
+            medicationId: parol, times: ['08:30'], days: ['friday']);
       });
       await openApp(tester);
       expect(await run(tester, () => service.logsForDay('2026-11-06')), isEmpty);
@@ -318,7 +318,7 @@ void main() {
         (tester) async {
       await seedAnd(tester, () async {
         await service.setRoutine(
-            medicationId: parol, time: '08:30', days: ['friday']);
+            medicationId: parol, times: ['08:30'], days: ['friday']);
       });
       await openApp(tester);
 
@@ -346,7 +346,7 @@ void main() {
         (tester) async {
       await seedAnd(tester, () async {
         await service.setRoutine(
-            medicationId: parol, time: '08:30', days: ['friday']);
+            medicationId: parol, times: ['08:30'], days: ['friday']);
       });
       await openApp(tester, extra: [
         medicationServiceProvider.overrideWithValue(_FailingCloseService(db)),

@@ -25,5 +25,10 @@ abstract final class RuleCodes {
   static const conditionNameExists = 'condition_name_exists';
   static const conditionNotFound = 'condition_not_found';
   static const routineTimeInvalid = 'routine_time_invalid';
+  static const routineTimesEmpty = 'routine_times_empty';
+  static const routineTooManyTimes = 'routine_too_many_times';
   static const routineDaysEmpty = 'routine_days_empty';
+  static const doseNotScheduled = 'dose_not_scheduled';
+  static const doseAlreadyTaken = 'dose_already_taken';
+  static const doseAlreadySkipped = 'dose_already_skipped';
 }

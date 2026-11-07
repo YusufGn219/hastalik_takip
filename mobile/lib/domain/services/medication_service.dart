@@ -17,15 +17,15 @@ class ConditionSummary {
   final List<Medication> medications;
 }
 
-/// Rutini kurulmuş bir ilaç: saat ("HH:mm") ve haftanın günleri.
+/// Rutini kurulmuş bir ilaç: doz saatleri ("HH:mm") ve haftanın günleri.
 class Routine {
-  const Routine(this.medication, this.time, this.days);
+  const Routine(this.medication, this.times, this.days);
 
   final Medication medication;
 
-  /// "HH:mm"; eski kayıtlardaki saniyeli yazım ("08:30:00") kırpılır. Saat
-  /// yazılmamış eski kayıtta boş metin.
-  final String time;
+  /// Doz saatleri, sıralı ve tekil. Eski kayıtlardaki saniyeli yazım
+  /// ("08:30:00") kırpılır; saat yazılmamış eski kayıtta boş liste.
+  final List<String> times;
 
   /// [weekdayKeys] sırasında gün adları. Kayıtta gün yoksa her gün sayılır.
   final List<String> days;
@@ -191,20 +191,40 @@ class MedicationService {
 
   static final _timePattern = RegExp(r'^([01]\d|2[0-3]):[0-5]\d$');
 
-  /// Mevcut ilacın üzerine rutin (saat + günler) kurar; yeni ilaç açılmaz. Bir
-  /// ilacın tek rutini olur, yeniden kurmak eskisini değiştirir. [time] "HH:mm"
-  /// olmalı; en az bir gün seçilmeli, günler geçerli olmalı (tekrarlar tek sayılır,
-  /// hafta sırasına dizilir). Hiçbir şey yazılmadan önce denetlenir.
+  /// Günde en çok bu kadar doz saati.
+  static const maxRoutineTimes = 10;
+
+  /// Mevcut ilacın üzerine rutin (doz saatleri + günler) kurar; yeni ilaç
+  /// açılmaz. Bir ilacın tek rutini olur (birden fazla saati olabilir), yeniden
+  /// kurmak eskisini değiştirir. [times] en az bir, en çok [maxRoutineTimes]
+  /// "HH:mm" olmalı (tekrarlar tek sayılır, saate göre dizilir); en az bir gün
+  /// seçilmeli, günler geçerli olmalı (tekrarlar tek sayılır, hafta sırasına
+  /// dizilir). Hiçbir şey yazılmadan önce denetlenir.
   Future<void> setRoutine({
     required String medicationId,
-    required String time,
+    required List<String> times,
     required List<String> days,
   }) async {
     await _requireMedications([medicationId]);
-    if (!_timePattern.hasMatch(time)) {
-      throw RuleViolation(
-        RuleCodes.routineTimeInvalid,
-        'Geçersiz saat: $time (HH:mm olmalı).',
+    if (times.isEmpty) {
+      throw const RuleViolation(
+        RuleCodes.routineTimesEmpty,
+        'En az bir doz saati seçilmeli.',
+      );
+    }
+    for (final t in times) {
+      if (!_timePattern.hasMatch(t)) {
+        throw RuleViolation(
+          RuleCodes.routineTimeInvalid,
+          'Geçersiz saat: $t (HH:mm olmalı).',
+        );
+      }
+    }
+    final uniqueTimes = times.toSet().toList()..sort();
+    if (uniqueTimes.length > maxRoutineTimes) {
+      throw const RuleViolation(
+        RuleCodes.routineTooManyTimes,
+        'Günde en çok $maxRoutineTimes doz saati olabilir.',
       );
     }
     if (days.isEmpty) {
@@ -225,7 +245,7 @@ class MedicationService {
     await _medications.setRecurrence(
       medicationId,
       isRecurring: true,
-      recurringTime: time,
+      recurringTime: uniqueTimes.join(','),
       recurringDays: weekdayKeys.where(unique.contains).toList(),
     );
   }
@@ -237,23 +257,23 @@ class MedicationService {
     await _medications.setRecurrence(medicationId, isRecurring: false);
   }
 
-  /// Rutini olan (silinmemiş) ilaçlar: saate, sonra Türkçe ada göre.
+  /// Rutini olan (silinmemiş) ilaçlar: ilk doz saatine, sonra Türkçe ada göre.
   Future<List<Routine>> routines() async {
     final result = <Routine>[];
     for (final m in await _medications.listAvailable()) {
       if (!m.isRecurring) continue;
-      final time = m.recurringTime ?? '';
       final saved = recurringDaysOf(m);
       result.add(Routine(
         m,
-        time.length > 5 ? time.substring(0, 5) : time,
+        recurringTimesOf(m),
         saved == null || saved.isEmpty
             ? List.of(weekdayKeys)
             : weekdayKeys.where(saved.contains).toList(),
       ));
     }
+    String first(Routine r) => r.times.isEmpty ? '' : r.times.first;
     result.sort((a, b) {
-      final byTime = a.time.compareTo(b.time);
+      final byTime = first(a).compareTo(first(b));
       return byTime != 0
           ? byTime
           : compareTr(a.medication.name, b.medication.name);

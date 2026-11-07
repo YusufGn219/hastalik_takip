@@ -38,7 +38,7 @@ void main() {
 
       await service.setRoutine(
         medicationId: m.id,
-        time: '08:30',
+        times: ['08:30'],
         days: ['friday', 'monday', 'monday'],
       );
 
@@ -54,13 +54,13 @@ void main() {
         () async {
       final m = await med('Zeta');
       await service.setRoutine(
-          medicationId: m.id, time: '08:30', days: ['monday']);
+          medicationId: m.id, times: ['08:30'], days: ['monday']);
       await service.setRoutine(
-          medicationId: m.id, time: '21:00', days: ['sunday', 'saturday']);
+          medicationId: m.id, times: ['21:00'], days: ['sunday', 'saturday']);
 
       final list = await service.routines();
       expect(list, hasLength(1));
-      expect(list.single.time, '21:00');
+      expect(list.single.times, ['21:00']);
       expect(list.single.days, ['saturday', 'sunday']);
     });
 
@@ -69,22 +69,22 @@ void main() {
       final m = await med('Zeta');
       for (final bad in ['8:30', '24:00', '08:60', '', '08:30:00', 'abc']) {
         await expectLater(
-          service.setRoutine(medicationId: m.id, time: bad, days: ['monday']),
+          service.setRoutine(medicationId: m.id, times: [bad], days: ['monday']),
           violation(RuleCodes.routineTimeInvalid),
           reason: bad,
         );
       }
       await expectLater(
-        service.setRoutine(medicationId: m.id, time: '08:30', days: []),
+        service.setRoutine(medicationId: m.id, times: ['08:30'], days: []),
         violation(RuleCodes.routineDaysEmpty),
       );
       await expectLater(
         service.setRoutine(
-            medicationId: m.id, time: '08:30', days: ['monday', 'pazartesi']),
+            medicationId: m.id, times: ['08:30'], days: ['monday', 'pazartesi']),
         violation(RuleCodes.invalidRecurringDay),
       );
       await expectLater(
-        service.setRoutine(medicationId: 'yok', time: '08:30', days: ['monday']),
+        service.setRoutine(medicationId: 'yok', times: ['08:30'], days: ['monday']),
         violation(RuleCodes.medicationNotFound),
       );
       expect((await repo.getById(m.id))!.isRecurring, isFalse);
@@ -96,7 +96,7 @@ void main() {
       await repo.softDelete(m.id);
       await expectLater(
         service.setRoutine(
-            medicationId: m.id, time: '08:30', days: ['monday']),
+            medicationId: m.id, times: ['08:30'], days: ['monday']),
         violation(RuleCodes.medicationNotFound),
       );
     });
@@ -107,7 +107,7 @@ void main() {
         () async {
       final m = await med('Zeta');
       await service.setRoutine(
-          medicationId: m.id, time: '08:30', days: ['monday']);
+          medicationId: m.id, times: ['08:30'], days: ['monday']);
       await service.clearRoutine(m.id);
 
       final after = (await repo.getById(m.id))!;
@@ -119,7 +119,7 @@ void main() {
       expect((await service.available()).map((x) => x.id), contains(m.id));
 
       await service.setRoutine(
-          medicationId: m.id, time: '09:00', days: ['tuesday']);
+          medicationId: m.id, times: ['09:00'], days: ['tuesday']);
       expect(await service.routines(), hasLength(1));
     });
 
@@ -136,11 +136,11 @@ void main() {
       final c = await med('Aspirin2');
       await med('Rutinsiz');
       await service.setRoutine(
-          medicationId: a.id, time: '20:00', days: ['monday']);
+          medicationId: a.id, times: ['20:00'], days: ['monday']);
       await service.setRoutine(
-          medicationId: b.id, time: '08:00', days: ['monday']);
+          medicationId: b.id, times: ['08:00'], days: ['monday']);
       await service.setRoutine(
-          medicationId: c.id, time: '08:00', days: ['monday']);
+          medicationId: c.id, times: ['08:00'], days: ['monday']);
 
       expect((await service.routines()).map((r) => r.medication.name),
           ['Aspirin2', 'Çinko', 'Işık']);
@@ -155,14 +155,14 @@ void main() {
         recurringDays: null,
       );
       final r = (await service.routines()).single;
-      expect(r.time, '08:30');
+      expect(r.times, ['08:30']);
       expect(r.days, weekdayKeys);
     });
 
     test('silinmiş ilaç listede görünmez', () async {
       final m = await med('Zeta');
       await service.setRoutine(
-          medicationId: m.id, time: '08:30', days: ['monday']);
+          medicationId: m.id, times: ['08:30'], days: ['monday']);
       await repo.softDelete(m.id);
       expect(await service.routines(), isEmpty);
     });
@@ -177,7 +177,7 @@ void main() {
       final bagsiz = await med('Rutinsiz');
       for (final m in [tansiyonIlaci, migrenIlaci, serbest]) {
         await service.setRoutine(
-            medicationId: m.id, time: '08:00', days: ['monday']);
+            medicationId: m.id, times: ['08:00'], days: ['monday']);
       }
       await service.createCondition(
           name: 'Tansiyon', medicationIds: [tansiyonIlaci.id]);
@@ -197,7 +197,7 @@ void main() {
         () async {
       final m = await med('Zeta');
       await service.setRoutine(
-          medicationId: m.id, time: '08:00', days: ['monday']);
+          medicationId: m.id, times: ['08:00'], days: ['monday']);
       await service.createCondition(name: 'A', medicationIds: [m.id]);
       await service.createCondition(name: 'B', medicationIds: [m.id]);
 
@@ -208,7 +208,7 @@ void main() {
     test('silinen hastalık gruplamada görünmez; ilaç "Diğer"e düşer', () async {
       final m = await med('Zeta');
       await service.setRoutine(
-          medicationId: m.id, time: '08:00', days: ['monday']);
+          medicationId: m.id, times: ['08:00'], days: ['monday']);
       final c = await service.createCondition(name: 'A', medicationIds: [m.id]);
       await service.deleteCondition(c.id);
 

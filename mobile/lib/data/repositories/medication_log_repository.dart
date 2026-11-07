@@ -7,6 +7,10 @@ import 'support.dart';
 /// İlaç alım kayıtları. "Atak ve kronik hastalık aynı anda dolu olamaz" gibi
 /// kurallar servis katmanındadır (Sprint 2); burası yalnız saklar.
 abstract class MedicationLogRepository {
+  /// [scheduledTime] ('HH:mm') ve [scheduledDay] ('YYYY-MM-DD') planlı bir doz
+  /// için alınıyorsa ikisi birlikte verilir; ikisi de boşsa plansız alımdır.
+  /// Yalnız biri verilirse [ArgumentError]. Aynı doz için ikinci kayıt
+  /// veritabanı dizininde reddedilir.
   Future<MedicationLog> create({
     required String medicationId,
     required DateTime takenAt,
@@ -15,9 +19,14 @@ abstract class MedicationLogRepository {
     String? episodeId,
     String? conditionId,
     String notes = '',
+    String? scheduledTime,
+    String? scheduledDay,
   });
 
   Future<MedicationLog?> getById(String id);
+
+  /// Yerel [day] gününe ait planlı dozların (silinmemiş) alım kayıtları.
+  Future<List<MedicationLog>> listScheduledForDay(String day);
 
   /// [from] ve [to] dahil; servis kendi kuralıyla süzer.
   Future<List<MedicationLog>> listInRange(DateTime from, DateTime to);
@@ -46,7 +55,14 @@ class DriftMedicationLogRepository implements MedicationLogRepository {
     String? episodeId,
     String? conditionId,
     String notes = '',
+    String? scheduledTime,
+    String? scheduledDay,
   }) {
+    if ((scheduledTime == null) != (scheduledDay == null)) {
+      throw ArgumentError(
+        'scheduledTime ve scheduledDay birlikte verilmeli ya da birlikte boş olmalı.',
+      );
+    }
     final now = _clock();
     return _db.into(_db.medicationLogs).insertReturning(
           MedicationLogsCompanion.insert(
@@ -61,6 +77,8 @@ class DriftMedicationLogRepository implements MedicationLogRepository {
             episodeId: Value(episodeId),
             conditionId: Value(conditionId),
             notes: Value(notes),
+            scheduledTime: Value(scheduledTime),
+            scheduledDay: Value(scheduledDay),
           ),
         );
   }
@@ -69,6 +87,14 @@ class DriftMedicationLogRepository implements MedicationLogRepository {
   Future<MedicationLog?> getById(String id) {
     return (_db.select(_db.medicationLogs)..where((t) => t.id.equals(id)))
         .getSingleOrNull();
+  }
+
+  @override
+  Future<List<MedicationLog>> listScheduledForDay(String day) {
+    return (_db.select(_db.medicationLogs)
+          ..where((t) => t.deletedAt.isNull() & t.scheduledDay.equals(day))
+          ..orderBy([(t) => OrderingTerm.asc(t.takenAt)]))
+        .get();
   }
 
   @override

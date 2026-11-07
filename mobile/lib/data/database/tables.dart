@@ -128,7 +128,9 @@ class Medications extends Table with BaseColumns {
   BoolColumn get isCatalog => boolean().withDefault(const Constant(false))();
   BoolColumn get isRecurring => boolean().withDefault(const Constant(false))();
 
-  /// 'HH:mm' (cihaz yerel saati).
+  /// Doz saatleri, virgülle ayrılmış 'HH:mm' listesi: "08:00" ya da
+  /// "08:00,20:00" (cihaz yerel saati, sıralı, tekil). Eski kayıtlarda tek
+  /// saat ya da saniyeli yazım ("08:30:00") olabilir; okuyan taraf toleranslıdır.
   TextColumn get recurringTime => text().nullable()();
 
   /// JSON liste: ["monday","wednesday"]. Boş/null = her gün.
@@ -163,6 +165,28 @@ class MedicationLogs extends Table with BaseColumns {
   TextColumn get conditionId =>
       text().nullable().references(ChronicConditions, #id)();
   TextColumn get notes => text().withDefault(const Constant(''))();
+
+  /// Rutin ilacın hangi planlı dozu için alındığı: doz saati 'HH:mm' ve o dozun
+  /// yerel günü 'YYYY-MM-DD'. İkisi birlikte dolu ya da birlikte boştur; boş =
+  /// plansız (ekstra) alım. Silinmemiş kayıtlar arasında (ilaç, gün, saat) tekil.
+  TextColumn get scheduledTime => text().nullable()();
+  TextColumn get scheduledDay => text().nullable()();
+}
+
+/// Atlandığı açıkça işaretlenen rutin dozlar. Alım kaydı DEĞİLDİR: alım kaydı
+/// okuyan hiçbir yer bu tabloyu görmez, atlanan doz yanlışlıkla "alındı"
+/// sayılmaz. Silinmemiş kayıtlar arasında (ilaç, gün, saat) tekil. Doz sonradan
+/// alınırsa bu kayıt silinmiş işareti alır.
+class DoseSkips extends Table with BaseColumns {
+  TextColumn get medicationId => text().references(Medications, #id)();
+
+  /// Atlanan dozun yerel günü 'YYYY-MM-DD' ve doz saati 'HH:mm'.
+  TextColumn get scheduledDay => text()();
+  TextColumn get scheduledTime => text()();
+
+  /// "Atladım" denilen an (UTC) ve o andaki cihaz UTC farkı (dakika).
+  DateTimeColumn get skippedAt => dateTime()();
+  IntColumn get utcOffsetMinutes => integer()();
 }
 
 // -------------------------------------------------------- günlük / ölçüm

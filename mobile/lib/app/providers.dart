@@ -8,12 +8,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/database/app_database.dart';
 import '../data/repositories/daily_log_repository.dart';
+import '../data/repositories/dose_skip_repository.dart';
 import '../data/repositories/episode_repository.dart';
 import '../data/repositories/medication_log_repository.dart';
 import '../data/repositories/medication_repository.dart';
 import '../data/repositories/support.dart';
 import '../data/repositories/symptom_entry_repository.dart';
 import '../data/repositories/symptom_repository.dart';
+import '../domain/services/dose_service.dart';
 import '../domain/services/episode_service.dart';
 import '../domain/services/medication_service.dart';
 import '../domain/services/timeline_service.dart';
@@ -66,6 +68,13 @@ final medicationLogRepositoryProvider = Provider<MedicationLogRepository>(
   ),
 );
 
+final doseSkipRepositoryProvider = Provider<DoseSkipRepository>(
+  (ref) => DriftDoseSkipRepository(
+    ref.watch(databaseProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
 final dailyLogRepositoryProvider = Provider<DailyLogRepository>(
   (ref) => DriftDailyLogRepository(
     ref.watch(databaseProvider),
@@ -88,6 +97,17 @@ final medicationServiceProvider = Provider<MedicationService>(
   (ref) => MedicationService(
     medications: ref.watch(medicationRepositoryProvider),
     logs: ref.watch(medicationLogRepositoryProvider),
+  ),
+);
+
+/// Rutin dozların takibi (alındı / atlandı / kaydedilmedi).
+final doseServiceProvider = Provider<DoseService>(
+  (ref) => DoseService(
+    medications: ref.watch(medicationRepositoryProvider),
+    logs: ref.watch(medicationLogRepositoryProvider),
+    skips: ref.watch(doseSkipRepositoryProvider),
+    transactor: ref.watch(databaseProvider).transaction,
+    clock: ref.watch(clockProvider),
   ),
 );
 

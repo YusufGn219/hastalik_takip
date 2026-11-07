@@ -185,7 +185,8 @@ CREATE TABLE "medication_logs" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NUL
       await r.setMedicationCategory('m1', c.id);
       expect((await r.getById('m1'))!.categoryId, c.id);
       final v = await old.customSelect('PRAGMA user_version').getSingle();
-      expect(v.read<int>('user_version'), 2);
+      // Eski v1 veritabanı güncel sürüme (3) kadar tüm adımlardan geçer.
+      expect(v.read<int>('user_version'), 3);
     });
   });
 }

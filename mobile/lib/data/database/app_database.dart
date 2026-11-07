@@ -18,6 +18,7 @@ part 'app_database.g.dart';
     ChronicConditions,
     ConditionMedications,
     MedicationLogs,
+    DoseSkips,
     DailyLogs,
     Measurements,
     Tags,
@@ -37,8 +38,12 @@ class AppDatabase extends _$AppDatabase {
   ///  * 2: ilaç türü (`medications.type`: kronik/semptomatik) kalktı; yerine
   ///    kullanıcının kendi kategorileri (`medication_categories` tablosu ve
   ///    `medications.category_id`) geldi.
+  ///  * 3: planlı doz takibi. `medication_logs.scheduled_time/scheduled_day`
+  ///    (alımın hangi dozu için olduğu) ve `dose_skips` tablosu (açıkça
+  ///    atlanan dozlar) geldi; ilaçta birden fazla doz saati
+  ///    (`recurring_time` virgüllü liste) desteklenir (şema aynı).
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -57,6 +62,14 @@ class AppDatabase extends _$AppDatabase {
             await m.dropColumn(medications, 'type');
             await customStatement(_medicationCategoryNameIndex);
           }
+          if (from < 3) {
+            // Eski alım kayıtları plansız (boş) kalır; hiçbiri değişmez.
+            await m.addColumn(medicationLogs, medicationLogs.scheduledTime);
+            await m.addColumn(medicationLogs, medicationLogs.scheduledDay);
+            await m.createTable(doseSkips);
+            await customStatement(_medicationLogDoseIndex);
+            await customStatement(_doseSkipDoseIndex);
+          }
         },
         beforeOpen: (details) async {
           // Yabancı anahtar kısıtları SQLite'ta varsayılan olarak kapalıdır.
@@ -70,8 +83,22 @@ class AppDatabase extends _$AppDatabase {
       'CREATE UNIQUE INDEX uq_medication_categories_name '
       'ON medication_categories (name) WHERE deleted_at IS NULL';
 
+  /// Bir doz (ilaç, gün, saat) için en çok bir alım kaydı.
+  static const _medicationLogDoseIndex =
+      'CREATE UNIQUE INDEX uq_medication_logs_dose '
+      'ON medication_logs (medication_id, scheduled_day, scheduled_time) '
+      'WHERE deleted_at IS NULL AND scheduled_time IS NOT NULL';
+
+  /// Bir doz (ilaç, gün, saat) için en çok bir atlama kaydı.
+  static const _doseSkipDoseIndex =
+      'CREATE UNIQUE INDEX uq_dose_skips_dose '
+      'ON dose_skips (medication_id, scheduled_day, scheduled_time) '
+      'WHERE deleted_at IS NULL';
+
   static const _extraIndexes = <String>[
     _medicationCategoryNameIndex,
+    _medicationLogDoseIndex,
+    _doseSkipDoseIndex,
     'CREATE UNIQUE INDEX uq_symptoms_name ON symptoms (name) '
         'WHERE deleted_at IS NULL',
     'CREATE UNIQUE INDEX uq_tags_name ON tags (name) '

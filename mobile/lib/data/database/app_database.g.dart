@@ -4223,7 +4223,9 @@ class Medication extends DataClass implements Insertable<Medication> {
   final bool isCatalog;
   final bool isRecurring;
 
-  /// 'HH:mm' (cihaz yerel saati).
+  /// Doz saatleri, virgülle ayrılmış 'HH:mm' listesi: "08:00" ya da
+  /// "08:00,20:00" (cihaz yerel saati, sıralı, tekil). Eski kayıtlarda tek
+  /// saat ya da saniyeli yazım ("08:30:00") olabilir; okuyan taraf toleranslıdır.
   final String? recurringTime;
 
   /// JSON liste: ["monday","wednesday"]. Boş/null = her gün.
@@ -5357,6 +5359,28 @@ class $MedicationLogsTable extends MedicationLogs
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
+  static const VerificationMeta _scheduledTimeMeta = const VerificationMeta(
+    'scheduledTime',
+  );
+  @override
+  late final GeneratedColumn<String> scheduledTime = GeneratedColumn<String>(
+    'scheduled_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _scheduledDayMeta = const VerificationMeta(
+    'scheduledDay',
+  );
+  @override
+  late final GeneratedColumn<String> scheduledDay = GeneratedColumn<String>(
+    'scheduled_day',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5371,6 +5395,8 @@ class $MedicationLogsTable extends MedicationLogs
     episodeId,
     conditionId,
     notes,
+    scheduledTime,
+    scheduledDay,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5468,6 +5494,24 @@ class $MedicationLogsTable extends MedicationLogs
         notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
       );
     }
+    if (data.containsKey('scheduled_time')) {
+      context.handle(
+        _scheduledTimeMeta,
+        scheduledTime.isAcceptableOrUnknown(
+          data['scheduled_time']!,
+          _scheduledTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('scheduled_day')) {
+      context.handle(
+        _scheduledDayMeta,
+        scheduledDay.isAcceptableOrUnknown(
+          data['scheduled_day']!,
+          _scheduledDayMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -5527,6 +5571,14 @@ class $MedicationLogsTable extends MedicationLogs
         DriftSqlType.string,
         data['${effectivePrefix}notes'],
       )!,
+      scheduledTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scheduled_time'],
+      ),
+      scheduledDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scheduled_day'],
+      ),
     );
   }
 
@@ -5554,6 +5606,12 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
   final String? episodeId;
   final String? conditionId;
   final String notes;
+
+  /// Rutin ilacın hangi planlı dozu için alındığı: doz saati 'HH:mm' ve o dozun
+  /// yerel günü 'YYYY-MM-DD'. İkisi birlikte dolu ya da birlikte boştur; boş =
+  /// plansız (ekstra) alım. Silinmemiş kayıtlar arasında (ilaç, gün, saat) tekil.
+  final String? scheduledTime;
+  final String? scheduledDay;
   const MedicationLog({
     required this.id,
     required this.createdAt,
@@ -5567,6 +5625,8 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
     this.episodeId,
     this.conditionId,
     required this.notes,
+    this.scheduledTime,
+    this.scheduledDay,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5595,6 +5655,12 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
       map['condition_id'] = Variable<String>(conditionId);
     }
     map['notes'] = Variable<String>(notes);
+    if (!nullToAbsent || scheduledTime != null) {
+      map['scheduled_time'] = Variable<String>(scheduledTime);
+    }
+    if (!nullToAbsent || scheduledDay != null) {
+      map['scheduled_day'] = Variable<String>(scheduledDay);
+    }
     return map;
   }
 
@@ -5620,6 +5686,12 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
           ? const Value.absent()
           : Value(conditionId),
       notes: Value(notes),
+      scheduledTime: scheduledTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(scheduledTime),
+      scheduledDay: scheduledDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(scheduledDay),
     );
   }
 
@@ -5643,6 +5715,8 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
       episodeId: serializer.fromJson<String?>(json['episodeId']),
       conditionId: serializer.fromJson<String?>(json['conditionId']),
       notes: serializer.fromJson<String>(json['notes']),
+      scheduledTime: serializer.fromJson<String?>(json['scheduledTime']),
+      scheduledDay: serializer.fromJson<String?>(json['scheduledDay']),
     );
   }
   @override
@@ -5663,6 +5737,8 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
       'episodeId': serializer.toJson<String?>(episodeId),
       'conditionId': serializer.toJson<String?>(conditionId),
       'notes': serializer.toJson<String>(notes),
+      'scheduledTime': serializer.toJson<String?>(scheduledTime),
+      'scheduledDay': serializer.toJson<String?>(scheduledDay),
     };
   }
 
@@ -5679,6 +5755,8 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
     Value<String?> episodeId = const Value.absent(),
     Value<String?> conditionId = const Value.absent(),
     String? notes,
+    Value<String?> scheduledTime = const Value.absent(),
+    Value<String?> scheduledDay = const Value.absent(),
   }) => MedicationLog(
     id: id ?? this.id,
     createdAt: createdAt ?? this.createdAt,
@@ -5692,6 +5770,10 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
     episodeId: episodeId.present ? episodeId.value : this.episodeId,
     conditionId: conditionId.present ? conditionId.value : this.conditionId,
     notes: notes ?? this.notes,
+    scheduledTime: scheduledTime.present
+        ? scheduledTime.value
+        : this.scheduledTime,
+    scheduledDay: scheduledDay.present ? scheduledDay.value : this.scheduledDay,
   );
   MedicationLog copyWithCompanion(MedicationLogsCompanion data) {
     return MedicationLog(
@@ -5715,6 +5797,12 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
           ? data.conditionId.value
           : this.conditionId,
       notes: data.notes.present ? data.notes.value : this.notes,
+      scheduledTime: data.scheduledTime.present
+          ? data.scheduledTime.value
+          : this.scheduledTime,
+      scheduledDay: data.scheduledDay.present
+          ? data.scheduledDay.value
+          : this.scheduledDay,
     );
   }
 
@@ -5732,7 +5820,9 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
           ..write('doseUnit: $doseUnit, ')
           ..write('episodeId: $episodeId, ')
           ..write('conditionId: $conditionId, ')
-          ..write('notes: $notes')
+          ..write('notes: $notes, ')
+          ..write('scheduledTime: $scheduledTime, ')
+          ..write('scheduledDay: $scheduledDay')
           ..write(')'))
         .toString();
   }
@@ -5751,6 +5841,8 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
     episodeId,
     conditionId,
     notes,
+    scheduledTime,
+    scheduledDay,
   );
   @override
   bool operator ==(Object other) =>
@@ -5767,7 +5859,9 @@ class MedicationLog extends DataClass implements Insertable<MedicationLog> {
           other.doseUnit == this.doseUnit &&
           other.episodeId == this.episodeId &&
           other.conditionId == this.conditionId &&
-          other.notes == this.notes);
+          other.notes == this.notes &&
+          other.scheduledTime == this.scheduledTime &&
+          other.scheduledDay == this.scheduledDay);
 }
 
 class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
@@ -5783,6 +5877,8 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
   final Value<String?> episodeId;
   final Value<String?> conditionId;
   final Value<String> notes;
+  final Value<String?> scheduledTime;
+  final Value<String?> scheduledDay;
   final Value<int> rowid;
   const MedicationLogsCompanion({
     this.id = const Value.absent(),
@@ -5797,6 +5893,8 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
     this.episodeId = const Value.absent(),
     this.conditionId = const Value.absent(),
     this.notes = const Value.absent(),
+    this.scheduledTime = const Value.absent(),
+    this.scheduledDay = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MedicationLogsCompanion.insert({
@@ -5812,6 +5910,8 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
     this.episodeId = const Value.absent(),
     this.conditionId = const Value.absent(),
     this.notes = const Value.absent(),
+    this.scheduledTime = const Value.absent(),
+    this.scheduledDay = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        createdAt = Value(createdAt),
@@ -5832,6 +5932,8 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
     Expression<String>? episodeId,
     Expression<String>? conditionId,
     Expression<String>? notes,
+    Expression<String>? scheduledTime,
+    Expression<String>? scheduledDay,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -5847,6 +5949,8 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
       if (episodeId != null) 'episode_id': episodeId,
       if (conditionId != null) 'condition_id': conditionId,
       if (notes != null) 'notes': notes,
+      if (scheduledTime != null) 'scheduled_time': scheduledTime,
+      if (scheduledDay != null) 'scheduled_day': scheduledDay,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -5864,6 +5968,8 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
     Value<String?>? episodeId,
     Value<String?>? conditionId,
     Value<String>? notes,
+    Value<String?>? scheduledTime,
+    Value<String?>? scheduledDay,
     Value<int>? rowid,
   }) {
     return MedicationLogsCompanion(
@@ -5879,6 +5985,8 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
       episodeId: episodeId ?? this.episodeId,
       conditionId: conditionId ?? this.conditionId,
       notes: notes ?? this.notes,
+      scheduledTime: scheduledTime ?? this.scheduledTime,
+      scheduledDay: scheduledDay ?? this.scheduledDay,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -5924,6 +6032,12 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
+    if (scheduledTime.present) {
+      map['scheduled_time'] = Variable<String>(scheduledTime.value);
+    }
+    if (scheduledDay.present) {
+      map['scheduled_day'] = Variable<String>(scheduledDay.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -5945,6 +6059,598 @@ class MedicationLogsCompanion extends UpdateCompanion<MedicationLog> {
           ..write('episodeId: $episodeId, ')
           ..write('conditionId: $conditionId, ')
           ..write('notes: $notes, ')
+          ..write('scheduledTime: $scheduledTime, ')
+          ..write('scheduledDay: $scheduledDay, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DoseSkipsTable extends DoseSkips
+    with TableInfo<$DoseSkipsTable, DoseSkip> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DoseSkipsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _medicationIdMeta = const VerificationMeta(
+    'medicationId',
+  );
+  @override
+  late final GeneratedColumn<String> medicationId = GeneratedColumn<String>(
+    'medication_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES medications (id)',
+    ),
+  );
+  static const VerificationMeta _scheduledDayMeta = const VerificationMeta(
+    'scheduledDay',
+  );
+  @override
+  late final GeneratedColumn<String> scheduledDay = GeneratedColumn<String>(
+    'scheduled_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _scheduledTimeMeta = const VerificationMeta(
+    'scheduledTime',
+  );
+  @override
+  late final GeneratedColumn<String> scheduledTime = GeneratedColumn<String>(
+    'scheduled_time',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _skippedAtMeta = const VerificationMeta(
+    'skippedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> skippedAt = GeneratedColumn<DateTime>(
+    'skipped_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _utcOffsetMinutesMeta = const VerificationMeta(
+    'utcOffsetMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> utcOffsetMinutes = GeneratedColumn<int>(
+    'utc_offset_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    medicationId,
+    scheduledDay,
+    scheduledTime,
+    skippedAt,
+    utcOffsetMinutes,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dose_skips';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DoseSkip> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('medication_id')) {
+      context.handle(
+        _medicationIdMeta,
+        medicationId.isAcceptableOrUnknown(
+          data['medication_id']!,
+          _medicationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_medicationIdMeta);
+    }
+    if (data.containsKey('scheduled_day')) {
+      context.handle(
+        _scheduledDayMeta,
+        scheduledDay.isAcceptableOrUnknown(
+          data['scheduled_day']!,
+          _scheduledDayMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_scheduledDayMeta);
+    }
+    if (data.containsKey('scheduled_time')) {
+      context.handle(
+        _scheduledTimeMeta,
+        scheduledTime.isAcceptableOrUnknown(
+          data['scheduled_time']!,
+          _scheduledTimeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_scheduledTimeMeta);
+    }
+    if (data.containsKey('skipped_at')) {
+      context.handle(
+        _skippedAtMeta,
+        skippedAt.isAcceptableOrUnknown(data['skipped_at']!, _skippedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_skippedAtMeta);
+    }
+    if (data.containsKey('utc_offset_minutes')) {
+      context.handle(
+        _utcOffsetMinutesMeta,
+        utcOffsetMinutes.isAcceptableOrUnknown(
+          data['utc_offset_minutes']!,
+          _utcOffsetMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_utcOffsetMinutesMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DoseSkip map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DoseSkip(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      medicationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}medication_id'],
+      )!,
+      scheduledDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scheduled_day'],
+      )!,
+      scheduledTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scheduled_time'],
+      )!,
+      skippedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}skipped_at'],
+      )!,
+      utcOffsetMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}utc_offset_minutes'],
+      )!,
+    );
+  }
+
+  @override
+  $DoseSkipsTable createAlias(String alias) {
+    return $DoseSkipsTable(attachedDatabase, alias);
+  }
+}
+
+class DoseSkip extends DataClass implements Insertable<DoseSkip> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  /// Boş değilse kayıt silinmiş sayılır (veri fiziksel silinmez).
+  final DateTime? deletedAt;
+  final String medicationId;
+
+  /// Atlanan dozun yerel günü 'YYYY-MM-DD' ve doz saati 'HH:mm'.
+  final String scheduledDay;
+  final String scheduledTime;
+
+  /// "Atladım" denilen an (UTC) ve o andaki cihaz UTC farkı (dakika).
+  final DateTime skippedAt;
+  final int utcOffsetMinutes;
+  const DoseSkip({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.medicationId,
+    required this.scheduledDay,
+    required this.scheduledTime,
+    required this.skippedAt,
+    required this.utcOffsetMinutes,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['medication_id'] = Variable<String>(medicationId);
+    map['scheduled_day'] = Variable<String>(scheduledDay);
+    map['scheduled_time'] = Variable<String>(scheduledTime);
+    map['skipped_at'] = Variable<DateTime>(skippedAt);
+    map['utc_offset_minutes'] = Variable<int>(utcOffsetMinutes);
+    return map;
+  }
+
+  DoseSkipsCompanion toCompanion(bool nullToAbsent) {
+    return DoseSkipsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      medicationId: Value(medicationId),
+      scheduledDay: Value(scheduledDay),
+      scheduledTime: Value(scheduledTime),
+      skippedAt: Value(skippedAt),
+      utcOffsetMinutes: Value(utcOffsetMinutes),
+    );
+  }
+
+  factory DoseSkip.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DoseSkip(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      medicationId: serializer.fromJson<String>(json['medicationId']),
+      scheduledDay: serializer.fromJson<String>(json['scheduledDay']),
+      scheduledTime: serializer.fromJson<String>(json['scheduledTime']),
+      skippedAt: serializer.fromJson<DateTime>(json['skippedAt']),
+      utcOffsetMinutes: serializer.fromJson<int>(json['utcOffsetMinutes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'medicationId': serializer.toJson<String>(medicationId),
+      'scheduledDay': serializer.toJson<String>(scheduledDay),
+      'scheduledTime': serializer.toJson<String>(scheduledTime),
+      'skippedAt': serializer.toJson<DateTime>(skippedAt),
+      'utcOffsetMinutes': serializer.toJson<int>(utcOffsetMinutes),
+    };
+  }
+
+  DoseSkip copyWith({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? medicationId,
+    String? scheduledDay,
+    String? scheduledTime,
+    DateTime? skippedAt,
+    int? utcOffsetMinutes,
+  }) => DoseSkip(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    medicationId: medicationId ?? this.medicationId,
+    scheduledDay: scheduledDay ?? this.scheduledDay,
+    scheduledTime: scheduledTime ?? this.scheduledTime,
+    skippedAt: skippedAt ?? this.skippedAt,
+    utcOffsetMinutes: utcOffsetMinutes ?? this.utcOffsetMinutes,
+  );
+  DoseSkip copyWithCompanion(DoseSkipsCompanion data) {
+    return DoseSkip(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      medicationId: data.medicationId.present
+          ? data.medicationId.value
+          : this.medicationId,
+      scheduledDay: data.scheduledDay.present
+          ? data.scheduledDay.value
+          : this.scheduledDay,
+      scheduledTime: data.scheduledTime.present
+          ? data.scheduledTime.value
+          : this.scheduledTime,
+      skippedAt: data.skippedAt.present ? data.skippedAt.value : this.skippedAt,
+      utcOffsetMinutes: data.utcOffsetMinutes.present
+          ? data.utcOffsetMinutes.value
+          : this.utcOffsetMinutes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DoseSkip(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('medicationId: $medicationId, ')
+          ..write('scheduledDay: $scheduledDay, ')
+          ..write('scheduledTime: $scheduledTime, ')
+          ..write('skippedAt: $skippedAt, ')
+          ..write('utcOffsetMinutes: $utcOffsetMinutes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    medicationId,
+    scheduledDay,
+    scheduledTime,
+    skippedAt,
+    utcOffsetMinutes,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DoseSkip &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.medicationId == this.medicationId &&
+          other.scheduledDay == this.scheduledDay &&
+          other.scheduledTime == this.scheduledTime &&
+          other.skippedAt == this.skippedAt &&
+          other.utcOffsetMinutes == this.utcOffsetMinutes);
+}
+
+class DoseSkipsCompanion extends UpdateCompanion<DoseSkip> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> medicationId;
+  final Value<String> scheduledDay;
+  final Value<String> scheduledTime;
+  final Value<DateTime> skippedAt;
+  final Value<int> utcOffsetMinutes;
+  final Value<int> rowid;
+  const DoseSkipsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.medicationId = const Value.absent(),
+    this.scheduledDay = const Value.absent(),
+    this.scheduledTime = const Value.absent(),
+    this.skippedAt = const Value.absent(),
+    this.utcOffsetMinutes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DoseSkipsCompanion.insert({
+    required String id,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String medicationId,
+    required String scheduledDay,
+    required String scheduledTime,
+    required DateTime skippedAt,
+    required int utcOffsetMinutes,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       medicationId = Value(medicationId),
+       scheduledDay = Value(scheduledDay),
+       scheduledTime = Value(scheduledTime),
+       skippedAt = Value(skippedAt),
+       utcOffsetMinutes = Value(utcOffsetMinutes);
+  static Insertable<DoseSkip> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? medicationId,
+    Expression<String>? scheduledDay,
+    Expression<String>? scheduledTime,
+    Expression<DateTime>? skippedAt,
+    Expression<int>? utcOffsetMinutes,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (medicationId != null) 'medication_id': medicationId,
+      if (scheduledDay != null) 'scheduled_day': scheduledDay,
+      if (scheduledTime != null) 'scheduled_time': scheduledTime,
+      if (skippedAt != null) 'skipped_at': skippedAt,
+      if (utcOffsetMinutes != null) 'utc_offset_minutes': utcOffsetMinutes,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DoseSkipsCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? medicationId,
+    Value<String>? scheduledDay,
+    Value<String>? scheduledTime,
+    Value<DateTime>? skippedAt,
+    Value<int>? utcOffsetMinutes,
+    Value<int>? rowid,
+  }) {
+    return DoseSkipsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      medicationId: medicationId ?? this.medicationId,
+      scheduledDay: scheduledDay ?? this.scheduledDay,
+      scheduledTime: scheduledTime ?? this.scheduledTime,
+      skippedAt: skippedAt ?? this.skippedAt,
+      utcOffsetMinutes: utcOffsetMinutes ?? this.utcOffsetMinutes,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (medicationId.present) {
+      map['medication_id'] = Variable<String>(medicationId.value);
+    }
+    if (scheduledDay.present) {
+      map['scheduled_day'] = Variable<String>(scheduledDay.value);
+    }
+    if (scheduledTime.present) {
+      map['scheduled_time'] = Variable<String>(scheduledTime.value);
+    }
+    if (skippedAt.present) {
+      map['skipped_at'] = Variable<DateTime>(skippedAt.value);
+    }
+    if (utcOffsetMinutes.present) {
+      map['utc_offset_minutes'] = Variable<int>(utcOffsetMinutes.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DoseSkipsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('medicationId: $medicationId, ')
+          ..write('scheduledDay: $scheduledDay, ')
+          ..write('scheduledTime: $scheduledTime, ')
+          ..write('skippedAt: $skippedAt, ')
+          ..write('utcOffsetMinutes: $utcOffsetMinutes, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -9657,6 +10363,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ConditionMedicationsTable conditionMedications =
       $ConditionMedicationsTable(this);
   late final $MedicationLogsTable medicationLogs = $MedicationLogsTable(this);
+  late final $DoseSkipsTable doseSkips = $DoseSkipsTable(this);
   late final $DailyLogsTable dailyLogs = $DailyLogsTable(this);
   late final $MeasurementsTable measurements = $MeasurementsTable(this);
   late final $TagsTable tags = $TagsTable(this);
@@ -9680,6 +10387,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     chronicConditions,
     conditionMedications,
     medicationLogs,
+    doseSkips,
     dailyLogs,
     measurements,
     tags,
@@ -12754,6 +13462,24 @@ final class $$MedicationsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$DoseSkipsTable, List<DoseSkip>>
+  _doseSkipsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.doseSkips,
+    aliasName: 'medications__id__dose_skips__medication_id',
+  );
+
+  $$DoseSkipsTableProcessedTableManager get doseSkipsRefs {
+    final manager = $$DoseSkipsTableTableManager(
+      $_db,
+      $_db.doseSkips,
+    ).filter((f) => f.medicationId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_doseSkipsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$MedicationsTableFilterComposer
@@ -12879,6 +13605,31 @@ class $$MedicationsTableFilterComposer
           }) => $$MedicationLogsTableFilterComposer(
             $db: $db,
             $table: $db.medicationLogs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> doseSkipsRefs(
+    Expression<bool> Function($$DoseSkipsTableFilterComposer f) f,
+  ) {
+    final $$DoseSkipsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.doseSkips,
+      getReferencedColumn: (t) => t.medicationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DoseSkipsTableFilterComposer(
+            $db: $db,
+            $table: $db.doseSkips,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -13094,6 +13845,31 @@ class $$MedicationsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> doseSkipsRefs<T extends Object>(
+    Expression<T> Function($$DoseSkipsTableAnnotationComposer a) f,
+  ) {
+    final $$DoseSkipsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.doseSkips,
+      getReferencedColumn: (t) => t.medicationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DoseSkipsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.doseSkips,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$MedicationsTableTableManager
@@ -13113,6 +13889,7 @@ class $$MedicationsTableTableManager
             bool categoryId,
             bool conditionMedicationsRefs,
             bool medicationLogsRefs,
+            bool doseSkipsRefs,
           })
         > {
   $$MedicationsTableTableManager(_$AppDatabase db, $MedicationsTable table)
@@ -13195,12 +13972,14 @@ class $$MedicationsTableTableManager
                 categoryId = false,
                 conditionMedicationsRefs = false,
                 medicationLogsRefs = false,
+                doseSkipsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (conditionMedicationsRefs) db.conditionMedications,
                     if (medicationLogsRefs) db.medicationLogs,
+                    if (doseSkipsRefs) db.doseSkips,
                   ],
                   addJoins:
                       <
@@ -13280,6 +14059,27 @@ class $$MedicationsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (doseSkipsRefs)
+                        await $_getPrefetchedData<
+                          Medication,
+                          $MedicationsTable,
+                          DoseSkip
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicationsTableReferences
+                              ._doseSkipsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicationsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).doseSkipsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicationId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -13304,6 +14104,7 @@ typedef $$MedicationsTableProcessedTableManager =
         bool categoryId,
         bool conditionMedicationsRefs,
         bool medicationLogsRefs,
+        bool doseSkipsRefs,
       })
     >;
 typedef $$ChronicConditionsTableCreateCompanionBuilder =
@@ -14116,6 +14917,8 @@ typedef $$MedicationLogsTableCreateCompanionBuilder =
       Value<String?> episodeId,
       Value<String?> conditionId,
       Value<String> notes,
+      Value<String?> scheduledTime,
+      Value<String?> scheduledDay,
       Value<int> rowid,
     });
 typedef $$MedicationLogsTableUpdateCompanionBuilder =
@@ -14132,6 +14935,8 @@ typedef $$MedicationLogsTableUpdateCompanionBuilder =
       Value<String?> episodeId,
       Value<String?> conditionId,
       Value<String> notes,
+      Value<String?> scheduledTime,
+      Value<String?> scheduledDay,
       Value<int> rowid,
     });
 
@@ -14249,6 +15054,16 @@ class $$MedicationLogsTableFilterComposer
 
   ColumnFilters<String> get notes => $composableBuilder(
     column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scheduledTime => $composableBuilder(
+    column: $table.scheduledTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scheduledDay => $composableBuilder(
+    column: $table.scheduledDay,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -14376,6 +15191,16 @@ class $$MedicationLogsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get scheduledTime => $composableBuilder(
+    column: $table.scheduledTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get scheduledDay => $composableBuilder(
+    column: $table.scheduledDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$MedicationsTableOrderingComposer get medicationId {
     final $$MedicationsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -14485,6 +15310,16 @@ class $$MedicationLogsTableAnnotationComposer
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<String> get scheduledTime => $composableBuilder(
+    column: $table.scheduledTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get scheduledDay => $composableBuilder(
+    column: $table.scheduledDay,
+    builder: (column) => column,
+  );
 
   $$MedicationsTableAnnotationComposer get medicationId {
     final $$MedicationsTableAnnotationComposer composer = $composerBuilder(
@@ -14603,6 +15438,8 @@ class $$MedicationLogsTableTableManager
                 Value<String?> episodeId = const Value.absent(),
                 Value<String?> conditionId = const Value.absent(),
                 Value<String> notes = const Value.absent(),
+                Value<String?> scheduledTime = const Value.absent(),
+                Value<String?> scheduledDay = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MedicationLogsCompanion(
                 id: id,
@@ -14617,6 +15454,8 @@ class $$MedicationLogsTableTableManager
                 episodeId: episodeId,
                 conditionId: conditionId,
                 notes: notes,
+                scheduledTime: scheduledTime,
+                scheduledDay: scheduledDay,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -14633,6 +15472,8 @@ class $$MedicationLogsTableTableManager
                 Value<String?> episodeId = const Value.absent(),
                 Value<String?> conditionId = const Value.absent(),
                 Value<String> notes = const Value.absent(),
+                Value<String?> scheduledTime = const Value.absent(),
+                Value<String?> scheduledDay = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MedicationLogsCompanion.insert(
                 id: id,
@@ -14647,6 +15488,8 @@ class $$MedicationLogsTableTableManager
                 episodeId: episodeId,
                 conditionId: conditionId,
                 notes: notes,
+                scheduledTime: scheduledTime,
+                scheduledDay: scheduledDay,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -14752,6 +15595,405 @@ typedef $$MedicationLogsTableProcessedTableManager =
         bool episodeId,
         bool conditionId,
       })
+    >;
+typedef $$DoseSkipsTableCreateCompanionBuilder =
+    DoseSkipsCompanion Function({
+      required String id,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String medicationId,
+      required String scheduledDay,
+      required String scheduledTime,
+      required DateTime skippedAt,
+      required int utcOffsetMinutes,
+      Value<int> rowid,
+    });
+typedef $$DoseSkipsTableUpdateCompanionBuilder =
+    DoseSkipsCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> medicationId,
+      Value<String> scheduledDay,
+      Value<String> scheduledTime,
+      Value<DateTime> skippedAt,
+      Value<int> utcOffsetMinutes,
+      Value<int> rowid,
+    });
+
+final class $$DoseSkipsTableReferences
+    extends BaseReferences<_$AppDatabase, $DoseSkipsTable, DoseSkip> {
+  $$DoseSkipsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $MedicationsTable _medicationIdTable(_$AppDatabase db) =>
+      db.medications.createAlias('dose_skips__medication_id__medications__id');
+
+  $$MedicationsTableProcessedTableManager get medicationId {
+    final $_column = $_itemColumn<String>('medication_id')!;
+
+    final manager = $$MedicationsTableTableManager(
+      $_db,
+      $_db.medications,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicationIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DoseSkipsTableFilterComposer
+    extends Composer<_$AppDatabase, $DoseSkipsTable> {
+  $$DoseSkipsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scheduledDay => $composableBuilder(
+    column: $table.scheduledDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scheduledTime => $composableBuilder(
+    column: $table.scheduledTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get skippedAt => $composableBuilder(
+    column: $table.skippedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get utcOffsetMinutes => $composableBuilder(
+    column: $table.utcOffsetMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicationsTableFilterComposer get medicationId {
+    final $$MedicationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableFilterComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DoseSkipsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DoseSkipsTable> {
+  $$DoseSkipsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get scheduledDay => $composableBuilder(
+    column: $table.scheduledDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get scheduledTime => $composableBuilder(
+    column: $table.scheduledTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get skippedAt => $composableBuilder(
+    column: $table.skippedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get utcOffsetMinutes => $composableBuilder(
+    column: $table.utcOffsetMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicationsTableOrderingComposer get medicationId {
+    final $$MedicationsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableOrderingComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DoseSkipsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DoseSkipsTable> {
+  $$DoseSkipsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get scheduledDay => $composableBuilder(
+    column: $table.scheduledDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get scheduledTime => $composableBuilder(
+    column: $table.scheduledTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get skippedAt =>
+      $composableBuilder(column: $table.skippedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get utcOffsetMinutes => $composableBuilder(
+    column: $table.utcOffsetMinutes,
+    builder: (column) => column,
+  );
+
+  $$MedicationsTableAnnotationComposer get medicationId {
+    final $$MedicationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DoseSkipsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DoseSkipsTable,
+          DoseSkip,
+          $$DoseSkipsTableFilterComposer,
+          $$DoseSkipsTableOrderingComposer,
+          $$DoseSkipsTableAnnotationComposer,
+          $$DoseSkipsTableCreateCompanionBuilder,
+          $$DoseSkipsTableUpdateCompanionBuilder,
+          (DoseSkip, $$DoseSkipsTableReferences),
+          DoseSkip,
+          PrefetchHooks Function({bool medicationId})
+        > {
+  $$DoseSkipsTableTableManager(_$AppDatabase db, $DoseSkipsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DoseSkipsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DoseSkipsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DoseSkipsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> medicationId = const Value.absent(),
+                Value<String> scheduledDay = const Value.absent(),
+                Value<String> scheduledTime = const Value.absent(),
+                Value<DateTime> skippedAt = const Value.absent(),
+                Value<int> utcOffsetMinutes = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DoseSkipsCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                medicationId: medicationId,
+                scheduledDay: scheduledDay,
+                scheduledTime: scheduledTime,
+                skippedAt: skippedAt,
+                utcOffsetMinutes: utcOffsetMinutes,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String medicationId,
+                required String scheduledDay,
+                required String scheduledTime,
+                required DateTime skippedAt,
+                required int utcOffsetMinutes,
+                Value<int> rowid = const Value.absent(),
+              }) => DoseSkipsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                medicationId: medicationId,
+                scheduledDay: scheduledDay,
+                scheduledTime: scheduledTime,
+                skippedAt: skippedAt,
+                utcOffsetMinutes: utcOffsetMinutes,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$DoseSkipsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({medicationId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (medicationId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.medicationId,
+                                referencedTable: $$DoseSkipsTableReferences
+                                    ._medicationIdTable(db),
+                                referencedColumn: $$DoseSkipsTableReferences
+                                    ._medicationIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$DoseSkipsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DoseSkipsTable,
+      DoseSkip,
+      $$DoseSkipsTableFilterComposer,
+      $$DoseSkipsTableOrderingComposer,
+      $$DoseSkipsTableAnnotationComposer,
+      $$DoseSkipsTableCreateCompanionBuilder,
+      $$DoseSkipsTableUpdateCompanionBuilder,
+      (DoseSkip, $$DoseSkipsTableReferences),
+      DoseSkip,
+      PrefetchHooks Function({bool medicationId})
     >;
 typedef $$DailyLogsTableCreateCompanionBuilder =
     DailyLogsCompanion Function({
@@ -17038,6 +18280,8 @@ class $AppDatabaseManager {
       $$ConditionMedicationsTableTableManager(_db, _db.conditionMedications);
   $$MedicationLogsTableTableManager get medicationLogs =>
       $$MedicationLogsTableTableManager(_db, _db.medicationLogs);
+  $$DoseSkipsTableTableManager get doseSkips =>
+      $$DoseSkipsTableTableManager(_db, _db.doseSkips);
   $$DailyLogsTableTableManager get dailyLogs =>
       $$DailyLogsTableTableManager(_db, _db.dailyLogs);
   $$MeasurementsTableTableManager get measurements =>
