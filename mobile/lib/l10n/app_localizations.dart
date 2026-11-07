@@ -394,11 +394,89 @@ abstract class AppLocalizations {
   /// **'Rutin kurulacak ilaç yok. Önce İlaç / takviye ekranından ilaç ekleyin ya da var olan rutinlerden birini kapatın.'**
   String get routineNoMedsAvailable;
 
-  /// No description provided for @routineTimeLabel.
+  /// No description provided for @routineTimesLabel.
   ///
   /// In tr, this message translates to:
-  /// **'Saat'**
-  String get routineTimeLabel;
+  /// **'Doz saatleri'**
+  String get routineTimesLabel;
+
+  /// No description provided for @routineAddTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saat ekle'**
+  String get routineAddTime;
+
+  /// No description provided for @routineRemoveTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saati sil'**
+  String get routineRemoveTime;
+
+  /// No description provided for @routineSkip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Atladım'**
+  String get routineSkip;
+
+  /// No description provided for @routineStateTaken.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alındı'**
+  String get routineStateTaken;
+
+  /// No description provided for @routineStateSkipped.
+  ///
+  /// In tr, this message translates to:
+  /// **'Atlandı'**
+  String get routineStateSkipped;
+
+  /// No description provided for @routineStateWaiting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bekliyor'**
+  String get routineStateWaiting;
+
+  /// No description provided for @routineStateUnrecorded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydedilmedi'**
+  String get routineStateUnrecorded;
+
+  /// No description provided for @routineSkippedSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} atlandı olarak kaydedildi.'**
+  String routineSkippedSaved(String name);
+
+  /// No description provided for @routineErrorTimes.
+  ///
+  /// In tr, this message translates to:
+  /// **'En az bir doz saati seçin.'**
+  String get routineErrorTimes;
+
+  /// No description provided for @routineErrorTooManyTimes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günde en çok 10 doz saati olabilir.'**
+  String get routineErrorTooManyTimes;
+
+  /// No description provided for @routineErrorDoseTaken.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu doz zaten alındı olarak kaydedilmiş.'**
+  String get routineErrorDoseTaken;
+
+  /// No description provided for @routineErrorDoseSkipped.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu doz zaten atlandı olarak kaydedilmiş.'**
+  String get routineErrorDoseSkipped;
+
+  /// No description provided for @routineErrorDoseNotScheduled.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu doz artık planlı değil. Ekranı yenileyip tekrar deneyin.'**
+  String get routineErrorDoseNotScheduled;
 
   /// No description provided for @routineDaysLabel.
   ///

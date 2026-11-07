@@ -167,7 +167,50 @@ class AppLocalizationsTr extends AppLocalizations {
       'Rutin kurulacak ilaç yok. Önce İlaç / takviye ekranından ilaç ekleyin ya da var olan rutinlerden birini kapatın.';
 
   @override
-  String get routineTimeLabel => 'Saat';
+  String get routineTimesLabel => 'Doz saatleri';
+
+  @override
+  String get routineAddTime => 'Saat ekle';
+
+  @override
+  String get routineRemoveTime => 'Saati sil';
+
+  @override
+  String get routineSkip => 'Atladım';
+
+  @override
+  String get routineStateTaken => 'Alındı';
+
+  @override
+  String get routineStateSkipped => 'Atlandı';
+
+  @override
+  String get routineStateWaiting => 'Bekliyor';
+
+  @override
+  String get routineStateUnrecorded => 'Kaydedilmedi';
+
+  @override
+  String routineSkippedSaved(String name) {
+    return '$name atlandı olarak kaydedildi.';
+  }
+
+  @override
+  String get routineErrorTimes => 'En az bir doz saati seçin.';
+
+  @override
+  String get routineErrorTooManyTimes => 'Günde en çok 10 doz saati olabilir.';
+
+  @override
+  String get routineErrorDoseTaken => 'Bu doz zaten alındı olarak kaydedilmiş.';
+
+  @override
+  String get routineErrorDoseSkipped =>
+      'Bu doz zaten atlandı olarak kaydedilmiş.';
+
+  @override
+  String get routineErrorDoseNotScheduled =>
+      'Bu doz artık planlı değil. Ekranı yenileyip tekrar deneyin.';
 
   @override
   String get routineDaysLabel => 'Günler';

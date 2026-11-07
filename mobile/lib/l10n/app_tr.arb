@@ -72,7 +72,27 @@
   "routineMedLabel": "İlaç",
   "routineMedHint": "İlaç seçin",
   "routineNoMedsAvailable": "Rutin kurulacak ilaç yok. Önce İlaç / takviye ekranından ilaç ekleyin ya da var olan rutinlerden birini kapatın.",
-  "routineTimeLabel": "Saat",
+  "routineTimesLabel": "Doz saatleri",
+  "routineAddTime": "Saat ekle",
+  "routineRemoveTime": "Saati sil",
+  "routineSkip": "Atladım",
+  "routineStateTaken": "Alındı",
+  "routineStateSkipped": "Atlandı",
+  "routineStateWaiting": "Bekliyor",
+  "routineStateUnrecorded": "Kaydedilmedi",
+  "routineSkippedSaved": "{name} atlandı olarak kaydedildi.",
+  "@routineSkippedSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "routineErrorTimes": "En az bir doz saati seçin.",
+  "routineErrorTooManyTimes": "Günde en çok 10 doz saati olabilir.",
+  "routineErrorDoseTaken": "Bu doz zaten alındı olarak kaydedilmiş.",
+  "routineErrorDoseSkipped": "Bu doz zaten atlandı olarak kaydedilmiş.",
+  "routineErrorDoseNotScheduled": "Bu doz artık planlı değil. Ekranı yenileyip tekrar deneyin.",
   "routineDaysLabel": "Günler",
   "routineSave": "Kaydet",
   "routineCancel": "İptal",

@@ -1,7 +1,8 @@
-// Rutin ilaçlar: bugünün rutinleri, tüm rutinler (kullanıcının bağladığı kronik
-// hastalığa göre gruplu), rutin ekleme ve kapatma. Yerel veritabanına
-// MedicationService üzerinden yazar. Hatırlatma bildirimi bu ekranda
-// planlanmaz (Sprint 4 Grup 3b).
+// Rutin ilaçlar: bugünün dozları (alındı / atlandı / kaydedilmedi, "Aldım" ve
+// "Atladım"), tüm rutinler (kullanıcının bağladığı kronik hastalığa göre gruplu),
+// rutin ekleme (birden fazla doz saati) ve kapatma. Yerel veritabanına
+// MedicationService ve DoseService üzerinden yazar. Hatırlatma bildirimi bu
+// ekranda planlanmaz (Sprint 4 Grup 3).
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import '../../../app/providers.dart';
 import '../../../core/utils/turkish_text.dart';
 import '../../../data/database/app_database.dart';
 import '../../../domain/errors.dart';
+import '../../../domain/services/dose_service.dart';
 import '../../../domain/services/medication_service.dart';
 import '../../../domain/weekdays.dart';
 import '../../../l10n/app_localizations.dart';
@@ -46,11 +48,21 @@ String routineErrorText(Object error, AppLocalizations l10n) {
     switch (error.code) {
       case RuleCodes.routineTimeInvalid:
         return l10n.routineErrorTime;
+      case RuleCodes.routineTimesEmpty:
+        return l10n.routineErrorTimes;
+      case RuleCodes.routineTooManyTimes:
+        return l10n.routineErrorTooManyTimes;
       case RuleCodes.routineDaysEmpty:
       case RuleCodes.invalidRecurringDay:
         return l10n.routineErrorDays;
       case RuleCodes.medicationNotFound:
         return l10n.routineErrorMedication;
+      case RuleCodes.doseAlreadyTaken:
+        return l10n.routineErrorDoseTaken;
+      case RuleCodes.doseAlreadySkipped:
+        return l10n.routineErrorDoseSkipped;
+      case RuleCodes.doseNotScheduled:
+        return l10n.routineErrorDoseNotScheduled;
     }
   }
   return l10n.routineErrorGeneric;
@@ -62,6 +74,11 @@ const Object _noMedicationChosen = 'ilac-secilmedi';
 String _hhmm(TimeOfDay t) =>
     '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
 
+TimeOfDay _parseHhmm(String s) => TimeOfDay(
+      hour: int.parse(s.substring(0, 2)),
+      minute: int.parse(s.substring(3, 5)),
+    );
+
 class RecurringScreen extends ConsumerStatefulWidget {
   const RecurringScreen({super.key});
 
@@ -70,7 +87,7 @@ class RecurringScreen extends ConsumerStatefulWidget {
 }
 
 class _RecurringScreenState extends ConsumerState<RecurringScreen> {
-  List<Routine> _all = [];
+  List<Dose> _doses = [];
   List<RoutineGroup> _groups = [];
   List<Medication> _freeMedications = [];
   bool _isLoading = true;
@@ -85,8 +102,10 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
   Future<void> _load() async {
     try {
       final service = ref.read(medicationServiceProvider);
+      final doseService = ref.read(doseServiceProvider);
       final all = await service.routines();
       final groups = await service.routineGroups();
+      final doses = await doseService.dosesForDay(doseService.today());
       final withRoutine = {for (final r in all) r.medication.id};
       final free = (await service.available())
           .where((m) => !withRoutine.contains(m.id))
@@ -94,7 +113,7 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
         ..sort((a, b) => compareTr(a.name, b.name));
       if (!mounted) return;
       setState(() {
-        _all = all;
+        _doses = doses;
         _groups = groups;
         _freeMedications = free;
         _loadFailed = false;
@@ -158,24 +177,42 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
     await _load();
   }
 
-  Future<void> _markTaken(Routine r) async {
+  Future<void> _take(Dose d) async {
     final l10n = AppLocalizations.of(context);
     try {
-      await ref.read(medicationServiceProvider).logIntake(
-            medicationId: r.medication.id,
-            takenAt: ref.read(clockProvider)(),
-          );
+      await ref
+          .read(doseServiceProvider)
+          .markTaken(medicationId: d.medication.id, time: d.time);
       if (!mounted) return;
-      _snack(l10n.routineTakenSaved(r.medication.name));
+      _snack(l10n.routineTakenSaved(d.medication.name));
     } catch (e) {
       if (!mounted) return;
       _snack(routineErrorText(e, l10n), error: true);
     }
+    // Hata olsa da durum değişmiş olabilir (ör. başka yerden kaydedilmiş).
+    await _load();
   }
 
-  List<Routine> _todays() {
-    final today = weekdayKeys[ref.read(clockProvider)().weekday - 1];
-    return _all.where((r) => r.days.contains(today)).toList();
+  Future<void> _skip(Dose d) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      await ref
+          .read(doseServiceProvider)
+          .markSkipped(medicationId: d.medication.id, time: d.time);
+      if (!mounted) return;
+      _snack(l10n.routineSkippedSaved(d.medication.name));
+    } catch (e) {
+      if (!mounted) return;
+      _snack(routineErrorText(e, l10n), error: true);
+    }
+    await _load();
+  }
+
+  /// Doz saati şimdiye geldi ya da geçti mi (cihazın yerel saatine göre).
+  bool _isDue(String time) {
+    final now = ref.read(clockProvider)();
+    final t = _parseHhmm(time);
+    return now.hour * 60 + now.minute >= t.hour * 60 + t.minute;
   }
 
   Widget _heading(String text) => Padding(
@@ -190,6 +227,87 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
     final days = routineDaysText(r.days, l10n);
     final times = r.times.join(', ');
     return Text(times.isEmpty ? days : '$times · $days');
+  }
+
+  Widget _doseCard(Dose d, AppLocalizations l10n) {
+    final String label;
+    final Color color;
+    switch (d.state) {
+      case DoseState.taken:
+        label = '${l10n.routineStateTaken} ✓';
+        color = Colors.green;
+      case DoseState.skipped:
+        label = l10n.routineStateSkipped;
+        color = Colors.orange;
+      case DoseState.pending:
+        final due = _isDue(d.time);
+        label = due ? l10n.routineStateUnrecorded : l10n.routineStateWaiting;
+        color = due ? Colors.redAccent : Colors.grey;
+    }
+    final id = '${d.medication.id}-${d.time}';
+    return Card(
+      key: ValueKey('dose-$id'),
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.medication),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        d.medication.name,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${d.time} · $label',
+                        key: ValueKey('dose-state-$id'),
+                        style: TextStyle(
+                          color: color,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (d.state != DoseState.taken) ...[
+              const SizedBox(height: 8),
+              // Düğmeler Expanded içinde: tema tam genişlik ister.
+              Row(
+                children: [
+                  if (d.state == DoseState.pending) ...[
+                    Expanded(
+                      child: OutlinedButton(
+                        key: ValueKey('skip-$id'),
+                        onPressed: () => _skip(d),
+                        child: Text(l10n.routineSkip),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  Expanded(
+                    child: ElevatedButton(
+                      key: ValueKey('take-$id'),
+                      onPressed: () => _take(d),
+                      child: Text(l10n.routineTaken),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -226,29 +344,11 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
                   padding: const EdgeInsets.all(16),
                   children: [
                     _heading(l10n.routineTodayTitle),
-                    if (_todays().isEmpty)
+                    if (_doses.isEmpty)
                       Text(l10n.routineTodayEmpty,
                           style: const TextStyle(color: Colors.grey))
                     else
-                      for (final r in _todays())
-                        Card(
-                          key: ValueKey('today-${r.medication.id}'),
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: ListTile(
-                            leading: const Icon(Icons.medication),
-                            title: Text(r.medication.name),
-                            subtitle: Text(r.times.join(', ')),
-                            // Tema düğmeye tam genişlik ister; ListTile'ın trailing
-                            // alanı sınırsız genişlik verdiği için sıfırlanmalı.
-                            trailing: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: const Size(0, 44),
-                              ),
-                              onPressed: () => _markTaken(r),
-                              child: Text(l10n.routineTaken),
-                            ),
-                          ),
-                        ),
+                      for (final d in _doses) _doseCard(d, l10n),
                     const SizedBox(height: 24),
                     _heading(l10n.routineAllTitle),
                     if (_groups.isEmpty)
@@ -299,16 +399,26 @@ class _RoutineDialog extends ConsumerStatefulWidget {
 
 class _RoutineDialogState extends ConsumerState<_RoutineDialog> {
   String? _medicationId;
-  TimeOfDay _time = const TimeOfDay(hour: 8, minute: 0);
+  final Set<String> _times = {'08:00'};
   final Set<String> _days = {};
   Object? _error;
   bool _saving = false;
 
-  Future<void> _pickTime() async {
-    final picked = await showTimePicker(context: context, initialTime: _time);
+  List<String> get _sortedTimes => _times.toList()..sort();
+
+  /// Yeni saat için seçici, son saatten bir saat sonrasını önerir.
+  Future<void> _addTime() async {
+    final last = _sortedTimes.isEmpty
+        ? const TimeOfDay(hour: 7, minute: 0)
+        : _parseHhmm(_sortedTimes.last);
+    final initial = TimeOfDay(
+      hour: last.hour < 23 ? last.hour + 1 : 23,
+      minute: last.minute,
+    );
+    final picked = await showTimePicker(context: context, initialTime: initial);
     if (picked != null) {
       setState(() {
-        _time = picked;
+        _times.add(_hhmm(picked));
         _error = null;
       });
     }
@@ -326,7 +436,7 @@ class _RoutineDialogState extends ConsumerState<_RoutineDialog> {
     try {
       await ref.read(medicationServiceProvider).setRoutine(
             medicationId: _medicationId!,
-            times: [_hhmm(_time)],
+            times: _sortedTimes,
             days: _days.toList(),
           );
       if (!mounted) return;
@@ -389,17 +499,36 @@ class _RoutineDialogState extends ConsumerState<_RoutineDialog> {
                 ),
               ),
             const SizedBox(height: 16),
-            Row(
+            Text(l10n.routineTimesLabel),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
               children: [
-                Text('${l10n.routineTimeLabel}: '),
-                TextButton(
-                  key: const ValueKey('routine-time'),
-                  onPressed: _saving ? null : _pickTime,
-                  child: Text(_hhmm(_time)),
+                for (final t in _sortedTimes)
+                  InputChip(
+                    key: ValueKey('time-$t'),
+                    label: Text(t),
+                    deleteButtonTooltipMessage: l10n.routineRemoveTime,
+                    onDeleted: _saving
+                        ? null
+                        : () => setState(() {
+                              _times.remove(t);
+                              _error = null;
+                            }),
+                  ),
+                ActionChip(
+                  key: const ValueKey('routine-add-time'),
+                  avatar: const Icon(Icons.add, size: 18),
+                  label: Text(l10n.routineAddTime),
+                  onPressed: (_saving ||
+                          _times.length >= MedicationService.maxRoutineTimes)
+                      ? null
+                      : _addTime,
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             Text(l10n.routineDaysLabel),
             const SizedBox(height: 8),
             Wrap(
