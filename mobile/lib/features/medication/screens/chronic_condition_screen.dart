@@ -305,6 +305,18 @@ class _ConditionDialogState extends ConsumerState<_ConditionDialog> {
                 border: const OutlineInputBorder(),
               ),
             ),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  conditionErrorText(_error!, l10n),
+                  key: const ValueKey('cond-dialog-error'),
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             const SizedBox(height: 16),
             Text(
               l10n.condMedsLabel,
@@ -331,17 +343,6 @@ class _ConditionDialogState extends ConsumerState<_ConditionDialog> {
                           }
                           _error = null;
                         }),
-              ),
-            if (_error != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  conditionErrorText(_error!, l10n),
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               ),
           ],
         ),

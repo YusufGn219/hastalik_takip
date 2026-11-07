@@ -185,6 +185,25 @@ void main() {
       expect(find.text('Bu adla bir kronik hastalık zaten var.'), findsNothing);
     });
 
+    testWidgets('hata metni ilaç listesinin altında değil, ad alanının altında',
+        (tester) async {
+      await run(tester, () => service.createCondition(name: 'Migren'));
+      await openApp(tester);
+      await tester.tap(find.byTooltip('Hastalık ekle'));
+      await tester.pumpAndSettle();
+      await tester.enterText(inDialog(find.byType(TextField)), 'migren');
+      await tapSaveInDialog(tester);
+
+      final errorTop =
+          tester.getTopLeft(find.byKey(const ValueKey('cond-dialog-error'))).dy;
+      final fieldBottom =
+          tester.getBottomLeft(inDialog(find.byType(TextField))).dy;
+      final firstMedTop =
+          tester.getTopLeft(find.byKey(ValueKey('med-$parol'))).dy;
+      expect(errorTop, greaterThanOrEqualTo(fieldBottom));
+      expect(errorTop, lessThan(firstMedTop));
+    });
+
     testWidgets('İptal hiçbir şey yazmaz', (tester) async {
       await openApp(tester);
       await tester.tap(find.byTooltip('Hastalık ekle'));
