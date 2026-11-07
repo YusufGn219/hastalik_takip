@@ -75,6 +75,19 @@ enum _SaveOutcome { saved, savedWithoutReminder }
 /// Pencerede ilaç seçilmeden Kaydet'e basıldığını işaretler (serviste hata yok).
 const Object _noMedicationChosen = 'ilac-secilmedi';
 
+/// Saat seçicinin yazı ölçeği 1'in altına inmesini engeller. Flutter'ın saat
+/// seçicisi, telefonun yazı boyutu küçükken (ör. 0,81) klavye girişi moduna
+/// geçince "BoxConstraints has non-normalized height constraints" hatası verip
+/// hata ekranı çiziyor (2026-11-07, Redmi telefonda görüldü, testte yeniden
+/// üretildi). Büyük yazı ölçeği olduğu gibi kalır.
+Widget timePickerBuilder(BuildContext context, Widget? child) {
+  final media = MediaQuery.of(context);
+  return MediaQuery(
+    data: media.copyWith(textScaler: media.textScaler.clamp(minScaleFactor: 1.0)),
+    child: child!,
+  );
+}
+
 String _hhmm(TimeOfDay t) =>
     '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
 
@@ -561,7 +574,11 @@ class _RoutineDialogState extends ConsumerState<_RoutineDialog> {
       hour: last.hour < 23 ? last.hour + 1 : 23,
       minute: last.minute,
     );
-    final picked = await showTimePicker(context: context, initialTime: initial);
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      builder: timePickerBuilder,
+    );
     if (picked != null) {
       setState(() {
         _times.add(_hhmm(picked));
