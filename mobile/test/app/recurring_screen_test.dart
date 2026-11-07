@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/app/providers.dart';
+import 'package:mobile/core/theme/app_theme.dart';
 import 'package:mobile/data/database/app_database.dart';
 import 'package:mobile/data/database/seed_loader.dart';
 import 'package:mobile/data/repositories/medication_log_repository.dart';
@@ -70,6 +71,10 @@ void main() {
         ...?extra,
       ],
       child: MaterialApp(
+        // Uygulamanın gerçek teması: düğmeler tam genişlik ister, ListTile
+        // içindeki düğme bu yüzden bozulabilir (telefonda görüldü).
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: const RecurringScreen(),

@@ -237,7 +237,12 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
                             leading: const Icon(Icons.medication),
                             title: Text(r.medication.name),
                             subtitle: Text(r.time),
+                            // Tema düğmeye tam genişlik ister; ListTile'ın trailing
+                            // alanı sınırsız genişlik verdiği için sıfırlanmalı.
                             trailing: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(0, 44),
+                              ),
                               onPressed: () => _markTaken(r),
                               child: Text(l10n.routineTaken),
                             ),
