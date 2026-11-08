@@ -1135,4 +1135,61 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get settingsWipeHint =>
       'Tüm kayıtlarınızı bu telefondan kalıcı olarak siler; geri alınamaz.';
+
+  @override
+  String get settingsBackupSection => 'Yedek';
+
+  @override
+  String get settingsBackupExportTitle => 'Yedek al';
+
+  @override
+  String get settingsBackupExportHint =>
+      'Verilerinizi parolayla şifreli bir dosyaya kaydedin';
+
+  @override
+  String get backupTitle => 'Yedek al';
+
+  @override
+  String get backupIntro =>
+      'Tüm kayıtlarınız, belirleyeceğiniz parolayla şifrelenmiş tek bir dosyaya yazılır. Dosyayı telefonunuzda, bulut depolamanızda ya da bir SD kartta saklayabilirsiniz.';
+
+  @override
+  String get backupWarning =>
+      'Bu parolayı unutursanız yedeğiniz açılamaz; kurtarma yolu yoktur. Parolayı güvenli bir yere not edin.';
+
+  @override
+  String get backupPassphrase => 'Yedek parolası';
+
+  @override
+  String get backupPassphraseConfirm => 'Parolayı tekrar yazın';
+
+  @override
+  String get backupShowPassphrase => 'Parolayı göster';
+
+  @override
+  String get backupHidePassphrase => 'Parolayı gizle';
+
+  @override
+  String backupTooShort(int n) {
+    return 'Parola en az $n karakter olmalı';
+  }
+
+  @override
+  String get backupMismatch => 'Parolalar aynı değil';
+
+  @override
+  String get backupAction => 'Yedek al';
+
+  @override
+  String get backupWorking => 'Yedek hazırlanıyor…';
+
+  @override
+  String get backupDone => 'Yedek kaydedildi.';
+
+  @override
+  String get backupCancelled => 'Konum seçilmedi; yedek alınmadı.';
+
+  @override
+  String get backupFailed =>
+      'Yedek alınamadı. Verileriniz silinmedi; tekrar deneyin.';
 }

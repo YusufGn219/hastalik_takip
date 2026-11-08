@@ -87,6 +87,7 @@ Future<void> _mount(WidgetTester tester, _Env env, {String? unlockWith}) async {
               return const HomeScreen();
             }),
         '/settings': (context) => const SettingsScreen(),
+        '/backup': (context) => const Scaffold(body: Text('yedek ekranı')),
       },
     ),
   ));
@@ -134,6 +135,17 @@ void main() {
     expect(find.text('Ayarlar'), findsWidgets);
     expect(find.byType(AppLockSettingsCard), findsOneWidget);
     expect(find.text('Tüm verimi sil'), findsOneWidget);
+  });
+
+  testWidgets('"Yedek al" satırı yedek ekranını açar', (tester) async {
+    final env = (await tester.runAsync(() => _env()))!;
+    await _mount(tester, env);
+    await _openSettings(tester);
+
+    expect(find.text('Yedek'), findsOneWidget);
+    await _tap(tester, find.byKey(const Key('ayar_yedek_al')));
+
+    expect(find.text('yedek ekranı'), findsOneWidget);
   });
 
   group('Tüm verimi sil', () {

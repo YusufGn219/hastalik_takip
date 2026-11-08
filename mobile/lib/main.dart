@@ -12,6 +12,7 @@ import 'data/database/seed_loader.dart';
 import 'data/repositories/medication_repository.dart';
 import 'domain/services/reminder_service.dart';
 import 'features/analytics/screens/analytics_dashboard_screen.dart';
+import 'features/backup/backup_export_screen.dart';
 import 'features/episode/screens/episode_list_screen.dart';
 import 'features/health/screens/daily_log_screen.dart';
 import 'features/health/screens/symptom_screen.dart';
@@ -123,6 +124,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const StartScreen(),
         '/home': (context) => const HomeScreen(),
         '/settings': (context) => const SettingsScreen(),
+        '/backup': (context) => const BackupExportScreen(),
         '/timeline': (context) => const DayTimelineScreen(),
         '/daily-log': (context) => const DailyLogScreen(),
         '/symptoms': (context) => const SymptomScreen(),

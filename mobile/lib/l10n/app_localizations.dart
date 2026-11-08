@@ -2079,6 +2079,108 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Tüm kayıtlarınızı bu telefondan kalıcı olarak siler; geri alınamaz.'**
   String get settingsWipeHint;
+
+  /// No description provided for @settingsBackupSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek'**
+  String get settingsBackupSection;
+
+  /// No description provided for @settingsBackupExportTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek al'**
+  String get settingsBackupExportTitle;
+
+  /// No description provided for @settingsBackupExportHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verilerinizi parolayla şifreli bir dosyaya kaydedin'**
+  String get settingsBackupExportHint;
+
+  /// No description provided for @backupTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek al'**
+  String get backupTitle;
+
+  /// No description provided for @backupIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm kayıtlarınız, belirleyeceğiniz parolayla şifrelenmiş tek bir dosyaya yazılır. Dosyayı telefonunuzda, bulut depolamanızda ya da bir SD kartta saklayabilirsiniz.'**
+  String get backupIntro;
+
+  /// No description provided for @backupWarning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu parolayı unutursanız yedeğiniz açılamaz; kurtarma yolu yoktur. Parolayı güvenli bir yere not edin.'**
+  String get backupWarning;
+
+  /// No description provided for @backupPassphrase.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek parolası'**
+  String get backupPassphrase;
+
+  /// No description provided for @backupPassphraseConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parolayı tekrar yazın'**
+  String get backupPassphraseConfirm;
+
+  /// No description provided for @backupShowPassphrase.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parolayı göster'**
+  String get backupShowPassphrase;
+
+  /// No description provided for @backupHidePassphrase.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parolayı gizle'**
+  String get backupHidePassphrase;
+
+  /// No description provided for @backupTooShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parola en az {n} karakter olmalı'**
+  String backupTooShort(int n);
+
+  /// No description provided for @backupMismatch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parolalar aynı değil'**
+  String get backupMismatch;
+
+  /// No description provided for @backupAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek al'**
+  String get backupAction;
+
+  /// No description provided for @backupWorking.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek hazırlanıyor…'**
+  String get backupWorking;
+
+  /// No description provided for @backupDone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek kaydedildi.'**
+  String get backupDone;
+
+  /// No description provided for @backupCancelled.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum seçilmedi; yedek alınmadı.'**
+  String get backupCancelled;
+
+  /// No description provided for @backupFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek alınamadı. Verileriniz silinmedi; tekrar deneyin.'**
+  String get backupFailed;
 }
 
 class _AppLocalizationsDelegate

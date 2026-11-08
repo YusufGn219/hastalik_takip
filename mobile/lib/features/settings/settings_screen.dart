@@ -73,6 +73,21 @@ class SettingsScreen extends ConsumerWidget {
             const AppLockSettingsCard(),
             Padding(
               padding: const EdgeInsets.only(top: 12, bottom: 8),
+              child: Text(l10n.settingsBackupSection, style: text.titleSmall),
+            ),
+            Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                key: const Key('ayar_yedek_al'),
+                leading: const Icon(Icons.upload_file_outlined),
+                title: Text(l10n.settingsBackupExportTitle),
+                subtitle: Text(l10n.settingsBackupExportHint),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).pushNamed('/backup'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 8),
               child: Text(l10n.settingsDataSection, style: text.titleSmall),
             ),
             Card(
