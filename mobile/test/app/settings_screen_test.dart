@@ -94,6 +94,7 @@ Future<void> _mount(WidgetTester tester, _Env env,
             }),
         '/settings': (context) => const SettingsScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/body': (context) => const Scaffold(body: Text('boy kilo ekranı')),
         '/backup': (context) => const Scaffold(body: Text('yedek ekranı')),
         '/restore': (context) => const Scaffold(body: Text('geri yükleme ekranı')),
       },
@@ -250,6 +251,15 @@ void main() {
       expect(env.restarts, 1);
       expect(_c.read(appLockProvider).enabled, isFalse);
     });
+  });
+
+  testWidgets('"Boy ve kilo" satırı ölçüm ekranını açar', (tester) async {
+    final env = (await tester.runAsync(() => _env()))!;
+    await _mount(tester, env);
+    await _openSettings(tester);
+
+    await _tap(tester, find.byKey(const Key('ayar_boy_kilo')));
+    expect(find.text('boy kilo ekranı'), findsOneWidget);
   });
 
   group('profil kartı', () {

@@ -1213,6 +1213,87 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profileRetry => 'Yeniden dene';
 
   @override
+  String get settingsBodyTitle => 'Boy ve kilo';
+
+  @override
+  String get settingsBodyHint => 'Kilo geçmişinizi ve boyunuzu kaydedin';
+
+  @override
+  String get bodyTitle => 'Boy ve kilo';
+
+  @override
+  String get bodyHeightSection => 'Boy';
+
+  @override
+  String get bodyHeightLabel => 'Boy (cm)';
+
+  @override
+  String get bodyHeightSave => 'Boyu kaydet';
+
+  @override
+  String get bodyHeightSaved => 'Boy kaydedildi';
+
+  @override
+  String get bodyWeightSection => 'Kilo';
+
+  @override
+  String get bodyWeightLabel => 'Kilo (kg)';
+
+  @override
+  String get bodyWeightDate => 'Tarih';
+
+  @override
+  String get bodyToday => 'Bugün';
+
+  @override
+  String get bodyWeightAdd => 'Kilo ekle';
+
+  @override
+  String get bodyWeightAdded => 'Kilo kaydedildi';
+
+  @override
+  String get bodyChartTitle => 'Kilo değişimi';
+
+  @override
+  String get bodyChartNeedMore => 'Grafik için en az iki kilo kaydı gerekir.';
+
+  @override
+  String get bodyHistoryTitle => 'Geçmiş';
+
+  @override
+  String get bodyHistoryEmpty => 'Henüz kilo kaydı yok.';
+
+  @override
+  String get bodyDeleteTitle => 'Kayıt silinsin mi?';
+
+  @override
+  String get bodyDeleteBody => 'Bu kilo kaydı silinecek.';
+
+  @override
+  String get bodyDeleteAction => 'Sil';
+
+  @override
+  String get bodyDeleted => 'Kayıt silindi';
+
+  @override
+  String get bodyErrNumber => 'Geçerli bir sayı girin.';
+
+  @override
+  String get bodyErrHeight => 'Boyu 50 ile 250 cm arasında girin.';
+
+  @override
+  String get bodyErrWeight => 'Kiloyu 2 ile 500 kg arasında girin.';
+
+  @override
+  String get bodyErrDay => 'Geçerli bir gün seçin.';
+
+  @override
+  String get bodyErrGeneric => 'Kaydedilemedi.';
+
+  @override
+  String get bodyLoadFailed => 'Ölçümler okunamadı.';
+
+  @override
   String get settingsBackupSection => 'Yedek';
 
   @override

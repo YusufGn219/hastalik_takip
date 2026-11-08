@@ -31,4 +31,8 @@ abstract final class RuleCodes {
   static const doseNotScheduled = 'dose_not_scheduled';
   static const doseAlreadyTaken = 'dose_already_taken';
   static const doseAlreadySkipped = 'dose_already_skipped';
+  static const heightOutOfRange = 'height_out_of_range';
+  static const weightOutOfRange = 'weight_out_of_range';
+  static const measurementDayInvalid = 'measurement_day_invalid';
+  static const measurementDayInFuture = 'measurement_day_in_future';
 }

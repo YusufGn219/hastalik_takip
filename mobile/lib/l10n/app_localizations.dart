@@ -2230,6 +2230,168 @@ abstract class AppLocalizations {
   /// **'Yeniden dene'**
   String get profileRetry;
 
+  /// No description provided for @settingsBodyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boy ve kilo'**
+  String get settingsBodyTitle;
+
+  /// No description provided for @settingsBodyHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilo geçmişinizi ve boyunuzu kaydedin'**
+  String get settingsBodyHint;
+
+  /// No description provided for @bodyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boy ve kilo'**
+  String get bodyTitle;
+
+  /// No description provided for @bodyHeightSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boy'**
+  String get bodyHeightSection;
+
+  /// No description provided for @bodyHeightLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boy (cm)'**
+  String get bodyHeightLabel;
+
+  /// No description provided for @bodyHeightSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boyu kaydet'**
+  String get bodyHeightSave;
+
+  /// No description provided for @bodyHeightSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boy kaydedildi'**
+  String get bodyHeightSaved;
+
+  /// No description provided for @bodyWeightSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilo'**
+  String get bodyWeightSection;
+
+  /// No description provided for @bodyWeightLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilo (kg)'**
+  String get bodyWeightLabel;
+
+  /// No description provided for @bodyWeightDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarih'**
+  String get bodyWeightDate;
+
+  /// No description provided for @bodyToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün'**
+  String get bodyToday;
+
+  /// No description provided for @bodyWeightAdd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilo ekle'**
+  String get bodyWeightAdd;
+
+  /// No description provided for @bodyWeightAdded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilo kaydedildi'**
+  String get bodyWeightAdded;
+
+  /// No description provided for @bodyChartTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilo değişimi'**
+  String get bodyChartTitle;
+
+  /// No description provided for @bodyChartNeedMore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Grafik için en az iki kilo kaydı gerekir.'**
+  String get bodyChartNeedMore;
+
+  /// No description provided for @bodyHistoryTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş'**
+  String get bodyHistoryTitle;
+
+  /// No description provided for @bodyHistoryEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz kilo kaydı yok.'**
+  String get bodyHistoryEmpty;
+
+  /// No description provided for @bodyDeleteTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt silinsin mi?'**
+  String get bodyDeleteTitle;
+
+  /// No description provided for @bodyDeleteBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kilo kaydı silinecek.'**
+  String get bodyDeleteBody;
+
+  /// No description provided for @bodyDeleteAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get bodyDeleteAction;
+
+  /// No description provided for @bodyDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt silindi'**
+  String get bodyDeleted;
+
+  /// No description provided for @bodyErrNumber.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli bir sayı girin.'**
+  String get bodyErrNumber;
+
+  /// No description provided for @bodyErrHeight.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boyu 50 ile 250 cm arasında girin.'**
+  String get bodyErrHeight;
+
+  /// No description provided for @bodyErrWeight.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kiloyu 2 ile 500 kg arasında girin.'**
+  String get bodyErrWeight;
+
+  /// No description provided for @bodyErrDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli bir gün seçin.'**
+  String get bodyErrDay;
+
+  /// No description provided for @bodyErrGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydedilemedi.'**
+  String get bodyErrGeneric;
+
+  /// No description provided for @bodyLoadFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçümler okunamadı.'**
+  String get bodyLoadFailed;
+
   /// No description provided for @settingsBackupSection.
   ///
   /// In tr, this message translates to:

@@ -15,6 +15,7 @@ import '../data/repositories/daily_log_repository.dart';
 import '../data/repositories/dose_skip_repository.dart';
 import '../data/repositories/episode_repository.dart';
 import '../data/repositories/medication_log_repository.dart';
+import '../data/repositories/measurement_repository.dart';
 import '../data/repositories/medication_repository.dart';
 import '../data/repositories/profile_repository.dart';
 import '../data/repositories/settings_repository.dart';
@@ -22,6 +23,7 @@ import '../data/repositories/support.dart';
 import '../data/repositories/symptom_entry_repository.dart';
 import '../data/repositories/symptom_repository.dart';
 import '../domain/services/analytics_service.dart';
+import '../domain/services/body_measurement_service.dart';
 import '../domain/services/dose_adherence_service.dart';
 import '../domain/services/dose_service.dart';
 import '../domain/services/episode_service.dart';
@@ -101,6 +103,13 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
   ),
 );
 
+final measurementRepositoryProvider = Provider<MeasurementRepository>(
+  (ref) => DriftMeasurementRepository(
+    ref.watch(databaseProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
 final profileRepositoryProvider = Provider<ProfileRepository>(
   (ref) => DriftProfileRepository(
     ref.watch(databaseProvider),
@@ -114,6 +123,18 @@ final profileProvider = FutureProvider.autoDispose<Profile>(
 );
 
 // ------------------------------------------------------------------ servisler
+
+final bodyMeasurementServiceProvider = Provider<BodyMeasurementService>(
+  (ref) => BodyMeasurementService(
+    measurements: ref.watch(measurementRepositoryProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+/// Boy ve kilo görünümü. Kayıttan sonra `ref.invalidate` ile tazelenir.
+final bodyMeasurementsProvider = FutureProvider.autoDispose<BodyMeasurements>(
+  (ref) => ref.watch(bodyMeasurementServiceProvider).overview(),
+);
 
 final episodeServiceProvider = Provider<EpisodeService>(
   (ref) => EpisodeService(

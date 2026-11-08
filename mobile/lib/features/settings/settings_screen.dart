@@ -73,6 +73,17 @@ class SettingsScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           children: [
             const _ProfileCard(),
+            Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                key: const Key('ayar_boy_kilo'),
+                leading: const Icon(Icons.monitor_weight_outlined),
+                title: Text(l10n.settingsBodyTitle),
+                subtitle: Text(l10n.settingsBodyHint),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).pushNamed('/body'),
+              ),
+            ),
             const AppLockSettingsCard(),
             Padding(
               padding: const EdgeInsets.only(top: 12, bottom: 8),
