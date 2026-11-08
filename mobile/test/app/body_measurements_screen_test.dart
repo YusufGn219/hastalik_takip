@@ -25,9 +25,21 @@ Future<void> _open(WidgetTester tester, FakeMeasurementRepository repo) async {
       theme: AppTheme.light(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const BodyMeasurementsScreen(),
+      home: Builder(
+        builder: (context) => Scaffold(
+          body: TextButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute<void>(builder: (_) => const BodyMeasurementsScreen()),
+            ),
+            child: const Text('aç'),
+          ),
+        ),
+      ),
     ),
   ));
+  // Ekran bir ana ekranın üstüne açılır; geri tuşu denenebilsin.
+  await tester.tap(find.text('aç'));
   await tester.pumpAndSettle();
 }
 
@@ -222,5 +234,129 @@ void main() {
     await tester.tap(find.byKey(const Key('vucut_tekrar')));
     await tester.pumpAndSettle();
     expect(find.text('71 kg'), findsOneWidget);
+  });
+
+  group('boyu temizle', () {
+    testWidgets('boy yokken düğme görünmez, boy varken görünür', (tester) async {
+      await _open(tester, FakeMeasurementRepository());
+      expect(find.byKey(const Key('vucut_boy_temizle')), findsNothing);
+    });
+
+    testWidgets('boy varken: vazgeçilirse kalır', (tester) async {
+      final repo = FakeMeasurementRepository()..seed(MeasurementTypes.height, 175, _now());
+      await _open(tester, repo);
+      await _tap(tester, 'vucut_boy_temizle');
+      await tester.tap(find.byKey(const Key('vucut_boy_sil_vazgec')));
+      await tester.pumpAndSettle();
+      expect(_fieldText(tester, 'vucut_boy'), '175');
+      expect(repo.rows.where((m) => m.deletedAt == null), hasLength(1));
+    });
+
+    testWidgets('onaylanırsa boy silinir, alan boşalır, düğme kaybolur; kilolar etkilenmez',
+        (tester) async {
+      final repo = FakeMeasurementRepository()
+        ..seed(MeasurementTypes.height, 170, DateTime(2026, 10, 1, 12))
+        ..seed(MeasurementTypes.height, 175, _now())
+        ..seed(MeasurementTypes.weight, 71, DateTime(2026, 10, 1, 12));
+      await _open(tester, repo);
+      await _tap(tester, 'vucut_boy_temizle');
+      await tester.tap(find.byKey(const Key('vucut_boy_sil_onay')));
+      await tester.pumpAndSettle();
+
+      expect(_fieldText(tester, 'vucut_boy'), '');
+      expect(find.text('Boy silindi'), findsOneWidget);
+      expect(find.byKey(const Key('vucut_boy_temizle')), findsNothing);
+      expect(repo.rows.where((m) => m.type == MeasurementTypes.height && m.deletedAt == null), isEmpty);
+      expect(find.text('71 kg'), findsOneWidget);
+    });
+
+    testWidgets('silinemezse boy yerinde kalır ve uyarı çıkar', (tester) async {
+      final repo = FakeMeasurementRepository(failDeletes: true)
+        ..seed(MeasurementTypes.height, 175, _now());
+      await _open(tester, repo);
+      await _tap(tester, 'vucut_boy_temizle');
+      await tester.tap(find.byKey(const Key('vucut_boy_sil_onay')));
+      await tester.pumpAndSettle();
+      expect(_fieldText(tester, 'vucut_boy'), '175');
+      expect(find.text('Kaydedilemedi.'), findsOneWidget);
+    });
+  });
+
+  group('kaydedilmemiş değişiklik uyarısı', () {
+    testWidgets('değişiklik yoksa geri tuşu uyarısız çıkar', (tester) async {
+      await _open(tester, FakeMeasurementRepository());
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(BodyMeasurementsScreen), findsNothing);
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsNothing);
+    });
+
+    testWidgets('yazılmış kilo varken uyarı çıkar; Kal ekranda ve yazıda bırakır', (tester) async {
+      await _open(tester, FakeMeasurementRepository());
+      await _type(tester, 'vucut_kilo', '72');
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('degisiklik_kal')));
+      await tester.pumpAndSettle();
+      expect(find.byType(BodyMeasurementsScreen), findsOneWidget);
+      expect(_fieldText(tester, 'vucut_kilo'), '72');
+    });
+
+    testWidgets('Çık ekrandan çıkarır, hiçbir şey kaydedilmez', (tester) async {
+      final repo = FakeMeasurementRepository();
+      await _open(tester, repo);
+      await _type(tester, 'vucut_kilo', '72');
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('degisiklik_cik')));
+      await tester.pumpAndSettle();
+      expect(find.byType(BodyMeasurementsScreen), findsNothing);
+      expect(repo.rows, isEmpty);
+    });
+
+    testWidgets('sistem geri tuşu da aynı uyarıyı verir', (tester) async {
+      await _open(tester, FakeMeasurementRepository());
+      await _type(tester, 'vucut_boy', '180');
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsOneWidget);
+    });
+
+    testWidgets('boy metni değişince uyarı çıkar; eski değere dönülünce çıkmaz', (tester) async {
+      final repo = FakeMeasurementRepository()..seed(MeasurementTypes.height, 175, _now());
+      await _open(tester, repo);
+      await _type(tester, 'vucut_boy', '176');
+      await _type(tester, 'vucut_boy', '175');
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(BodyMeasurementsScreen), findsNothing);
+    });
+
+    testWidgets('seçilmiş (henüz eklenmemiş) gün de değişiklik sayılır', (tester) async {
+      await _open(tester, FakeMeasurementRepository());
+      await _tap(tester, 'vucut_tarih');
+      await tester.tap(find.text('3'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Tamam'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsOneWidget);
+    });
+
+    testWidgets('kilo eklendikten ve boy kaydedildikten sonra uyarı çıkmaz', (tester) async {
+      final repo = FakeMeasurementRepository();
+      await _open(tester, repo);
+      await _type(tester, 'vucut_boy', '176');
+      await _tap(tester, 'vucut_boy_kaydet');
+      await _type(tester, 'vucut_kilo', '72');
+      await _tap(tester, 'vucut_kilo_ekle');
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsNothing);
+      expect(find.byType(BodyMeasurementsScreen), findsNothing);
+    });
   });
 }

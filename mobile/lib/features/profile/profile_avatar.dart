@@ -17,7 +17,11 @@ class ProfileAvatar extends StatelessWidget {
       radius: radius,
       backgroundColor: scheme.primaryContainer,
       foregroundImage: bytes == null ? null : MemoryImage(bytes),
-      child: Icon(Icons.person_outline, size: radius, color: scheme.onPrimaryContainer),
+      child: Icon(
+        Icons.person_outline,
+        size: radius,
+        color: scheme.onPrimaryContainer,
+      ),
     );
   }
 }

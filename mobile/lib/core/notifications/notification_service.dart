@@ -2,6 +2,7 @@
 // kullanıcı ilk rutini kaydederken sorulur (Sprint 4 Grup 3). Saat dilimi sabit
 // değildir, cihazın gerçek saat dilimi kullanılır.
 
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
@@ -123,4 +124,8 @@ class NotificationService implements NotificationGateway {
     await initialize();
     await _android?.requestExactAlarmsPermission();
   }
+
+  @override
+  Future<void> openNotificationSettings() =>
+      AppSettings.openAppSettings(type: AppSettingsType.notification);
 }

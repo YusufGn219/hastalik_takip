@@ -15,6 +15,7 @@ import '../../data/repositories/support.dart';
 import '../../domain/errors.dart';
 import '../../domain/services/body_measurement_service.dart';
 import '../../l10n/l10n.dart';
+import 'unsaved_guard.dart';
 
 /// Grafikte gösterilen en son kayıt sayısı.
 const _chartPoints = 60;
@@ -39,6 +40,9 @@ class _BodyMeasurementsScreenState
   final _weight = TextEditingController();
 
   bool _heightLoaded = false;
+
+  /// Yüklendiği andaki boy alanı metni; null = henüz yüklenmedi.
+  String? _initialHeight;
   bool _busy = false;
   String? _heightError;
   String? _weightError;
@@ -103,9 +107,63 @@ class _BodyMeasurementsScreenState
     }
     ref.invalidate(bodyMeasurementsProvider);
     if (!mounted) return;
-    setState(() => _busy = false);
+    setState(() {
+      _busy = false;
+      _initialHeight = _height.text;
+    });
     messenger.showSnackBar(SnackBar(content: Text(l10n.bodyHeightSaved)));
   }
+
+  Future<void> _clearHeight() async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.bodyHeightClearTitle),
+        content: Text(l10n.bodyHeightClearBody),
+        actions: [
+          TextButton(
+            key: const Key('vucut_boy_sil_vazgec'),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.commonCancel),
+          ),
+          TextButton(
+            key: const Key('vucut_boy_sil_onay'),
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: Text(l10n.bodyDeleteAction),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    try {
+      await _service.clearHeight();
+    } catch (e) {
+      debugPrint('Boy silinemedi: ${e.runtimeType}');
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(l10n.bodyErrGeneric)));
+      return;
+    }
+    ref.invalidate(bodyMeasurementsProvider);
+    if (!mounted) return;
+    setState(() {
+      _height.clear();
+      _initialHeight = '';
+      _heightError = null;
+    });
+    messenger.showSnackBar(SnackBar(content: Text(l10n.bodyHeightCleared)));
+  }
+
+  /// Kaydedilmemiş değişiklik var mı: boy metni değişti, kilo yazıldı ya da gün seçildi.
+  bool get _dirty =>
+      _initialHeight != null &&
+      (_height.text != _initialHeight ||
+          _weight.text.isNotEmpty ||
+          _day != null);
 
   Future<void> _addWeight() async {
     final l10n = context.l10n;
@@ -230,9 +288,16 @@ class _BodyMeasurementsScreenState
       data: _content,
     );
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.bodyTitle)),
-      body: SafeArea(child: body),
+    // Metin alanları değişince koruma yeniden hesaplanır.
+    return ListenableBuilder(
+      listenable: Listenable.merge([_height, _weight]),
+      builder: (context, _) => UnsavedChangesGuard(
+        dirty: _dirty,
+        child: Scaffold(
+          appBar: AppBar(title: Text(l10n.bodyTitle)),
+          body: SafeArea(child: body),
+        ),
+      ),
     );
   }
 
@@ -249,6 +314,7 @@ class _BodyMeasurementsScreenState
       _heightLoaded = true;
       final h = d.height;
       if (h != null) _height.text = _plain(h.value);
+      _initialHeight = _height.text;
     }
 
     final dayLabel = _day == null
@@ -279,6 +345,16 @@ class _BodyMeasurementsScreenState
           onPressed: _busy ? null : _saveHeight,
           child: Text(l10n.bodyHeightSave),
         ),
+        if (d.height != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              key: const Key('vucut_boy_temizle'),
+              onPressed: _busy ? null : _clearHeight,
+              style: TextButton.styleFrom(foregroundColor: scheme.error),
+              child: Text(l10n.bodyHeightClear),
+            ),
+          ),
         const SizedBox(height: 24),
         Text(l10n.bodyWeightSection, style: text.titleSmall),
         const SizedBox(height: 8),

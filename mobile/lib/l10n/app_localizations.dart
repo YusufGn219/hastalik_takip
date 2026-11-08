@@ -484,6 +484,12 @@ abstract class AppLocalizations {
   /// **'Şimdi değil'**
   String get reminderPermLater;
 
+  /// No description provided for @reminderOpenSettings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarları aç'**
+  String get reminderOpenSettings;
+
   /// No description provided for @reminderOffBanner.
   ///
   /// In tr, this message translates to:
@@ -2445,6 +2451,54 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Geçerli bir telefon numarası girin (7-15 rakam).'**
   String get profilePhoneInvalid;
+
+  /// No description provided for @unsavedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydedilmemiş değişiklikler var'**
+  String get unsavedTitle;
+
+  /// No description provided for @unsavedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çıkarsanız girdiğiniz bilgiler kaybolur.'**
+  String get unsavedBody;
+
+  /// No description provided for @unsavedStay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kal'**
+  String get unsavedStay;
+
+  /// No description provided for @unsavedLeave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çık'**
+  String get unsavedLeave;
+
+  /// No description provided for @bodyHeightClear.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boyu temizle'**
+  String get bodyHeightClear;
+
+  /// No description provided for @bodyHeightClearTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boy silinsin mi?'**
+  String get bodyHeightClearTitle;
+
+  /// No description provided for @bodyHeightClearBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıtlı boy bilgisi silinecek.'**
+  String get bodyHeightClearBody;
+
+  /// No description provided for @bodyHeightCleared.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boy silindi'**
+  String get bodyHeightCleared;
 
   /// No description provided for @settingsBackupSection.
   ///

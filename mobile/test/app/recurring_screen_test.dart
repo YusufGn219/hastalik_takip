@@ -596,6 +596,28 @@ void main() {
       expect(find.textContaining('Bildirimler kapalı'), findsOneWidget);
     });
 
+    testWidgets('bildirim kapalıyken uyarı kartındaki "Ayarları aç" bildirim ayarlarını açar',
+        (tester) async {
+      gateway.notificationsEnabled = false;
+      await openApp(tester);
+      await addParol(tester);
+      await tester.tap(find.byKey(const ValueKey('perm-later')));
+      await tester.pumpAndSettle();
+
+      expect(gateway.settingsOpens, 0);
+      expect(find.text('Ayarları aç'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('reminder-settings-button')));
+      await tester.pumpAndSettle();
+      expect(gateway.settingsOpens, 1);
+      expect(gateway.notificationRequests, 0, reason: 'sistem izin penceresi değil, ayar sayfası');
+    });
+
+    testWidgets('bildirim açıkken "Ayarları aç" düğmesi görünmez', (tester) async {
+      await openApp(tester);
+      await addParol(tester);
+      expect(find.byKey(const ValueKey('reminder-settings-button')), findsNothing);
+    });
+
     testWidgets('sistem izni reddedilirse uyarı kartı görünür, rutin kayıtlı',
         (tester) async {
       gateway.notificationsEnabled = false;

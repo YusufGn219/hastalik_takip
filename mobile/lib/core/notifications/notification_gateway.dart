@@ -47,4 +47,8 @@ abstract class NotificationGateway {
   /// Tam alarm izni için sistem ayar ekranını açar (sonuç ekrandan dönünce
   /// `canScheduleExact` ile okunur).
   Future<void> requestExactAlarmPermission();
+
+  /// Uygulamanın bildirim ayarları sayfasını açar (izin kapalıyken kullanıcı
+  /// oradan açar; dönünce izin durumu yeniden okunur).
+  Future<void> openNotificationSettings();
 }

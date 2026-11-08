@@ -28,7 +28,9 @@ class ImagePickerProfilePhotoPicker implements ProfilePhotoPicker {
   @override
   Future<Uint8List?> pick(PhotoSource source) async {
     final picked = await ImagePicker().pickImage(
-      source: source == PhotoSource.camera ? ImageSource.camera : ImageSource.gallery,
+      source: source == PhotoSource.camera
+          ? ImageSource.camera
+          : ImageSource.gallery,
       maxWidth: maxSide,
       maxHeight: maxSide,
       imageQuality: quality,
@@ -46,5 +48,6 @@ class ImagePickerProfilePhotoPicker implements ProfilePhotoPicker {
   }
 }
 
-final profilePhotoPickerProvider =
-    Provider<ProfilePhotoPicker>((ref) => const ImagePickerProfilePhotoPicker());
+final profilePhotoPickerProvider = Provider<ProfilePhotoPicker>(
+  (ref) => const ImagePickerProfilePhotoPicker(),
+);

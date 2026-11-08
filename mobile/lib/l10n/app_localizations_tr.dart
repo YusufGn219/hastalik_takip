@@ -217,6 +217,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get reminderPermLater => 'Şimdi değil';
 
   @override
+  String get reminderOpenSettings => 'Ayarları aç';
+
+  @override
   String get reminderOffBanner =>
       'Bildirimler kapalı: doz saatinde hatırlatma gelmez. Telefonun Ayarlar > Uygulamalar > Vitapuls > Bildirimler bölümünden açabilirsiniz.';
 
@@ -1321,6 +1324,30 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get profilePhoneInvalid =>
       'Geçerli bir telefon numarası girin (7-15 rakam).';
+
+  @override
+  String get unsavedTitle => 'Kaydedilmemiş değişiklikler var';
+
+  @override
+  String get unsavedBody => 'Çıkarsanız girdiğiniz bilgiler kaybolur.';
+
+  @override
+  String get unsavedStay => 'Kal';
+
+  @override
+  String get unsavedLeave => 'Çık';
+
+  @override
+  String get bodyHeightClear => 'Boyu temizle';
+
+  @override
+  String get bodyHeightClearTitle => 'Boy silinsin mi?';
+
+  @override
+  String get bodyHeightClearBody => 'Kayıtlı boy bilgisi silinecek.';
+
+  @override
+  String get bodyHeightCleared => 'Boy silindi';
 
   @override
   String get settingsBackupSection => 'Yedek';

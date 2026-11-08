@@ -132,6 +132,36 @@ void main() {
     });
   });
 
+  group('boyu temizle', () {
+    test('tüm boy kayıtları silinir; kilolar kalır', () async {
+      await service.saveHeight(170);
+      final later = BodyMeasurementService(
+        measurements: DriftMeasurementRepository(db, clock: () => DateTime(2026, 11, 9, 9)),
+        clock: () => DateTime(2026, 11, 9, 9),
+      );
+      await later.saveHeight(171.5);
+      await service.addWeight(kg: 70);
+
+      await service.clearHeight();
+      final o = await service.overview();
+      expect(o.height, isNull);
+      expect(await repo.listByType(MeasurementTypes.height), isEmpty);
+      expect(o.weights, hasLength(1));
+    });
+
+    test('boy yokken temizlemek hata vermez', () async {
+      await service.clearHeight();
+      expect((await service.overview()).height, isNull);
+    });
+
+    test('temizledikten sonra yeniden boy kaydedilebilir', () async {
+      await service.saveHeight(170);
+      await service.clearHeight();
+      await service.saveHeight(170);
+      expect((await service.overview()).height!.value, 170);
+    });
+  });
+
   test('boy ve kilo birbirinin geçmişine karışmaz', () async {
     await service.saveHeight(180);
     await service.addWeight(kg: 80);

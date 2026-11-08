@@ -17,6 +17,7 @@ import '../../data/repositories/support.dart';
 import '../../l10n/l10n.dart';
 import 'profile_avatar.dart';
 import 'profile_platform.dart';
+import 'unsaved_guard.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -43,6 +44,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String? _blood;
   Uint8List? _photo;
   bool _photoChanged = false;
+
+  /// Yüklendiği andaki alan değerlerinin özeti; değişiklik var mı karşılaştırılır.
+  String _initialSig = '';
+
+  String _signature() => [
+    _first.text,
+    _last.text,
+    _birth,
+    _gender,
+    _blood,
+    _allergies.text,
+    _contactName.text,
+    _contactPhone.text,
+    _photoChanged,
+  ].join('\u0001');
+
+  bool get _dirty => !_loading && !_loadFailed && _signature() != _initialSig;
 
   @override
   void initState() {
@@ -80,6 +98,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         _photo = p.photo;
         _photoChanged = false;
         _loading = false;
+        _initialSig = _signature();
       });
     } catch (e) {
       debugPrint('Profil okunamadı: ${e.runtimeType}');
@@ -134,8 +153,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       return;
     }
     try {
-      final bytes = await ref.read(profilePhotoPickerProvider).pick(
-            choice == _PhotoChoice.camera ? PhotoSource.camera : PhotoSource.gallery,
+      final bytes = await ref
+          .read(profilePhotoPickerProvider)
+          .pick(
+            choice == _PhotoChoice.camera
+                ? PhotoSource.camera
+                : PhotoSource.gallery,
           );
       if (bytes == null || !mounted) return;
       setState(() {
@@ -157,12 +180,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (b == null) return null;
     final parts = b.split('-');
     if (parts.length != 3) return null;
-    return DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+    return DateTime(
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+      int.parse(parts[2]),
+    );
   }
 
   Future<void> _pickBirth() async {
     final now = ref.read(clockProvider)();
-    final initial = _parseBirth() ?? DateTime(now.year - 30, now.month, now.day);
+    final initial =
+        _parseBirth() ?? DateTime(now.year - 30, now.month, now.day);
     final picked = await showDatePicker(
       context: context,
       initialDate: initial.isAfter(now) ? now : initial,
@@ -190,7 +218,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       _phoneError = null;
     });
     try {
-      await ref.read(profileRepositoryProvider).save(
+      await ref
+          .read(profileRepositoryProvider)
+          .save(
             ProfilesCompanion(
               firstName: Value(_first.text),
               lastName: Value(_last.text),
@@ -207,7 +237,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } catch (e) {
       debugPrint('Profil kaydedilemedi: ${e.runtimeType}');
       if (!mounted) return;
-      final phoneProblem = e is ArgumentError && e.name == 'emergencyContactPhone';
+      final phoneProblem =
+          e is ArgumentError && e.name == 'emergencyContactPhone';
       setState(() {
         _saving = false;
         if (phoneProblem) {
@@ -286,7 +317,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 TextButton(
                   key: const Key('profil_foto_degistir'),
                   onPressed: _saving ? null : _photoSheet,
-                  child: Text(_photo == null ? l10n.profilePhotoAdd : l10n.profilePhotoChange),
+                  child: Text(
+                    _photo == null
+                        ? l10n.profilePhotoAdd
+                        : l10n.profilePhotoChange,
+                  ),
                 ),
               ],
             ),
@@ -299,7 +334,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             maxLength: maxProfileNameLength,
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: l10n.profileFirstName, counterText: ''),
+            decoration: InputDecoration(
+              labelText: l10n.profileFirstName,
+              counterText: '',
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
@@ -309,7 +347,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             maxLength: maxProfileNameLength,
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.done,
-            decoration: InputDecoration(labelText: l10n.profileLastName, counterText: ''),
+            decoration: InputDecoration(
+              labelText: l10n.profileLastName,
+              counterText: '',
+            ),
           ),
           const SizedBox(height: 12),
           InkWell(
@@ -324,11 +365,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         key: const Key('profil_dogum_temizle'),
                         tooltip: l10n.profileBirthDateClear,
                         icon: const Icon(Icons.clear),
-                        onPressed: _saving ? null : () => setState(() => _birth = null),
+                        onPressed: _saving
+                            ? null
+                            : () => setState(() => _birth = null),
                       ),
               ),
               child: Text(
-                birth == null ? l10n.profileBirthDateNone : DateFormat('d MMMM y', locale).format(birth),
+                birth == null
+                    ? l10n.profileBirthDateNone
+                    : DateFormat('d MMMM y', locale).format(birth),
                 key: const Key('profil_dogum_deger'),
               ),
             ),
@@ -340,7 +385,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             decoration: InputDecoration(labelText: l10n.profileGender),
             items: [
               for (final g in <String?>[null, ...Genders.all])
-                DropdownMenuItem<String?>(value: g, child: Text(_genderLabel(g))),
+                DropdownMenuItem<String?>(
+                  value: g,
+                  child: Text(_genderLabel(g)),
+                ),
             ],
             onChanged: _saving ? null : (g) => setState(() => _gender = g),
           ),
@@ -354,9 +402,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             initialValue: _blood,
             decoration: InputDecoration(labelText: l10n.profileBloodType),
             items: [
-              DropdownMenuItem<String?>(value: null, child: Text(l10n.profileBloodNone)),
+              DropdownMenuItem<String?>(
+                value: null,
+                child: Text(l10n.profileBloodNone),
+              ),
               for (final b in BloodTypes.all)
-                DropdownMenuItem<String?>(value: b, child: Text(_bloodLabel(b))),
+                DropdownMenuItem<String?>(
+                  value: b,
+                  child: Text(_bloodLabel(b)),
+                ),
             ],
             onChanged: _saving ? null : (b) => setState(() => _blood = b),
           ),
@@ -385,7 +439,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             maxLength: maxProfileNameLength,
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
-            decoration: InputDecoration(labelText: l10n.profileContactName, counterText: ''),
+            decoration: InputDecoration(
+              labelText: l10n.profileContactName,
+              counterText: '',
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
@@ -403,7 +460,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           if (_error != null) ...[
             const SizedBox(height: 16),
-            Text(_error!, key: const Key('profil_hata'), style: TextStyle(color: scheme.error)),
+            Text(
+              _error!,
+              key: const Key('profil_hata'),
+              style: TextStyle(color: scheme.error),
+            ),
           ],
           const SizedBox(height: 20),
           ElevatedButton(
@@ -415,9 +476,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.profileTitle)),
-      body: SafeArea(child: body),
+    // Metin alanları değişince koruma yeniden hesaplanır.
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        _first,
+        _last,
+        _allergies,
+        _contactName,
+        _contactPhone,
+      ]),
+      builder: (context, _) => UnsavedChangesGuard(
+        dirty: _dirty,
+        child: Scaffold(
+          appBar: AppBar(title: Text(l10n.profileTitle)),
+          body: SafeArea(child: body),
+        ),
+      ),
     );
   }
 }

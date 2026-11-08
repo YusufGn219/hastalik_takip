@@ -47,6 +47,7 @@ class FakeNotificationGateway implements NotificationGateway {
   bool grantOnRequest = true;
   int notificationRequests = 0;
   int exactRequests = 0;
+  int settingsOpens = 0;
 
   @override
   Future<bool> areNotificationsEnabled() async => notificationsEnabled;
@@ -61,5 +62,10 @@ class FakeNotificationGateway implements NotificationGateway {
   @override
   Future<void> requestExactAlarmPermission() async {
     exactRequests++;
+  }
+
+  @override
+  Future<void> openNotificationSettings() async {
+    settingsOpens++;
   }
 }

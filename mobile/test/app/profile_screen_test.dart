@@ -321,4 +321,108 @@ void main() {
       expect(find.text('Geçerli bir telefon numarası girin (7-15 rakam).'), findsNothing);
     });
   });
+
+  group('kaydedilmemiş değişiklik uyarısı', () {
+    testWidgets('değişiklik yoksa geri tuşu uyarısız çıkar', (tester) async {
+      await _open(tester, FakeProfileRepository());
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(ProfileScreen), findsNothing);
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsNothing);
+    });
+
+    testWidgets('ad yazılınca uyarı çıkar; Kal ekranda ve yazıda bırakır', (tester) async {
+      await _open(tester, FakeProfileRepository());
+      await tester.enterText(find.byKey(const Key('profil_ad')), 'Ada');
+      await tester.pump();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('degisiklik_kal')));
+      await tester.pumpAndSettle();
+      expect(find.byType(ProfileScreen), findsOneWidget);
+      expect(_text(tester, 'profil_ad'), 'Ada');
+    });
+
+    testWidgets('Çık ekrandan çıkarır, hiçbir şey kaydedilmez', (tester) async {
+      final repo = FakeProfileRepository();
+      await _open(tester, repo);
+      await tester.enterText(find.byKey(const Key('profil_ad')), 'Ada');
+      await tester.pump();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('degisiklik_cik')));
+      await tester.pumpAndSettle();
+      expect(find.byType(ProfileScreen), findsNothing);
+      expect(repo.saves, isEmpty);
+    });
+
+    testWidgets('sistem geri tuşu da aynı uyarıyı verir', (tester) async {
+      await _open(tester, FakeProfileRepository());
+      await tester.enterText(find.byKey(const Key('profil_soyad')), 'Lovelace');
+      await tester.pump();
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsOneWidget);
+    });
+
+    testWidgets('yazılıp geri silinirse değişiklik sayılmaz', (tester) async {
+      await _open(tester, FakeProfileRepository());
+      await tester.enterText(find.byKey(const Key('profil_ad')), 'Ada');
+      await tester.pump();
+      await tester.enterText(find.byKey(const Key('profil_ad')), '');
+      await tester.pump();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(ProfileScreen), findsNothing);
+    });
+
+    testWidgets('metin olmayan değişiklikler de sayılır: cinsiyet, kan grubu, fotoğraf', (tester) async {
+      // Kan grubu
+      await _open(tester, FakeProfileRepository());
+      await _tap(tester, 'profil_kan');
+      await tester.tap(find.text('A Rh+').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('degisiklik_cik')));
+      await tester.pumpAndSettle();
+
+      // Fotoğraf
+      await _open(tester, FakeProfileRepository(), picker: _FakePicker(result: _png));
+      await _tap(tester, 'profil_foto_degistir');
+      await tester.tap(find.byKey(const Key('profil_foto_galeri')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsOneWidget);
+    });
+
+    testWidgets('kayıtlı değerler yüklendikten sonra dokunulmazsa uyarı çıkmaz', (tester) async {
+      final repo = FakeProfileRepository();
+      repo.current = repo.current.copyWith(
+        firstName: 'Ada',
+        bloodType: const Value('0+'),
+        allergies: 'penisilin',
+        emergencyContactPhone: const Value('05321234567'),
+      );
+      await _open(tester, repo);
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(ProfileScreen), findsNothing);
+    });
+
+    testWidgets('kaydedince uyarı çıkmaz, ekran kapanır', (tester) async {
+      final repo = FakeProfileRepository();
+      await _open(tester, repo);
+      await tester.enterText(find.byKey(const Key('profil_ad')), 'Ada');
+      await tester.pump();
+      await _tap(tester, 'profil_kaydet');
+      expect(find.text('Kaydedilmemiş değişiklikler var'), findsNothing);
+      expect(find.byType(ProfileScreen), findsNothing);
+      expect(repo.saves, hasLength(1));
+    });
+  });
 }

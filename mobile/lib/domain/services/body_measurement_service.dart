@@ -27,8 +27,8 @@ class BodyMeasurementService {
   BodyMeasurementService({
     required MeasurementRepository measurements,
     required Clock clock,
-  })  : _measurements = measurements,
-        _clock = clock;
+  }) : _measurements = measurements,
+       _clock = clock;
 
   final MeasurementRepository _measurements;
   final Clock _clock;
@@ -52,8 +52,10 @@ class BodyMeasurementService {
   Future<void> saveHeight(double cm) async {
     final value = _round(cm);
     if (!value.isFinite || value < minHeightCm || value > maxHeightCm) {
-      throw RuleViolation(RuleCodes.heightOutOfRange,
-          'Boy $minHeightCm-$maxHeightCm cm arasında olmalı: $cm');
+      throw RuleViolation(
+        RuleCodes.heightOutOfRange,
+        'Boy $minHeightCm-$maxHeightCm cm arasında olmalı: $cm',
+      );
     }
     final current = await _measurements.latest(MeasurementTypes.height);
     if (current != null && current.value == value) return;
@@ -70,21 +72,31 @@ class BodyMeasurementService {
   Future<Measurement> addWeight({required double kg, String? day}) async {
     final value = _round(kg);
     if (!value.isFinite || value < minWeightKg || value > maxWeightKg) {
-      throw RuleViolation(RuleCodes.weightOutOfRange,
-          'Kilo $minWeightKg-$maxWeightKg kg arasında olmalı: $kg');
+      throw RuleViolation(
+        RuleCodes.weightOutOfRange,
+        'Kilo $minWeightKg-$maxWeightKg kg arasında olmalı: $kg',
+      );
     }
     final now = _clock();
     final today = formatDay(now.year, now.month, now.day);
     final chosen = day ?? today;
     final parsed = _parseDay(chosen);
     if (parsed == null) {
-      throw RuleViolation(RuleCodes.measurementDayInvalid, 'Geçersiz gün: $chosen');
+      throw RuleViolation(
+        RuleCodes.measurementDayInvalid,
+        'Geçersiz gün: $chosen',
+      );
     }
     if (chosen.compareTo(today) > 0) {
-      throw RuleViolation(RuleCodes.measurementDayInFuture, 'Gelecek gün: $chosen');
+      throw RuleViolation(
+        RuleCodes.measurementDayInFuture,
+        'Gelecek gün: $chosen',
+      );
     }
     // Bugünse şimdiki an; geçmiş gün için yerel öğlen (saat bilgisi yok).
-    final measuredAt = chosen == today ? now : DateTime(parsed.year, parsed.month, parsed.day, 12);
+    final measuredAt = chosen == today
+        ? now
+        : DateTime(parsed.year, parsed.month, parsed.day, 12);
     return _measurements.add(
       type: MeasurementTypes.weight,
       value: value,
@@ -94,6 +106,14 @@ class BodyMeasurementService {
   }
 
   Future<void> deleteWeight(String id) => _measurements.softDelete(id);
+
+  /// Kayıtlı boyu siler (tüm boy kayıtları silinmiş olur; kilo etkilenmez).
+  Future<void> clearHeight() async {
+    final all = await _measurements.listByType(MeasurementTypes.height);
+    for (final m in all) {
+      await _measurements.softDelete(m.id);
+    }
+  }
 
   double _round(double v) => (v * 10).roundToDouble() / 10;
 

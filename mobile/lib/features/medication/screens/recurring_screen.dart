@@ -208,7 +208,22 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen>
             children: [
               const Icon(Icons.notifications_off, color: Colors.orange),
               const SizedBox(width: 12),
-              Expanded(child: Text(l10n.reminderOffBanner)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.reminderOffBanner),
+                    const SizedBox(height: 8),
+                    OutlinedButton(
+                      key: const ValueKey('reminder-settings-button'),
+                      style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
+                      onPressed: () =>
+                          ref.read(reminderServiceProvider).openNotificationSettings(),
+                      child: Text(l10n.reminderOpenSettings),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

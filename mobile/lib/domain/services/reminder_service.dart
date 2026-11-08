@@ -99,6 +99,9 @@ class ReminderService {
   /// Tam alarm ayar ekranını açar.
   Future<void> requestExact() => _gateway.requestExactAlarmPermission();
 
+  /// Uygulamanın bildirim ayarları sayfasını açar.
+  Future<void> openNotificationSettings() => _gateway.openNotificationSettings();
+
   /// Hepsini silip tüm rutinleri baştan kurar: açılışta (saat dilimi
   /// değişmiş olabilir, kayıtlar güncel olsun) ve gerektiğinde çağrılır.
   Future<void> rescheduleAll() async {
