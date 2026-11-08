@@ -13,6 +13,7 @@ import '../../../domain/services/analytics_service.dart';
 import '../../../domain/services/dose_adherence_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../analytics_overview.dart';
+import '../smoothing.dart';
 
 /// Seçilebilen dönemler (gün).
 const analyticsPeriods = [7, 30, 90];
@@ -254,6 +255,13 @@ class _AnalyticsDashboardScreenState
   Widget _dailyTab(AnalyticsOverview data, AppLocalizations l10n) {
     final trends = data.daily.trends;
     final a = data.daily.averages;
+    final dates = [for (final p in trends) p.date];
+    final smooth = trends.length > smoothingThreshold;
+    List<double> series(Iterable<num> raw) {
+      final values = [for (final x in raw) x.toDouble()];
+      return smooth ? trailingAverage(dates, values) : values;
+    }
+
     String v(double? x, String Function(String) f) => x == null ? '-' : f(_n(x));
     final rows = [
       ('😴', l10n.analyticsSleep, v(a['sleep_hours'], l10n.analyticsHours),
@@ -308,7 +316,7 @@ class _AnalyticsDashboardScreenState
         const SizedBox(height: 8),
         if (trends.isEmpty)
           _emptyCard(l10n.analyticsNoDaily, 'analytics-daily-empty')
-        else
+        else ...[
           _card(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -320,20 +328,71 @@ class _AnalyticsDashboardScreenState
                 ]),
                 const SizedBox(height: 16),
                 _lineChart(
-                  dates: [for (final p in trends) p.date],
+                  chartKey: const ValueKey('daily-mood-energy-chart'),
+                  dates: dates,
                   maxY: 5,
+                  showDots: !smooth,
                   lines: [
                     _Line(AppColors.primary400,
-                        [for (final p in trends) p.mood.toDouble()]),
+                        series(trends.map((p) => p.mood))),
                     _Line(Colors.amber,
-                        [for (final p in trends) p.energyLevel.toDouble()]),
+                        series(trends.map((p) => p.energyLevel))),
                   ],
                 ),
               ],
             ),
           ),
+          const SizedBox(height: 20),
+          _sectionTitle(l10n.analyticsSleepTrend),
+          const SizedBox(height: 8),
+          _card(
+            child: _lineChart(
+              chartKey: const ValueKey('daily-sleep-chart'),
+              dates: dates,
+              maxY: _chartTop(series(trends.map((p) => p.sleepHours)), 10),
+              leftInterval: 2,
+              showDots: !smooth,
+              lines: [
+                _Line(AppColors.primary400,
+                    series(trends.map((p) => p.sleepHours))),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          _sectionTitle(l10n.analyticsWaterTrend),
+          const SizedBox(height: 8),
+          _card(
+            child: _lineChart(
+              chartKey: const ValueKey('daily-water-chart'),
+              dates: dates,
+              maxY: _chartTop(series(trends.map((p) => p.waterIntake)), 4),
+              leftInterval: 1,
+              showDots: !smooth,
+              lines: [
+                _Line(AppColors.medication,
+                    series(trends.map((p) => p.waterIntake))),
+              ],
+            ),
+          ),
+          if (smooth) ...[
+            const SizedBox(height: 12),
+            Text(l10n.analyticsSmoothedNote,
+                key: const ValueKey('daily-smoothed-note'),
+                style: TextStyle(fontSize: 12, color: _muted)),
+          ],
+        ],
       ],
     );
+  }
+
+  /// Grafiğin üst sınırı: en büyük değerin yukarı yuvarlanmışı, en az [floor].
+  double _chartTop(List<double> values, double floor) {
+    var top = floor;
+    for (final v in values) {
+      final c = v.ceilToDouble();
+      if (c > top) top = c;
+    }
+    return top;
   }
 
   // -------------------------------------------------------------- ilaç etkisi
@@ -537,11 +596,15 @@ class _AnalyticsDashboardScreenState
     required List<String> dates,
     required double maxY,
     required List<_Line> lines,
+    Key? chartKey,
+    bool showDots = true,
+    double? leftInterval,
   }) {
     final grid = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07);
     return SizedBox(
       height: 180,
       child: LineChart(
+        key: chartKey,
         LineChartData(
           gridData: FlGridData(
             show: true,
@@ -551,7 +614,7 @@ class _AnalyticsDashboardScreenState
           borderData: FlBorderData(show: false),
           minY: 0,
           maxY: maxY,
-          titlesData: _titles(dates),
+          titlesData: _titles(dates, leftInterval: leftInterval),
           lineBarsData: [
             for (final line in lines)
               LineChartBarData(
@@ -563,6 +626,7 @@ class _AnalyticsDashboardScreenState
                 color: line.color,
                 barWidth: 2.5,
                 dotData: FlDotData(
+                  show: showDots,
                   getDotPainter: (spot, percent, bar, index) =>
                       FlDotCirclePainter(
                     radius: 4,
@@ -581,7 +645,7 @@ class _AnalyticsDashboardScreenState
     );
   }
 
-  FlTitlesData _titles(List<String> dates) {
+  FlTitlesData _titles(List<String> dates, {double? leftInterval}) {
     final style = TextStyle(fontSize: 10, color: _muted);
     return FlTitlesData(
       bottomTitles: AxisTitles(
@@ -602,6 +666,7 @@ class _AnalyticsDashboardScreenState
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 28,
+          interval: leftInterval,
           getTitlesWidget: (value, meta) =>
               Text(value.toInt().toString(), style: style),
         ),

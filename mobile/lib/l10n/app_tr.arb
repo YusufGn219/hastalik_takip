@@ -743,5 +743,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "analyticsSleepTrend": "Uyku eğilimi (saat)",
+  "analyticsWaterTrend": "Su eğilimi (litre)",
+  "analyticsSmoothedNote": "Çok günlük dönemlerde çizgiler 7 günlük hareketli ortalamadır; kayıt girilmeyen günler hesaba katılmaz."
 }

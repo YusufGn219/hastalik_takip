@@ -6,6 +6,7 @@ import 'package:mobile/app/providers.dart';
 import 'package:mobile/core/theme/app_theme.dart';
 import 'package:mobile/data/database/app_database.dart';
 import 'package:mobile/data/database/seed_loader.dart';
+import 'package:mobile/data/repositories/support.dart';
 import 'package:mobile/domain/services/analytics_service.dart';
 import 'package:mobile/domain/services/dose_adherence_service.dart';
 import 'package:mobile/domain/weekdays.dart';
@@ -132,6 +133,9 @@ void main() {
 
     await openTab(tester, 'Günlük');
     expect(find.byKey(const ValueKey('analytics-daily-empty')), findsOneWidget);
+    // Veri yokken uyku ve su eğilim grafikleri de çizilmez.
+    expect(find.byKey(const ValueKey('daily-sleep-chart')), findsNothing);
+    expect(find.byKey(const ValueKey('daily-water-chart')), findsNothing);
     expect(find.text('-'), findsNWidgets(4)); // dört ortalama da boş
 
     await openTab(tester, 'İlaç etkisi');
@@ -162,8 +166,123 @@ void main() {
     expect(find.text('4,5 / 5'), findsOneWidget);
     expect(find.text('3,5 / 5'), findsOneWidget);
     expect(find.textContaining('son 30 gün'), findsOneWidget);
-    final chart = tester.widget<LineChart>(find.byType(LineChart));
+    final chart = tester.widget<LineChart>(
+        find.byKey(const ValueKey('daily-mood-energy-chart')));
     expect(chart.data.lineBarsData, hasLength(2)); // ruh hali ve enerji
+    // Az nokta (2): ham değerler, noktalar görünür, hareketli ortalama notu yok.
+    expect(chart.data.lineBarsData.first.spots.map((s) => s.y), [4.0, 5.0]);
+    expect(chart.data.lineBarsData.first.dotData.show, isTrue);
+    expect(find.byKey(const ValueKey('daily-smoothed-note')), findsNothing);
+    // Uyku ve su için de birer eğilim grafiği vardır.
+    final sleep = tester.widget<LineChart>(
+        find.byKey(const ValueKey('daily-sleep-chart')));
+    final water = tester.widget<LineChart>(
+        find.byKey(const ValueKey('daily-water-chart')));
+    expect(sleep.data.lineBarsData.single.spots.map((s) => s.y), [7.5, 6.0]);
+    expect(water.data.lineBarsData.single.spots.map((s) => s.y), [2.0, 2.5]);
+    expect(find.text('Uyku eğilimi (saat)'), findsOneWidget);
+    expect(find.text('Su eğilimi (litre)'), findsOneWidget);
+  });
+
+  AnalyticsOverview withDaily(int days, List<DailyTrendPoint> points) =>
+      AnalyticsOverview(
+        days: days,
+        symptoms: _empty(days).symptoms,
+        daily: DailyTrends(days, points, const {
+          'sleep_hours': 7.0,
+          'water_intake': 2.0,
+          'mood': 3.0,
+          'energy_level': 3.0,
+        }),
+        effect: _empty(days).effect,
+        adherence: _empty(days).adherence,
+      );
+
+  testWidgets(
+      'günlük sekmesi: 30 günde ruh hali, enerji, uyku ve su 7 günlük hareketli ortalama çizilir',
+      (tester) async {
+    // 2026-10-09 .. 2026-11-07, art arda 30 gün.
+    final points = [
+      for (var i = 0; i < 30; i++)
+        DailyTrendPoint(
+          dayKey(DateTime(2026, 10, 9 + i)),
+          6.0 + (i % 3), // uyku 6, 7, 8, 6, 7, 8 ...
+          2.0, // su sabit
+          i.isEven ? 2 : 4, // ruh hali 2, 4, 2, 4 ...
+          3, // enerji sabit
+        ),
+    ];
+    await openApp(tester, extra: [fake(_FakeLoader((d) => withDaily(d, points)))]);
+    await openTab(tester, 'Günlük');
+
+    final moodEnergy = tester.widget<LineChart>(
+        find.byKey(const ValueKey('daily-mood-energy-chart')));
+    final mood = moodEnergy.data.lineBarsData[0];
+    final energy = moodEnergy.data.lineBarsData[1];
+    expect(mood.spots, hasLength(30));
+    expect(mood.dotData.show, isFalse);
+    // İlk günde pencerede yalnız kendisi var; ortalama kendi değeri.
+    expect(mood.spots.first.y, 2.0);
+    // Son 7 gün ruh hali: 4, 2, 4, 2, 4, 2, 4 -> 22/7.
+    expect(mood.spots.last.y, closeTo(22 / 7, 1e-9));
+    expect(energy.spots.last.y, closeTo(3.0, 1e-9));
+
+    final sleep = tester
+        .widget<LineChart>(find.byKey(const ValueKey('daily-sleep-chart')))
+        .data
+        .lineBarsData
+        .single;
+    // Son 7 günde uyku: 8, 6, 7, 8, 6, 7, 8 -> 50/7.
+    expect(sleep.spots.last.y, closeTo(50 / 7, 1e-9));
+    expect(sleep.dotData.show, isFalse);
+
+    final water = tester
+        .widget<LineChart>(find.byKey(const ValueKey('daily-water-chart')))
+        .data
+        .lineBarsData
+        .single;
+    expect(water.spots.last.y, closeTo(2.0, 1e-9));
+
+    await tester.dragUntilVisible(
+      find.byKey(const ValueKey('daily-smoothed-note')),
+      find.byType(ListView).first,
+      const Offset(0, -200),
+    );
+    expect(find.textContaining('7 günlük hareketli ortalama'), findsOneWidget);
+  });
+
+  testWidgets('günlük sekmesi: 14 nokta sınırında hâlâ ham değer çizilir',
+      (tester) async {
+    final points = [
+      for (var i = 0; i < 14; i++)
+        DailyTrendPoint(dayKey(DateTime(2026, 10, 25 + i)), 7.0, 2.0, i.isEven ? 1 : 5, 3),
+    ];
+    await openApp(tester, extra: [fake(_FakeLoader((d) => withDaily(d, points)))]);
+    await openTab(tester, 'Günlük');
+
+    final mood = tester
+        .widget<LineChart>(find.byKey(const ValueKey('daily-mood-energy-chart')))
+        .data
+        .lineBarsData
+        .first;
+    expect(mood.spots.map((s) => s.y).take(4), [1.0, 5.0, 1.0, 5.0]);
+    expect(mood.dotData.show, isTrue);
+    expect(find.byKey(const ValueKey('daily-smoothed-note')), findsNothing);
+  });
+
+  testWidgets('günlük sekmesi: büyük uyku ve su değerinde grafik üst sınırı yukarı açılır',
+      (tester) async {
+    final points = [
+      DailyTrendPoint('2026-11-05', 11.2, 5.3, 3, 3),
+      DailyTrendPoint('2026-11-06', 7.0, 2.0, 3, 3),
+    ];
+    await openApp(tester, extra: [fake(_FakeLoader((d) => withDaily(d, points)))]);
+    await openTab(tester, 'Günlük');
+
+    final sleep = tester.widget<LineChart>(find.byKey(const ValueKey('daily-sleep-chart')));
+    final water = tester.widget<LineChart>(find.byKey(const ValueKey('daily-water-chart')));
+    expect(sleep.data.maxY, 12.0); // 11,2 yukarı yuvarlanır (en az 10)
+    expect(water.data.maxY, 6.0); // 5,3 yukarı yuvarlanır (en az 4)
   });
 
   testWidgets('ilaç etkisi: önce/sonra, fark, ortalama etki ve uyarı',

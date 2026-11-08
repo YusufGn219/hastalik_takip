@@ -2925,6 +2925,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{name} için geçerli bir değer girin ({range}).'**
   String extraFieldInvalid(String name, String range);
+
+  /// No description provided for @analyticsSleepTrend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku eğilimi (saat)'**
+  String get analyticsSleepTrend;
+
+  /// No description provided for @analyticsWaterTrend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Su eğilimi (litre)'**
+  String get analyticsWaterTrend;
+
+  /// No description provided for @analyticsSmoothedNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok günlük dönemlerde çizgiler 7 günlük hareketli ortalamadır; kayıt girilmeyen günler hesaba katılmaz.'**
+  String get analyticsSmoothedNote;
 }
 
 class _AppLocalizationsDelegate

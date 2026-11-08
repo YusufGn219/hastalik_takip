@@ -1580,4 +1580,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String extraFieldInvalid(String name, String range) {
     return '$name için geçerli bir değer girin ($range).';
   }
+
+  @override
+  String get analyticsSleepTrend => 'Uyku eğilimi (saat)';
+
+  @override
+  String get analyticsWaterTrend => 'Su eğilimi (litre)';
+
+  @override
+  String get analyticsSmoothedNote =>
+      'Çok günlük dönemlerde çizgiler 7 günlük hareketli ortalamadır; kayıt girilmeyen günler hesaba katılmaz.';
 }
