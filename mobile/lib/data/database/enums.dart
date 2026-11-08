@@ -45,6 +45,7 @@ abstract final class MeasurementTypes {
   static const mealPattern = 'meal_pattern';
   static const smoking = 'smoking';
   static const pain = 'pain'; // 0-10
+  static const steps = 'steps'; // adım
   // Vücut ölçüleri (zaman serisi)
   static const weight = 'weight'; // kg
   static const height = 'height'; // cm

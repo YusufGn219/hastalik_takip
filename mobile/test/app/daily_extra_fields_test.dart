@@ -154,6 +154,7 @@ void main() {
         MeasurementTypes.caffeine,
         MeasurementTypes.exercise,
         MeasurementTypes.pain,
+        MeasurementTypes.steps,
       ]);
     });
 

@@ -216,4 +216,56 @@ void main() {
     expect(result.items.map((i) => i.medicationName), ['Aspirin', 'Parol']);
     expect(result.periodDays, 7);
   });
+
+  group('haftalık eğilim', () {
+    test('7 günlük bloklar eskiden yeniye, bugünde biten bloktan geriye sayılır',
+        () async {
+      // Önceki blok (25-31 Ekim): ilk kayıt 30 Ekim; 30'u alındı, 31'i atlandı.
+      for (final t in ['08:00', '20:00']) {
+        await take('2026-10-30', t);
+        await skip('2026-10-31', t);
+      }
+      // Son blok (1-7 Kasım): 1-6 Kasım tamamen alındı, 7 Kasım sabahı alındı.
+      for (var d = 1; d <= 6; d++) {
+        for (final t in ['08:00', '20:00']) {
+          await take('2026-11-0$d', t);
+        }
+      }
+      await take('2026-11-07', '08:00');
+
+      final item = await aspirinItem(14);
+
+      expect(item.weekly.map((w) => w.endDay), ['2026-10-31', '2026-11-07']);
+      expect(item.weekly.map((w) => w.rate), [50.0, 100.0]);
+    });
+
+    test('dönemin başındaki tamamlanmayan günler eğilime girmez ama toplama girer',
+        () async {
+      await skip('2026-10-29', '08:00'); // 10 günlük pencerenin ilk günleri
+      await take('2026-11-07', '08:00');
+
+      final item = await aspirinItem(10);
+
+      expect(item.weekly.length, 1);
+      expect(item.weekly.single.endDay, '2026-11-07');
+      // Son 7 gün: 6 gün x 2 doz + bugünün sabahı = 13 doz, 1 alındı.
+      expect(item.weekly.single.rate, 7.7);
+      // Toplam ise ilk kayıttan (29 Ekim) başlayıp eski günleri de sayar.
+      expect(item.planned, greaterThan(13));
+    });
+
+    test('kayıt başlamadan önceki bloklar listede yer almaz', () async {
+      await take('2026-11-03', '08:00');
+
+      final item = await aspirinItem(30);
+
+      expect(item.weekly.length, 1);
+      expect(item.weekly.single.endDay, '2026-11-07');
+    });
+
+    test('hiç kayıt yoksa eğilim boştur', () async {
+      final item = await aspirinItem(30);
+      expect(item.weekly, isEmpty);
+    });
+  });
 }

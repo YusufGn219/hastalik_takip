@@ -61,7 +61,7 @@ void main() {
       service.create(name: name, kind: kind, unit: unit, min: min, max: max);
 
   group('hazır alanlar', () {
-    test('kafein, spor ve ağrı düzeyi kapalı olarak eklenir; tekrar çağırmak çoğaltmaz', () async {
+    test('kafein, spor, ağrı düzeyi ve adım sayısı kapalı olarak eklenir; tekrar çağırmak çoğaltmaz', () async {
       await service.ensurePresets();
       await service.ensurePresets();
       final all = await service.list();
@@ -69,7 +69,12 @@ void main() {
         MeasurementTypes.caffeine,
         MeasurementTypes.exercise,
         MeasurementTypes.pain,
+        MeasurementTypes.steps,
       ]);
+      final steps = all.last;
+      expect(steps.name, 'Adım sayısı');
+      expect(steps.unit, 'adım');
+      expect(steps.maxValue, 100000);
       expect(all.every((f) => !f.isActive), isTrue);
       expect(all.first.unit, 'bardak');
       expect(all.first.maxValue, 20);

@@ -354,6 +354,7 @@ class _AnalyticsDashboardScreenState
               chartKey: const ValueKey('daily-sleep-chart'),
               dates: dates,
               maxY: _chartTop(series(trends.map((p) => p.sleepHours)), 10),
+              minY: _chartBottom(series(trends.map((p) => p.sleepHours)), 2),
               leftInterval: 2,
               showDots: !smooth,
               lines: [
@@ -370,6 +371,7 @@ class _AnalyticsDashboardScreenState
               chartKey: const ValueKey('daily-water-chart'),
               dates: dates,
               maxY: _chartTop(series(trends.map((p) => p.waterIntake)), 4),
+              minY: _chartBottom(series(trends.map((p) => p.waterIntake)), 1),
               leftInterval: 1,
               showDots: !smooth,
               lines: [
@@ -490,6 +492,20 @@ class _AnalyticsDashboardScreenState
         ],
       ),
     );
+  }
+
+  /// Grafiğin alt sınırı: en küçük değerin [step] katına yuvarlanmış alt komşusu;
+  /// eğri eksene yapışmasın diye değer bu sınıra [step]/2'den yakınsa bir adım
+  /// daha aşağı alınır. 0'ın altına inmez.
+  double _chartBottom(List<double> values, double step) {
+    if (values.isEmpty) return 0;
+    var low = values.first;
+    for (final v in values) {
+      if (v < low) low = v;
+    }
+    var bottom = (low / step).floor() * step;
+    if (low - bottom < step / 2) bottom -= step;
+    return bottom < 0 ? 0 : bottom;
   }
 
   /// Grafiğin üst sınırı: en büyük değerin yukarı yuvarlanmışı, en az [floor].
@@ -674,6 +690,21 @@ class _AnalyticsDashboardScreenState
                 style: TextStyle(fontSize: 12, color: _muted),
               ),
             ],
+            if (item.weekly.length >= 2) ...[
+              const SizedBox(height: 14),
+              Text(l10n.analyticsAdherenceWeekly,
+                  style: TextStyle(fontSize: 12, color: _muted)),
+              const SizedBox(height: 8),
+              _lineChart(
+                chartKey: ValueKey('adherence-weekly-${item.medicationId}'),
+                dates: [for (final w in item.weekly) w.endDay],
+                maxY: 100,
+                leftInterval: 25,
+                lines: [
+                  _Line(color, [for (final w in item.weekly) w.rate]),
+                ],
+              ),
+            ],
             if (item.extraIntakes > 0) ...[
               const SizedBox(height: 4),
               Text(l10n.analyticsExtra(item.extraIntakes),
@@ -703,6 +734,7 @@ class _AnalyticsDashboardScreenState
     required List<String> dates,
     required double maxY,
     required List<_Line> lines,
+    double minY = 0,
     Key? chartKey,
     bool showDots = true,
     double? leftInterval,
@@ -719,7 +751,7 @@ class _AnalyticsDashboardScreenState
             getDrawingHorizontalLine: (_) => FlLine(color: grid, strokeWidth: 0.5),
           ),
           borderData: FlBorderData(show: false),
-          minY: 0,
+          minY: minY,
           maxY: maxY,
           titlesData: _titles(dates, leftInterval: leftInterval),
           lineBarsData: [

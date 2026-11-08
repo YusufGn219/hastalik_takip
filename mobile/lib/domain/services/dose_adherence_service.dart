@@ -21,6 +21,17 @@ import '../../data/repositories/support.dart';
 import '../local_day.dart';
 import 'dose_service.dart';
 
+/// Bir 7 günlük bloğun uyum oranı.
+class WeeklyAdherence {
+  const WeeklyAdherence(this.endDay, this.rate);
+
+  /// Bloğun son günü ('YYYY-MM-DD'); blok bu günü ve önceki 6 günü kapsar.
+  final String endDay;
+
+  /// 0–100, tek ondalık.
+  final double rate;
+}
+
 class DoseAdherenceItem {
   const DoseAdherenceItem({
     required this.medicationId,
@@ -29,7 +40,13 @@ class DoseAdherenceItem {
     required this.skipped,
     required this.unrecorded,
     required this.extraIntakes,
+    this.weekly = const [],
   });
+
+  /// Eskiden yeniye, bugünde biten tam 7 günlük bloklar (dönemin başındaki
+  /// 7 güne tamamlanmayan günler dışarıda kalır). Sayılacak dozu olmayan blok
+  /// listede yer almaz.
+  final List<WeeklyAdherence> weekly;
 
   final String medicationId;
   final String medicationName;
@@ -85,11 +102,15 @@ class DoseAdherenceService {
     final start = addDays(today, -(days - 1));
 
     // İlaç -> (zaman anahtarı "YYYY-MM-DD HH:mm", durum) listesi.
-    final slots = <String, List<(String, DoseState)>>{};
+    // Üçüncü değer: bugünden geriye 7 günlük blok sırası (0 = son 7 gün).
+    final slots = <String, List<(String, DoseState, int)>>{};
     final names = <String, String>{};
     final firstRecorded = <String, String>{};
 
+    var offset = days; // bugünden kaç gün geride
     for (var day = start; day.compareTo(today) <= 0; day = addDays(day, 1)) {
+      offset--;
+      final block = offset ~/ 7;
       for (final dose in await _doses.dosesForDay(day)) {
         // Bugünün saati henüz gelmemiş dozu sayılmaz.
         if (day == today &&
@@ -100,7 +121,7 @@ class DoseAdherenceService {
         final id = dose.medication.id;
         final key = '$day ${dose.time}';
         names[id] = dose.medication.name;
-        slots.putIfAbsent(id, () => []).add((key, dose.state));
+        slots.putIfAbsent(id, () => []).add((key, dose.state, block));
         if (dose.state != DoseState.pending) {
           final first = firstRecorded[id];
           if (first == null || key.compareTo(first) < 0) firstRecorded[id] = key;
@@ -122,9 +143,16 @@ class DoseAdherenceService {
     for (final entry in slots.entries) {
       final first = firstRecorded[entry.key];
       var taken = 0, skipped = 0, unrecorded = 0;
+      final fullBlocks = days ~/ 7;
+      final blockTaken = List.filled(fullBlocks, 0);
+      final blockPlanned = List.filled(fullBlocks, 0);
       if (first != null) {
-        for (final (key, state) in entry.value) {
+        for (final (key, state, block) in entry.value) {
           if (key.compareTo(first) < 0) continue;
+          if (block < fullBlocks) {
+            blockPlanned[block]++;
+            if (state == DoseState.taken) blockTaken[block]++;
+          }
           switch (state) {
             case DoseState.taken:
               taken++;
@@ -142,6 +170,14 @@ class DoseAdherenceService {
         skipped: skipped,
         unrecorded: unrecorded,
         extraIntakes: extras[entry.key] ?? 0,
+        weekly: [
+          for (var b = fullBlocks - 1; b >= 0; b--)
+            if (blockPlanned[b] > 0)
+              WeeklyAdherence(
+                addDays(today, -7 * b),
+                (blockTaken[b] / blockPlanned[b] * 1000).round() / 10,
+              ),
+        ],
       ));
     }
     items.sort((a, b) => compareTr(a.medicationName, b.medicationName));

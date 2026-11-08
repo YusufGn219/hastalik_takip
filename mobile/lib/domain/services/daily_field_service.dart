@@ -84,6 +84,14 @@ class DailyFieldService {
       min: 0,
       max: 10,
     ),
+    DailyFieldPreset(
+      key: MeasurementTypes.steps,
+      name: 'Adım sayısı',
+      kind: DailyFieldKinds.number,
+      unit: 'adım',
+      min: 0,
+      max: 100000,
+    ),
   ];
 
   /// Alanın `measurements` tablosundaki tür anahtarı.

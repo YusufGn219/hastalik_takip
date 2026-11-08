@@ -571,6 +571,7 @@
   "analyticsNoAdherenceData": "Henüz veri yok",
   "analyticsAdherenceLine": "{taken} alındı · {skipped} atlandı · {unrecorded} kaydedilmedi",
   "@analyticsAdherenceLine": { "placeholders": { "taken": { "type": "int" }, "skipped": { "type": "int" }, "unrecorded": { "type": "int" } } },
+  "analyticsAdherenceWeekly": "Haftalık uyum (her nokta 7 gün)",
   "analyticsExtra": "Plansız alım: {n}",
   "@analyticsExtra": { "placeholders": { "n": { "type": "int" } } },
   "analyticsAdherenceNote": "Sayım, ilacın ilk kayıtlı dozundan başlar. Rutini sonradan değiştirdiyseniz geçmiş günler bugünkü rutininize göre hesaplanır.",

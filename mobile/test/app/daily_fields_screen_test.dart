@@ -104,7 +104,7 @@ void main() {
       tester.runAsync(service.list).then((v) => v!);
 
   group('liste ve açma/kapatma', () {
-    testWidgets('üç hazır alan kapalı gelir; hazır alanda düzenle düğmesi yok', (tester) async {
+    testWidgets('dört hazır alan kapalı gelir; hazır alanda düzenle düğmesi yok', (tester) async {
       await tester.pumpWidget(_app(overrides()));
       await _open(tester);
 
@@ -112,7 +112,8 @@ void main() {
       expect(find.text('Kafein'), findsOneWidget);
       expect(find.text('Spor'), findsOneWidget);
       expect(find.text('Ağrı düzeyi'), findsOneWidget);
-      expect(find.byType(Switch), findsNWidgets(3));
+      expect(find.text('Adım sayısı'), findsOneWidget);
+      expect(find.byType(Switch), findsNWidgets(4));
       for (final f in await all(tester)) {
         expect(_switchOn(tester, f.id), isFalse);
         expect(find.byKey(Key('alan_duzenle_${f.id}')), findsNothing);

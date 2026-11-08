@@ -1074,6 +1074,9 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get analyticsAdherenceWeekly => 'Haftalık uyum (her nokta 7 gün)';
+
+  @override
   String analyticsExtra(int n) {
     return 'Plansız alım: $n';
   }

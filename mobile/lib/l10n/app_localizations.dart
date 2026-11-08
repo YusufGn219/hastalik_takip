@@ -1966,6 +1966,12 @@ abstract class AppLocalizations {
   /// **'{taken} alındı · {skipped} atlandı · {unrecorded} kaydedilmedi'**
   String analyticsAdherenceLine(int taken, int skipped, int unrecorded);
 
+  /// No description provided for @analyticsAdherenceWeekly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık uyum (her nokta 7 gün)'**
+  String get analyticsAdherenceWeekly;
+
   /// No description provided for @analyticsExtra.
   ///
   /// In tr, this message translates to:

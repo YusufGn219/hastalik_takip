@@ -320,6 +320,86 @@ void main() {
     final water = tester.widget<LineChart>(find.byKey(const ValueKey('daily-water-chart')));
     expect(sleep.data.maxY, 12.0); // 11,2 yukarı yuvarlanır (en az 10)
     expect(water.data.maxY, 6.0); // 5,3 yukarı yuvarlanır (en az 4)
+    // Alt sınır veriye göre: 7 saat 6'ya oturur; 2 litre eksene yapışmasın diye 1'e iner.
+    expect(sleep.data.minY, 6.0);
+    expect(water.data.minY, 1.0);
+  });
+
+  testWidgets('günlük sekmesi: küçük değerlerde alt sınır sıfırın altına inmez',
+      (tester) async {
+    final points = [
+      DailyTrendPoint('2026-11-05', 0.5, 0.2, 3, 3),
+      DailyTrendPoint('2026-11-06', 3.0, 1.0, 3, 3),
+    ];
+    await openApp(tester, extra: [fake(_FakeLoader((d) => withDaily(d, points)))]);
+    await openTab(tester, 'Günlük');
+
+    final sleep = tester.widget<LineChart>(find.byKey(const ValueKey('daily-sleep-chart')));
+    final water = tester.widget<LineChart>(find.byKey(const ValueKey('daily-water-chart')));
+    expect(sleep.data.minY, 0.0);
+    expect(water.data.minY, 0.0);
+  });
+
+  testWidgets('günlük sekmesi: en küçük değer sınıra yarım adımdan yakınsa alt sınır bir adım iner',
+      (tester) async {
+    // 6,7 saat: 6'ya 0,7 uzak (< 1 = adımın yarısı değil, adımın tamamının altı);
+    // uyku adımı 2 olduğundan yarım adım 1'dir → sınır 6 değil 4 olur.
+    // 2,6 litre: 2'ye 0,6 uzak (>= 0,5) → sınır 2'de kalır.
+    final points = [
+      DailyTrendPoint('2026-11-05', 6.7, 2.6, 3, 3),
+      DailyTrendPoint('2026-11-06', 8.0, 3.0, 3, 3),
+    ];
+    await openApp(tester, extra: [fake(_FakeLoader((d) => withDaily(d, points)))]);
+    await openTab(tester, 'Günlük');
+
+    final sleep = tester.widget<LineChart>(find.byKey(const ValueKey('daily-sleep-chart')));
+    final water = tester.widget<LineChart>(find.byKey(const ValueKey('daily-water-chart')));
+    expect(sleep.data.minY, 4.0);
+    expect(water.data.minY, 2.0);
+  });
+
+  testWidgets('uyum: iki ve daha çok haftalık blok varsa eğilim grafiği çıkar',
+      (tester) async {
+    AnalyticsOverview build(int days) => AnalyticsOverview(
+          days: days,
+          symptoms: _empty(days).symptoms,
+          daily: _empty(days).daily,
+          effect: _empty(days).effect,
+          adherence: DoseAdherence(days, const [
+            DoseAdherenceItem(
+              medicationId: 'a',
+              medicationName: 'Aspirin',
+              taken: 10,
+              skipped: 2,
+              unrecorded: 2,
+              extraIntakes: 0,
+              weekly: [
+                WeeklyAdherence('2026-10-24', 40.0),
+                WeeklyAdherence('2026-10-31', 70.0),
+                WeeklyAdherence('2026-11-07', 90.0),
+              ],
+            ),
+            DoseAdherenceItem(
+              medicationId: 'b',
+              medicationName: 'Parol',
+              taken: 3,
+              skipped: 0,
+              unrecorded: 0,
+              extraIntakes: 0,
+              weekly: [WeeklyAdherence('2026-11-07', 100.0)],
+            ),
+          ]),
+        );
+    await openApp(tester, extra: [fake(_FakeLoader(build))]);
+    await openTab(tester, 'Uyum');
+
+    final chart = tester.widget<LineChart>(
+        find.byKey(const ValueKey('adherence-weekly-a')));
+    expect(chart.data.lineBarsData.single.spots.map((s) => s.y), [40, 70, 90]);
+    expect(chart.data.maxY, 100);
+    // Tek blokluk ilaçta eğilim çizilmez.
+    expect(find.byKey(const ValueKey('adherence-weekly-b')), findsNothing);
+    expect(find.text('Haftalık uyum (her nokta 7 gün)'), findsOneWidget);
   });
 
   testWidgets('ilaç etkisi: önce/sonra, fark, ortalama etki ve uyarı',
