@@ -237,6 +237,7 @@ final timelineDayLoaderProvider = Provider<TimelineDayLoader>(
     symptoms: ref.watch(symptomRepositoryProvider),
     medications: ref.watch(medicationRepositoryProvider),
     episodes: ref.watch(episodeOverviewLoaderProvider),
+    fields: ref.watch(dailyFieldServiceProvider),
   ),
 );
 

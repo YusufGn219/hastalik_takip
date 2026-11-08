@@ -4,6 +4,7 @@
 import '../../data/database/app_database.dart';
 import '../../data/repositories/medication_repository.dart';
 import '../../data/repositories/symptom_repository.dart';
+import '../../domain/services/daily_field_service.dart';
 import '../../domain/services/timeline_service.dart';
 import '../episode/episode_overview.dart';
 
@@ -70,6 +71,7 @@ class TimelineDay {
     required this.dailyLog,
     required this.items,
     this.activeEpisodes = const [],
+    this.fieldValues = const [],
   });
 
   final String day;
@@ -79,7 +81,11 @@ class TimelineDay {
   final List<TimelineItem> items;
   final List<EpisodeOverview> activeEpisodes;
 
-  bool get isEmpty => dailyLog == null && items.isEmpty;
+  /// O gün değeri girilmiş ek günlük alanları (kafein, spor...). Kapatılmış
+  /// alanlar da girilmiş değerleriyle görünür; değeri olmayanlar yoktur.
+  final List<DailyFieldValue> fieldValues;
+
+  bool get isEmpty => dailyLog == null && items.isEmpty && fieldValues.isEmpty;
 }
 
 class TimelineDayLoader {
@@ -88,15 +94,18 @@ class TimelineDayLoader {
     required SymptomRepository symptoms,
     required MedicationRepository medications,
     required EpisodeOverviewLoader episodes,
+    DailyFieldService? fields,
   })  : _timeline = timeline,
         _symptoms = symptoms,
         _medications = medications,
-        _episodes = episodes;
+        _episodes = episodes,
+        _fields = fields;
 
   final TimelineService _timeline;
   final SymptomRepository _symptoms;
   final MedicationRepository _medications;
   final EpisodeOverviewLoader _episodes;
+  final DailyFieldService? _fields;
 
   Future<TimelineDay> load(String day, {bool withActiveEpisodes = false}) async {
     final t = await _timeline.forDay(day);
@@ -117,12 +126,25 @@ class TimelineDayLoader {
         SkipTimelineItem(s, await medicationName(s.medicationId)),
     ]..sort((a, b) => a.instant.compareTo(b.instant));
 
+    // Ek alanlar okunamazsa çizelgenin geri kalanı yine gösterilir.
+    var fieldValues = const <DailyFieldValue>[];
+    final fields = _fields;
+    if (fields != null) {
+      try {
+        fieldValues = [
+          for (final v in await fields.valuesForDay(day))
+            if (v.value != null) v,
+        ];
+      } catch (_) {}
+    }
+
     return TimelineDay(
       day: day,
       dailyLog: t.dailyLog,
       items: items,
       activeEpisodes:
           withActiveEpisodes ? (await _episodes.load()).active : const [],
+      fieldValues: fieldValues,
     );
   }
 }

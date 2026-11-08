@@ -9,8 +9,10 @@ import 'package:intl/intl.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../data/database/enums.dart';
 import '../../../data/repositories/support.dart';
 import '../../../domain/local_day.dart';
+import '../../../domain/services/daily_field_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../episode/episode_format.dart';
 import '../../episode/episode_overview.dart';
@@ -182,6 +184,11 @@ class _DayTimelineScreenState extends ConsumerState<DayTimelineScreen> {
           _heading(l10n.timelineDailyTitle),
           _dailyLogCard(data, l10n),
           const SizedBox(height: 16),
+          if (data.fieldValues.isNotEmpty) ...[
+            _heading(l10n.extraFieldsTitle),
+            _extraFieldsCard(data, l10n),
+            const SizedBox(height: 16),
+          ],
           _heading(l10n.timelineEventsTitle),
           if (data.items.isEmpty)
             Text(
@@ -279,6 +286,38 @@ class _DayTimelineScreenState extends ConsumerState<DayTimelineScreen> {
         ),
       ),
     );
+  }
+
+  Widget _extraFieldsCard(TimelineDay data, AppLocalizations l10n) {
+    return Card(
+      key: const ValueKey('timeline-extras'),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final v in data.fieldValues)
+              Text(
+                '${v.field.name}: ${_fieldValueText(v, l10n)}',
+                key: ValueKey('timeline-extra-${v.field.id}'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _fieldValueText(DailyFieldValue v, AppLocalizations l10n) {
+    final value = v.value!;
+    switch (v.field.kind) {
+      case DailyFieldKinds.scale:
+        return '${value.toInt()}/5';
+      case DailyFieldKinds.yesNo:
+        return value == 1 ? l10n.extraFieldYes : l10n.extraFieldNo;
+      default:
+        final unit = v.field.unit;
+        return unit.isEmpty ? _number(value) : '${_number(value)} $unit';
+    }
   }
 
   Widget _itemCard(TimelineItem item, AppLocalizations l10n) {
