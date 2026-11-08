@@ -1756,6 +1756,48 @@ abstract class AppLocalizations {
   /// **'Uyum'**
   String get analyticsTabAdherence;
 
+  /// No description provided for @analyticsTabFields.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ek alanlar'**
+  String get analyticsTabFields;
+
+  /// No description provided for @analyticsNoFields.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dönemde ek alan değeri girilmemiş'**
+  String get analyticsNoFields;
+
+  /// No description provided for @analyticsFieldYesNo.
+  ///
+  /// In tr, this message translates to:
+  /// **'{yes} gün evet · {no} gün hayır'**
+  String analyticsFieldYesNo(int yes, int no);
+
+  /// No description provided for @analyticsFieldWithSymptom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom kaydı olan günler: {value} ({n} gün)'**
+  String analyticsFieldWithSymptom(String value, int n);
+
+  /// No description provided for @analyticsFieldWithoutSymptom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom kaydı olmayan günler: {value} ({n} gün)'**
+  String analyticsFieldWithoutSymptom(String value, int n);
+
+  /// No description provided for @analyticsFieldTooFew.
+  ///
+  /// In tr, this message translates to:
+  /// **'Karşılaştırma için her grupta en az {n} gün gerekir'**
+  String analyticsFieldTooFew(int n);
+
+  /// No description provided for @analyticsFieldsNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu karşılaştırma bir birliktelik gösterir; bir şeyin diğerine yol açtığını kanıtlamaz. Tıbbi tavsiye değildir.'**
+  String get analyticsFieldsNote;
+
   /// No description provided for @analyticsDays.
   ///
   /// In tr, this message translates to:

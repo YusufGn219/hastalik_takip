@@ -939,6 +939,36 @@ class AppLocalizationsTr extends AppLocalizations {
   String get analyticsTabAdherence => 'Uyum';
 
   @override
+  String get analyticsTabFields => 'Ek alanlar';
+
+  @override
+  String get analyticsNoFields => 'Bu dönemde ek alan değeri girilmemiş';
+
+  @override
+  String analyticsFieldYesNo(int yes, int no) {
+    return '$yes gün evet · $no gün hayır';
+  }
+
+  @override
+  String analyticsFieldWithSymptom(String value, int n) {
+    return 'Semptom kaydı olan günler: $value ($n gün)';
+  }
+
+  @override
+  String analyticsFieldWithoutSymptom(String value, int n) {
+    return 'Semptom kaydı olmayan günler: $value ($n gün)';
+  }
+
+  @override
+  String analyticsFieldTooFew(int n) {
+    return 'Karşılaştırma için her grupta en az $n gün gerekir';
+  }
+
+  @override
+  String get analyticsFieldsNote =>
+      'Bu karşılaştırma bir birliktelik gösterir; bir şeyin diğerine yol açtığını kanıtlamaz. Tıbbi tavsiye değildir.';
+
+  @override
   String analyticsDays(int n) {
     return '$n gün';
   }

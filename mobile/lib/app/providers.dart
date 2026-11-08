@@ -26,6 +26,7 @@ import '../data/repositories/symptom_repository.dart';
 import '../domain/services/analytics_service.dart';
 import '../domain/services/body_measurement_service.dart';
 import '../domain/services/daily_field_service.dart';
+import '../domain/services/field_analytics_service.dart';
 import '../domain/services/dose_adherence_service.dart';
 import '../domain/services/dose_service.dart';
 import '../domain/services/episode_service.dart';
@@ -267,5 +268,15 @@ final analyticsOverviewLoaderProvider = Provider<AnalyticsOverviewLoader>(
   (ref) => AnalyticsOverviewLoader(
     analytics: ref.watch(analyticsServiceProvider),
     adherence: ref.watch(doseAdherenceServiceProvider),
+    fieldAnalytics: ref.watch(fieldAnalyticsServiceProvider),
+  ),
+);
+
+final fieldAnalyticsServiceProvider = Provider<FieldAnalyticsService>(
+  (ref) => FieldAnalyticsService(
+    fields: ref.watch(dailyFieldServiceProvider),
+    measurements: ref.watch(measurementRepositoryProvider),
+    entries: ref.watch(symptomEntryRepositoryProvider),
+    clock: ref.watch(clockProvider),
   ),
 );

@@ -8,7 +8,9 @@ import 'package:mobile/data/database/app_database.dart';
 import 'package:mobile/data/database/seed_loader.dart';
 import 'package:mobile/data/repositories/support.dart';
 import 'package:mobile/domain/services/analytics_service.dart';
+import 'package:mobile/data/database/enums.dart';
 import 'package:mobile/domain/services/dose_adherence_service.dart';
+import 'package:mobile/domain/services/field_analytics_service.dart';
 import 'package:mobile/domain/weekdays.dart';
 import 'package:mobile/features/analytics/analytics_overview.dart';
 import 'package:mobile/features/analytics/screens/analytics_dashboard_screen.dart';
@@ -84,6 +86,41 @@ AnalyticsOverview _filled(int days) => AnalyticsOverview(
         ),
       ]),
       adherence: DoseAdherence(days, const []),
+    );
+
+DailyField _field(String id, String name, String kind,
+        {String unit = '', double max = 20}) =>
+    DailyField(
+      id: id,
+      createdAt: DateTime(2026, 11, 1),
+      updatedAt: DateTime(2026, 11, 1),
+      name: name,
+      kind: kind,
+      unit: unit,
+      minValue: 0,
+      maxValue: max,
+      isActive: true,
+      sortOrder: 1,
+    );
+
+List<String> _dates(int n) => [
+      for (var i = 0; i < n; i++)
+        '2026-10-${(10 + i).toString().padLeft(2, '0')}',
+    ];
+
+AnalyticsOverview _withFields(int days, List<FieldSeries> series) =>
+    AnalyticsOverview(
+      days: days,
+      symptoms: SymptomAnalytics(days, const [], const []),
+      daily: DailyTrends(days, const [], const {
+        'sleep_hours': null,
+        'water_intake': null,
+        'mood': null,
+        'energy_level': null,
+      }),
+      effect: MedicationEffect(days, const []),
+      adherence: DoseAdherence(days, const []),
+      fields: FieldAnalytics(days, series),
     );
 
 void main() {
@@ -420,6 +457,120 @@ void main() {
     );
     expect(find.byKey(ValueKey('adherence-line-$parol')), findsNothing);
     expect(find.textContaining('ilk kayıtlı dozundan'), findsOneWidget);
+  });
+
+  testWidgets('ek alanlar sekmesi: veri yokken boş durum, not yok', (tester) async {
+    await openApp(tester);
+    await openTab(tester, 'Ek alanlar');
+    expect(find.byKey(const ValueKey('analytics-fields-empty')), findsOneWidget);
+    expect(find.byKey(const ValueKey('fields-note')), findsNothing);
+  });
+
+  testWidgets('ek alanlar: sayı alanı ortalama, grafik ve karşılaştırma gösterir',
+      (tester) async {
+    final kafein = _field('k', 'Kafein', DailyFieldKinds.number, unit: 'bardak');
+    final loader = _FakeLoader((d) => _withFields(d, [
+          FieldSeries(
+            field: kafein,
+            dates: ['2026-11-03', '2026-11-04'],
+            values: [2, 4],
+            relation: const FieldRelation(FieldGroup(6, 3.5), FieldGroup(8, 1.25)),
+          ),
+        ]));
+    await openApp(tester, extra: [fake(loader)]);
+    await openTab(tester, 'Ek alanlar');
+
+    expect(tester.widget<Text>(find.byKey(const ValueKey('field-summary-k'))).data,
+        'Ort: 3 bardak');
+    expect(find.byKey(const ValueKey('field-chart-k')), findsOneWidget);
+    expect(tester.widget<Text>(find.byKey(const ValueKey('field-with-k'))).data,
+        'Semptom kaydı olan günler: 3,5 bardak (6 gün)');
+    expect(tester.widget<Text>(find.byKey(const ValueKey('field-without-k'))).data,
+        'Semptom kaydı olmayan günler: 1,3 bardak (8 gün)');
+    expect(find.textContaining('Tıbbi tavsiye değildir'), findsOneWidget);
+    // 14 noktadan az: ortalama notu yok.
+    expect(find.byKey(const ValueKey('fields-smoothed-note')), findsNothing);
+  });
+
+  testWidgets('ek alanlar: gruplardan biri 5 günden azsa karşılaştırma gösterilmez',
+      (tester) async {
+    final f = _field('s', 'Spor', DailyFieldKinds.number, unit: 'dk', max: 1440);
+    final loader = _FakeLoader((d) => _withFields(d, [
+          FieldSeries(
+            field: f,
+            dates: ['2026-11-03'],
+            values: [30],
+            relation: const FieldRelation(FieldGroup(4, 20), FieldGroup(9, 40)),
+          ),
+        ]));
+    await openApp(tester, extra: [fake(loader)]);
+    await openTab(tester, 'Ek alanlar');
+
+    expect(find.byKey(const ValueKey('field-with-s')), findsNothing);
+    expect(find.byKey(const ValueKey('field-without-s')), findsNothing);
+    expect(find.byKey(const ValueKey('field-toofew-s')), findsOneWidget);
+    expect(find.textContaining('en az 5 gün'), findsOneWidget);
+  });
+
+  testWidgets('ek alanlar: evet/hayır alanı grafiksiz, gün sayısı ve yüzde gösterir',
+      (tester) async {
+    final f = _field('y', 'Yürüyüş', DailyFieldKinds.yesNo, max: 1);
+    final loader = _FakeLoader((d) => _withFields(d, [
+          FieldSeries(
+            field: f,
+            dates: ['2026-11-03', '2026-11-04', '2026-11-05'],
+            values: [1, 0, 1],
+            relation: const FieldRelation(FieldGroup(5, 0.2), FieldGroup(6, 0.5)),
+          ),
+        ]));
+    await openApp(tester, extra: [fake(loader)]);
+    await openTab(tester, 'Ek alanlar');
+
+    expect(tester.widget<Text>(find.byKey(const ValueKey('field-summary-y'))).data,
+        '2 gün evet · 1 gün hayır');
+    expect(find.byKey(const ValueKey('field-chart-y')), findsNothing);
+    expect(tester.widget<Text>(find.byKey(const ValueKey('field-with-y'))).data,
+        'Semptom kaydı olan günler: %20 (5 gün)');
+  });
+
+  testWidgets('ek alanlar: ölçek alanı n/5 yazar; 14 günden fazlada ortalama notu çıkar',
+      (tester) async {
+    final f = _field('t', 'Stres', DailyFieldKinds.scale, max: 5);
+    final loader = _FakeLoader((d) => _withFields(d, [
+          FieldSeries(
+            field: f,
+            dates: _dates(15),
+            values: [for (var i = 0; i < 15; i++) 1.0 + i % 5],
+            relation: const FieldRelation(FieldGroup(7, 4), FieldGroup(8, 2)),
+          ),
+        ]));
+    await openApp(tester, extra: [fake(loader)]);
+    await openTab(tester, 'Ek alanlar');
+
+    expect(tester.widget<Text>(find.byKey(const ValueKey('field-with-t'))).data,
+        'Semptom kaydı olan günler: 4/5 (7 gün)');
+    expect(find.byKey(const ValueKey('fields-smoothed-note')), findsOneWidget);
+    final chart = tester.widget<LineChart>(find.byKey(const ValueKey('field-chart-t')));
+    expect(chart.data.maxY, 5);
+    expect(chart.data.lineBarsData.single.spots.length, 15);
+  });
+
+  testWidgets('ek alanlar: sayı alanında grafik üst sınırı alan sınırına değil veriye bağlı',
+      (tester) async {
+    final f = _field('s', 'Spor', DailyFieldKinds.number, unit: 'dk', max: 1440);
+    final loader = _FakeLoader((d) => _withFields(d, [
+          FieldSeries(
+            field: f,
+            dates: ['2026-11-03', '2026-11-04'],
+            values: [30, 45.5],
+            relation: const FieldRelation(FieldGroup(0, null), FieldGroup(2, 37.75)),
+          ),
+        ]));
+    await openApp(tester, extra: [fake(loader)]);
+    await openTab(tester, 'Ek alanlar');
+
+    final chart = tester.widget<LineChart>(find.byKey(const ValueKey('field-chart-s')));
+    expect(chart.data.maxY, 46);
   });
 
   testWidgets('okunamazsa anlaşılır hata gösterilir', (tester) async {

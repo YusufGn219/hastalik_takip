@@ -1,4 +1,4 @@
-// Analizler: dört sekme (semptomlar, günlük, ilaç etkisi, ilaç uyumu), 7/30/90
+// Analizler: beş sekme (semptomlar, günlük, ilaç etkisi, ilaç uyumu, ek alanlar), 7/30/90
 // gün. Yerel veritabanından AnalyticsOverviewLoader ile okur. İlaç uyumu doz
 // bazlıdır (alındı / atlandı / kaydedilmedi). Yalnız okur.
 
@@ -10,7 +10,9 @@ import 'package:intl/intl.dart';
 import '../../../app/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/services/analytics_service.dart';
+import '../../../data/database/enums.dart';
 import '../../../domain/services/dose_adherence_service.dart';
+import '../../../domain/services/field_analytics_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../analytics_overview.dart';
 import '../smoothing.dart';
@@ -85,7 +87,7 @@ class _AnalyticsDashboardScreenState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         appBar: AppBar(
           title: Text(l10n.analyticsTitle),
@@ -102,6 +104,7 @@ class _AnalyticsDashboardScreenState
               Tab(text: l10n.analyticsTabDaily),
               Tab(text: l10n.analyticsTabEffect),
               Tab(text: l10n.analyticsTabAdherence),
+              Tab(text: l10n.analyticsTabFields),
             ],
           ),
         ),
@@ -161,6 +164,7 @@ class _AnalyticsDashboardScreenState
             _dailyTab(data, l10n),
             _effectTab(data, l10n),
             _adherenceTab(data, l10n),
+            _fieldsTab(data, l10n),
           ],
         ),
         if (_isLoading) const LinearProgressIndicator(minHeight: 2),
@@ -382,6 +386,109 @@ class _AnalyticsDashboardScreenState
           ],
         ],
       ],
+    );
+  }
+
+  // ------------------------------------------------------------ ek alanlar
+
+  Widget _fieldsTab(AnalyticsOverview data, AppLocalizations l10n) {
+    final all = data.fields.series;
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        if (all.isEmpty)
+          _emptyCard(l10n.analyticsNoFields, 'analytics-fields-empty')
+        else ...[
+          for (final s in all) ...[
+            _sectionTitle(s.field.name),
+            const SizedBox(height: 8),
+            _fieldCard(s, l10n),
+            const SizedBox(height: 20),
+          ],
+          Text(l10n.analyticsFieldsNote,
+              key: const ValueKey('fields-note'),
+              style: TextStyle(fontSize: 12, color: _muted)),
+          if (all.any((s) => s.values.length > smoothingThreshold)) ...[
+            const SizedBox(height: 6),
+            Text(l10n.analyticsSmoothedNote,
+                key: const ValueKey('fields-smoothed-note'),
+                style: TextStyle(fontSize: 12, color: _muted)),
+          ],
+        ],
+      ],
+    );
+  }
+
+  String _fieldValue(FieldSeries s, double v) {
+    final f = s.field;
+    if (f.kind == DailyFieldKinds.yesNo) return '%${_n((v * 100).round())}';
+    if (f.kind == DailyFieldKinds.scale) return '${_n(_round1(v))}/5';
+    final u = f.unit;
+    return u.isEmpty ? _n(_round1(v)) : '${_n(_round1(v))} $u';
+  }
+
+  double _round1(double x) => (x * 10).round() / 10;
+
+  Widget _fieldCard(FieldSeries s, AppLocalizations l10n) {
+    final f = s.field;
+    final isYesNo = f.kind == DailyFieldKinds.yesNo;
+    final smooth = s.values.length > smoothingThreshold;
+    final line = smooth ? trailingAverage(s.dates, s.values) : s.values;
+    final yes = s.values.where((v) => v >= 1).length;
+    final avg = s.values.reduce((a, b) => a + b) / s.values.length;
+    final rel = s.relation;
+
+    String group(FieldGroup g) =>
+        g.average == null ? '-' : _fieldValue(s, g.average!);
+
+    return _card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            isYesNo
+                ? l10n.analyticsFieldYesNo(yes, s.values.length - yes)
+                : l10n.analyticsAvg(_fieldValue(s, avg)),
+            key: ValueKey('field-summary-${f.id}'),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          ),
+          if (!isYesNo) ...[
+            const SizedBox(height: 12),
+            _lineChart(
+              chartKey: ValueKey('field-chart-${f.id}'),
+              dates: s.dates,
+              // Ölçekte alanın üst sınırı (5); sayıda veriye göre (spor için
+              // 1440 dk sınırı eğriyi ezerdi).
+              maxY: f.kind == DailyFieldKinds.scale
+                  ? f.maxValue
+                  : _chartTop(line, 1),
+              showDots: !smooth,
+              lines: [_Line(AppColors.primary400, line)],
+            ),
+          ],
+          const SizedBox(height: 12),
+          if (rel.isReliable(FieldAnalyticsService.minRelationDays)) ...[
+            Text(
+              l10n.analyticsFieldWithSymptom(
+                  group(rel.withSymptom), rel.withSymptom.days),
+              key: ValueKey('field-with-${f.id}'),
+              style: const TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              l10n.analyticsFieldWithoutSymptom(
+                  group(rel.withoutSymptom), rel.withoutSymptom.days),
+              key: ValueKey('field-without-${f.id}'),
+              style: const TextStyle(fontSize: 13),
+            ),
+          ] else
+            Text(
+              l10n.analyticsFieldTooFew(FieldAnalyticsService.minRelationDays),
+              key: ValueKey('field-toofew-${f.id}'),
+              style: TextStyle(fontSize: 12, color: _muted),
+            ),
+        ],
+      ),
     );
   }
 
