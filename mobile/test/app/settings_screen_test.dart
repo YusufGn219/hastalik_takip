@@ -88,6 +88,7 @@ Future<void> _mount(WidgetTester tester, _Env env, {String? unlockWith}) async {
             }),
         '/settings': (context) => const SettingsScreen(),
         '/backup': (context) => const Scaffold(body: Text('yedek ekranı')),
+        '/restore': (context) => const Scaffold(body: Text('geri yükleme ekranı')),
       },
     ),
   ));
@@ -146,6 +147,16 @@ void main() {
     await _tap(tester, find.byKey(const Key('ayar_yedek_al')));
 
     expect(find.text('yedek ekranı'), findsOneWidget);
+  });
+
+  testWidgets('"Yedekten geri yükle" satırı geri yükleme ekranını açar', (tester) async {
+    final env = (await tester.runAsync(() => _env()))!;
+    await _mount(tester, env);
+    await _openSettings(tester);
+
+    await _tap(tester, find.byKey(const Key('ayar_yedek_geri')));
+
+    expect(find.text('geri yükleme ekranı'), findsOneWidget);
   });
 
   group('Tüm verimi sil', () {

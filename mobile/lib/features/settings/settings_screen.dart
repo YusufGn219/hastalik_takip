@@ -86,6 +86,17 @@ class SettingsScreen extends ConsumerWidget {
                 onTap: () => Navigator.of(context).pushNamed('/backup'),
               ),
             ),
+            Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                key: const Key('ayar_yedek_geri'),
+                leading: const Icon(Icons.download_for_offline_outlined),
+                title: Text(l10n.settingsRestoreTitle),
+                subtitle: Text(l10n.settingsRestoreHint),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).pushNamed('/restore'),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(top: 12, bottom: 8),
               child: Text(l10n.settingsDataSection, style: text.titleSmall),

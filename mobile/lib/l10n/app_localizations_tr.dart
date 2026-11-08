@@ -1192,4 +1192,75 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get backupFailed =>
       'Yedek alınamadı. Verileriniz silinmedi; tekrar deneyin.';
+
+  @override
+  String get commonOk => 'Tamam';
+
+  @override
+  String get settingsRestoreTitle => 'Yedekten geri yükle';
+
+  @override
+  String get settingsRestoreHint =>
+      'Daha önce aldığınız yedeği bu telefona yükleyin';
+
+  @override
+  String get restoreTitle => 'Yedekten geri yükle';
+
+  @override
+  String get restoreIntro =>
+      'Daha önce aldığınız yedek dosyasını seçin ve yedeği alırken belirlediğiniz parolayı yazın.';
+
+  @override
+  String get restoreWarning =>
+      'Geri yükleme, telefondaki mevcut tüm kayıtlarınızın yerine yedektekileri koyar ve geri alınamaz. Önce güncel bir yedek almanız önerilir.';
+
+  @override
+  String get restorePick => 'Yedek dosyası seç';
+
+  @override
+  String get restoreNoFile => 'Henüz dosya seçilmedi';
+
+  @override
+  String get restorePassphrase => 'Yedek parolası';
+
+  @override
+  String get restoreAction => 'Geri yükle';
+
+  @override
+  String get restoreWorking => 'Geri yükleniyor…';
+
+  @override
+  String get restoreNeedFile => 'Önce bir yedek dosyası seçin';
+
+  @override
+  String get restoreNeedPassphrase => 'Yedek parolasını yazın';
+
+  @override
+  String get restoreConfirmTitle => 'Geri yüklensin mi?';
+
+  @override
+  String get restoreConfirmBody =>
+      'Telefondaki mevcut tüm kayıtlarınız silinir ve yedektekilerle değiştirilir. Bu işlem geri alınamaz.';
+
+  @override
+  String get restoreDoneTitle => 'Geri yüklendi';
+
+  @override
+  String get restoreDoneBody => 'Verileriniz yedekten geri yüklendi.';
+
+  @override
+  String get restoreErrWrong =>
+      'Parola yanlış ya da dosya bozuk. Mevcut verileriniz değişmedi.';
+
+  @override
+  String get restoreErrNewer =>
+      'Bu yedek uygulamanın daha yeni bir sürümüyle alınmış. Önce uygulamayı güncelleyin. Mevcut verileriniz değişmedi.';
+
+  @override
+  String get restoreErrNotBackup =>
+      'Bu dosya bir Vitapuls yedeği değil. Mevcut verileriniz değişmedi.';
+
+  @override
+  String get restoreErrIo =>
+      'Geri yüklenemedi. Mevcut verileriniz değişmedi; tekrar deneyin.';
 }

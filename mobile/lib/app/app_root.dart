@@ -11,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/database/app_database.dart';
 import '../features/lock/app_lock_platform.dart';
 import '../features/lock/app_lock_store.dart';
+import 'database_error_app.dart';
+import 'database_swapper.dart';
 import 'providers.dart';
 
 /// "Tüm veriyi sil" uygulaması: açık veritabanını kapatır, dosyaları ve anahtarı
@@ -43,6 +45,7 @@ class AppRoot extends StatefulWidget {
     required this.eraseStorage,
     required this.child,
     this.overrides = const [],
+    this.onDatabaseReplaced,
   });
 
   /// Açılışta açılmış veritabanı.
@@ -60,6 +63,10 @@ class AppRoot extends StatefulWidget {
   /// Ek geçersiz kılmalar (parmak izi, ekran güvenliği gibi platform parçaları).
   final List<Override> overrides;
 
+  /// Yedekten geri yükleme sonrası, yeni veritabanı açılınca çağrılır (ör. planlı
+  /// bildirimleri yeni veriye göre baştan kurmak). Hatası geri yüklemeyi bozmaz.
+  final Future<void> Function(AppDatabase db)? onDatabaseReplaced;
+
   @override
   State<AppRoot> createState() => _AppRootState();
 }
@@ -67,10 +74,33 @@ class AppRoot extends StatefulWidget {
 class _AppRootState extends State<AppRoot> {
   late AppDatabase _db = widget.database;
   int _generation = 0;
+
+  /// Geri yükleme sonrası veritabanı yeniden açılamadıysa true: uygulama devam
+  /// edemez, hata ekranı gösterilir.
+  bool _openFailed = false;
   late final AppDataWiper _wiper = AppDataWiper(
     closeCurrent: () => _db.close(),
     erase: () => widget.eraseStorage(),
     openFresh: () async => _db = await widget.openDatabase(),
+  );
+
+  late final AppDatabaseSwapper _swapper = AppDatabaseSwapper(
+    closeCurrent: () => _db.close(),
+    openFresh: () async {
+      try {
+        _db = await widget.openDatabase();
+      } catch (_) {
+        if (mounted) setState(() => _openFailed = true);
+        rethrow;
+      }
+    },
+    afterReplaced: () async {
+      try {
+        await widget.onDatabaseReplaced?.call(_db);
+      } catch (_) {
+        // Bildirimlerin kurulamaması geri yüklemeyi geri almaz.
+      }
+    },
   );
 
   Future<void> _restart() async {
@@ -86,12 +116,14 @@ class _AppRootState extends State<AppRoot> {
 
   @override
   Widget build(BuildContext context) {
+    if (_openFailed) return const DatabaseErrorApp();
     return ProviderScope(
       key: ValueKey(_generation),
       overrides: [
         databaseProvider.overrideWithValue(_db),
         sharedPreferencesProvider.overrideWithValue(widget.prefs),
         dataWiperProvider.overrideWithValue(_wiper),
+        databaseSwapperProvider.overrideWithValue(_swapper),
         appRestartProvider.overrideWithValue(_restart),
         ...widget.overrides,
       ],

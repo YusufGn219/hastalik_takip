@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/app/app_root.dart';
+import 'package:mobile/app/database_swapper.dart';
 import 'package:mobile/app/providers.dart';
 import 'package:mobile/data/database/app_database.dart';
 import 'package:mobile/data/database/database_opener.dart';
@@ -167,6 +168,117 @@ void main() {
 
       await expectLater(seenRef.read(dataWiperProvider).wipe(), throwsStateError);
       expect(opened, 0);
+    });
+  });
+
+  group('AppRoot: veritabanı takası (yedekten geri yükleme)', () {
+    testWidgets('kapat → iş → yeniden aç; başarıda "değişti" bildirimi yeni veritabanıyla çağrılır', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final second = createTestDb();
+      addTearDown(second.close);
+      final order = <String>[];
+      AppDatabase? replaced;
+      late WidgetRef seenRef;
+
+      await tester.pumpWidget(AppRoot(
+        database: createTestDb(),
+        prefs: prefs,
+        openDatabase: () async {
+          order.add('open');
+          return second;
+        },
+        eraseStorage: () async {},
+        onDatabaseReplaced: (db) async {
+          order.add('replaced');
+          replaced = db;
+        },
+        child: Consumer(builder: (context, ref, _) {
+          seenRef = ref;
+          return const SizedBox();
+        }),
+      ));
+
+      await seenRef.read(databaseSwapperProvider).swap(() async => order.add('iş'));
+
+      expect(order, ['iş', 'open', 'replaced']);
+      expect(replaced, same(second));
+    });
+
+    testWidgets('iş başarısız olursa veritabanı yine açılır, hata yukarı çıkar, bildirim çağrılmaz', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      var opened = 0;
+      var replaced = 0;
+      late WidgetRef seenRef;
+      final reopened = createTestDb();
+      addTearDown(reopened.close);
+
+      await tester.pumpWidget(AppRoot(
+        database: createTestDb(),
+        prefs: prefs,
+        openDatabase: () async {
+          opened++;
+          return reopened;
+        },
+        eraseStorage: () async {},
+        onDatabaseReplaced: (db) async => replaced++,
+        child: Consumer(builder: (context, ref, _) {
+          seenRef = ref;
+          return const SizedBox();
+        }),
+      ));
+
+      await expectLater(
+        seenRef.read(databaseSwapperProvider).swap(() async => throw StateError('disk')),
+        throwsStateError,
+      );
+      expect(opened, 1);
+      expect(replaced, 0);
+    });
+
+    testWidgets('"değişti" bildirimi hata verirse geri yükleme bozulmaz', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      late WidgetRef seenRef;
+      final reopened = createTestDb();
+      addTearDown(reopened.close);
+
+      await tester.pumpWidget(AppRoot(
+        database: createTestDb(),
+        prefs: prefs,
+        openDatabase: () async => reopened,
+        eraseStorage: () async {},
+        onDatabaseReplaced: (db) async => throw StateError('bildirim'),
+        child: Consumer(builder: (context, ref, _) {
+          seenRef = ref;
+          return const SizedBox();
+        }),
+      ));
+
+      await seenRef.read(databaseSwapperProvider).swap(() async {});
+    });
+
+    testWidgets('geri yüklemeden sonra veritabanı açılamazsa hata ekranı gösterilir', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      late WidgetRef seenRef;
+
+      await tester.pumpWidget(AppRoot(
+        database: createTestDb(),
+        prefs: prefs,
+        openDatabase: () async => throw StateError('açılamadı'),
+        eraseStorage: () async {},
+        child: Consumer(builder: (context, ref, _) {
+          seenRef = ref;
+          return const SizedBox();
+        }),
+      ));
+
+      await expectLater(seenRef.read(databaseSwapperProvider).swap(() async {}), throwsStateError);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Veritabanı açılamadı'), findsOneWidget);
     });
   });
 }

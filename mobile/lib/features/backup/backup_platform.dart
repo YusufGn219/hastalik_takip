@@ -12,7 +12,9 @@ import 'package:path_provider/path_provider.dart';
 import '../../app/providers.dart';
 import '../../data/backup/backup_service.dart';
 import '../../data/database/database_opener.dart';
+import '../../app/database_swapper.dart';
 import 'backup_exporter.dart';
+import 'backup_restorer.dart';
 
 /// Yedeğin alınacağı veritabanı: dosyası, anahtarı ve geçici dosyaların yeri.
 abstract class BackupStorage {
@@ -73,5 +75,34 @@ final backupExporterProvider = Provider<BackupExporter>(
     storage: ref.watch(backupStorageProvider),
     saver: ref.watch(backupFileSaverProvider),
     clock: ref.watch(clockProvider),
+  ),
+);
+
+/// Geri yüklenecek yedek dosyasını kullanıcıya seçtirir.
+abstract class BackupFilePicker {
+  /// Seçilen dosya; vazgeçildiyse null. (Android'de seçilen dosyanın uygulama
+  /// önbelleğindeki kopyasıdır.)
+  Future<File?> pick();
+}
+
+class FilePickerBackupFilePicker implements BackupFilePicker {
+  const FilePickerBackupFilePicker();
+
+  @override
+  Future<File?> pick() async {
+    final result = await FilePicker.pickFiles();
+    final path = result?.files.single.path;
+    return path == null ? null : File(path);
+  }
+}
+
+final backupFilePickerProvider = Provider<BackupFilePicker>((ref) => const FilePickerBackupFilePicker());
+
+/// "Yedekten geri yükle" işi; testlerde sahtesiyle değiştirilir.
+final backupRestorerProvider = Provider<BackupRestorer>(
+  (ref) => BackupRestorer(
+    service: ref.watch(backupServiceProvider),
+    storage: ref.watch(backupStorageProvider),
+    swapper: ref.watch(databaseSwapperProvider),
   ),
 );

@@ -2181,6 +2181,132 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Yedek alınamadı. Verileriniz silinmedi; tekrar deneyin.'**
   String get backupFailed;
+
+  /// No description provided for @commonOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get commonOk;
+
+  /// No description provided for @settingsRestoreTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedekten geri yükle'**
+  String get settingsRestoreTitle;
+
+  /// No description provided for @settingsRestoreHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha önce aldığınız yedeği bu telefona yükleyin'**
+  String get settingsRestoreHint;
+
+  /// No description provided for @restoreTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedekten geri yükle'**
+  String get restoreTitle;
+
+  /// No description provided for @restoreIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha önce aldığınız yedek dosyasını seçin ve yedeği alırken belirlediğiniz parolayı yazın.'**
+  String get restoreIntro;
+
+  /// No description provided for @restoreWarning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri yükleme, telefondaki mevcut tüm kayıtlarınızın yerine yedektekileri koyar ve geri alınamaz. Önce güncel bir yedek almanız önerilir.'**
+  String get restoreWarning;
+
+  /// No description provided for @restorePick.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek dosyası seç'**
+  String get restorePick;
+
+  /// No description provided for @restoreNoFile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz dosya seçilmedi'**
+  String get restoreNoFile;
+
+  /// No description provided for @restorePassphrase.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek parolası'**
+  String get restorePassphrase;
+
+  /// No description provided for @restoreAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri yükle'**
+  String get restoreAction;
+
+  /// No description provided for @restoreWorking.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri yükleniyor…'**
+  String get restoreWorking;
+
+  /// No description provided for @restoreNeedFile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önce bir yedek dosyası seçin'**
+  String get restoreNeedFile;
+
+  /// No description provided for @restoreNeedPassphrase.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek parolasını yazın'**
+  String get restoreNeedPassphrase;
+
+  /// No description provided for @restoreConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri yüklensin mi?'**
+  String get restoreConfirmTitle;
+
+  /// No description provided for @restoreConfirmBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefondaki mevcut tüm kayıtlarınız silinir ve yedektekilerle değiştirilir. Bu işlem geri alınamaz.'**
+  String get restoreConfirmBody;
+
+  /// No description provided for @restoreDoneTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri yüklendi'**
+  String get restoreDoneTitle;
+
+  /// No description provided for @restoreDoneBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verileriniz yedekten geri yüklendi.'**
+  String get restoreDoneBody;
+
+  /// No description provided for @restoreErrWrong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parola yanlış ya da dosya bozuk. Mevcut verileriniz değişmedi.'**
+  String get restoreErrWrong;
+
+  /// No description provided for @restoreErrNewer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu yedek uygulamanın daha yeni bir sürümüyle alınmış. Önce uygulamayı güncelleyin. Mevcut verileriniz değişmedi.'**
+  String get restoreErrNewer;
+
+  /// No description provided for @restoreErrNotBackup.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dosya bir Vitapuls yedeği değil. Mevcut verileriniz değişmedi.'**
+  String get restoreErrNotBackup;
+
+  /// No description provided for @restoreErrIo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri yüklenemedi. Mevcut verileriniz değişmedi; tekrar deneyin.'**
+  String get restoreErrIo;
 }
 
 class _AppLocalizationsDelegate

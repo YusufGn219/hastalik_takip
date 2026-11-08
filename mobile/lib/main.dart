@@ -13,6 +13,7 @@ import 'data/repositories/medication_repository.dart';
 import 'domain/services/reminder_service.dart';
 import 'features/analytics/screens/analytics_dashboard_screen.dart';
 import 'features/backup/backup_export_screen.dart';
+import 'features/backup/backup_restore_screen.dart';
 import 'features/episode/screens/episode_list_screen.dart';
 import 'features/health/screens/daily_log_screen.dart';
 import 'features/health/screens/symptom_screen.dart';
@@ -57,6 +58,7 @@ Future<void> main() async {
       prefs: prefs,
       openDatabase: _openSeededDatabase,
       eraseStorage: _eraseEverything,
+      onDatabaseReplaced: _afterRestore,
       overrides: [
         biometricAuthenticatorProvider.overrideWithValue(LocalAuthBiometric()),
         screenSecurityProvider.overrideWithValue(MethodChannelScreenSecurity()),
@@ -89,6 +91,17 @@ Future<void> _eraseEverything() async {
     debugPrint('Bildirimler iptal edilemedi: ${e.runtimeType}');
   }
   await eraseDatabaseStorage();
+}
+
+/// Yedekten geri yüklemeden sonra: eski veriye ait planlı bildirimler iptal edilir,
+/// geri yüklenen rutinlere göre baştan kurulur.
+Future<void> _afterRestore(AppDatabase db) async {
+  try {
+    await NotificationService.instance.cancelAll();
+  } catch (e) {
+    debugPrint('Bildirimler iptal edilemedi: ${e.runtimeType}');
+  }
+  await _rescheduleReminders(db);
 }
 
 /// Veritabanını açar ve başlangıç verisini yükler; yüklenemezse kapatıp hatayı atar.
@@ -125,6 +138,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/settings': (context) => const SettingsScreen(),
         '/backup': (context) => const BackupExportScreen(),
+        '/restore': (context) => const BackupRestoreScreen(),
         '/timeline': (context) => const DayTimelineScreen(),
         '/daily-log': (context) => const DailyLogScreen(),
         '/symptoms': (context) => const SymptomScreen(),

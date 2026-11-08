@@ -72,6 +72,15 @@ class BackupService {
     return Isolate.run(() => _exportSync(src, hexKey, dst, passphrase));
   }
 
+  /// Yedeği değiştirmeden denetler: parola doğru mu, sürüm uygulamanınkinden
+  /// yeni değil mi, Vitapuls yedeği mi, bütünlük tamam mı. Geri yüklemeden önce,
+  /// veritabanını kapatmadan çağrılır; sorun varsa [BackupException] fırlatır.
+  Future<void> verify({required File backup, required String passphrase}) {
+    final src = backup.path;
+    final version = currentSchemaVersion;
+    return Isolate.run(() => _verifySync(src, passphrase, version));
+  }
+
   /// İçe aktarma: [backup] dosyasını [passphrase] ile açar, doğrular ve
   /// [database] dosyasının **yerine** koyar (bu cihazın [hexKey] anahtarıyla).
   /// Veritabanı çağrıdan önce kapatılmış olmalıdır. Hata olursa eski veritabanı
@@ -196,6 +205,48 @@ void _exportSync(String sourcePath, String hexKey, String targetPath, String pas
   }
 }
 
+/// Yedeği açar ve denetler; geçerliyse (açık veritabanı, şema sürümü) döndürür.
+/// Çağıran veritabanı bağlantısını kapatmakla yükümlüdür.
+(Database, int) _openValidated(String backupPath, String passphrase, int currentVersion) {
+  if (!File(backupPath).existsSync()) {
+    throw BackupException(BackupFailure.io, 'Yedek dosyası yok.');
+  }
+  Database db;
+  try {
+    db = _openKeyed(backupPath, _quoted(passphrase));
+  } on SqliteException catch (e) {
+    throw BackupException(BackupFailure.wrongPassphraseOrCorrupt, e.message);
+  }
+  try {
+    final version = _userVersion(db);
+    if (version > currentVersion) {
+      throw BackupException(
+        BackupFailure.newerVersion,
+        'Yedek sürümü $version, uygulama sürümü $currentVersion.',
+      );
+    }
+    if (version < 1 || !_tableNames(db).containsAll(_requiredTables)) {
+      throw BackupException(BackupFailure.notABackup, 'Beklenen tablolar yok.');
+    }
+    final integrity = db.select('PRAGMA integrity_check;');
+    if (integrity.isEmpty || integrity.first.values.first != 'ok') {
+      throw BackupException(BackupFailure.wrongPassphraseOrCorrupt, 'Bütünlük denetimi başarısız.');
+    }
+    return (db, version);
+  } on SqliteException catch (e) {
+    db.close();
+    throw BackupException(BackupFailure.wrongPassphraseOrCorrupt, e.message);
+  } catch (_) {
+    db.close();
+    rethrow;
+  }
+}
+
+void _verifySync(String backupPath, String passphrase, int currentVersion) {
+  final opened = _openValidated(backupPath, passphrase, currentVersion);
+  opened.$1.close();
+}
+
 void _restoreSync(
   String backupPath,
   String passphrase,
@@ -217,29 +268,9 @@ void _restoreSync(
 
   Database? backup;
   try {
-    if (!File(backupPath).existsSync()) {
-      throw BackupException(BackupFailure.io, 'Yedek dosyası yok.');
-    }
-    try {
-      backup = _openKeyed(backupPath, _quoted(passphrase));
-    } on SqliteException catch (e) {
-      throw BackupException(BackupFailure.wrongPassphraseOrCorrupt, e.message);
-    }
-
-    final version = _userVersion(backup);
-    if (version > currentVersion) {
-      throw BackupException(
-        BackupFailure.newerVersion,
-        'Yedek sürümü $version, uygulama sürümü $currentVersion.',
-      );
-    }
-    if (version < 1 || !_tableNames(backup).containsAll(_requiredTables)) {
-      throw BackupException(BackupFailure.notABackup, 'Beklenen tablolar yok.');
-    }
-    final integrity = backup.select('PRAGMA integrity_check;');
-    if (integrity.isEmpty || integrity.first.values.first != 'ok') {
-      throw BackupException(BackupFailure.wrongPassphraseOrCorrupt, 'Bütünlük denetimi başarısız.');
-    }
+    final opened = _openValidated(backupPath, passphrase, currentVersion);
+    backup = opened.$1;
+    final version = opened.$2;
 
     backup.execute('ATTACH DATABASE ? AS target KEY ?;', [tmp, _rawKeyText(hexKey)]);
     backup.select("SELECT sqlcipher_export('target');");

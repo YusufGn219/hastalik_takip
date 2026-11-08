@@ -156,6 +156,42 @@ void main() {
     expect(dir.listSync().map((e) => e.uri.pathSegments.last).toSet(), {'vitapuls.db', 'yedek.vpbak'});
   });
 
+  group('verify', () {
+    test('doğru parolalı sağlam yedekte sessizce geçer ve hiçbir dosyayı değiştirmez', () async {
+      await makeDb(main, _keyA, ['Mevcut']);
+      await service.export(database: main, hexKey: _keyA, target: backup, passphrase: _pass);
+      final mainBefore = main.readAsBytesSync();
+      final backupBefore = backup.readAsBytesSync();
+
+      await service.verify(backup: backup, passphrase: _pass);
+
+      expect(main.readAsBytesSync(), mainBefore);
+      expect(backup.readAsBytesSync(), backupBefore);
+    });
+
+    test('yanlış parola, bozuk dosya, yeni sürüm ve yabancı dosya reddedilir', () async {
+      await makeDb(main, _keyA, ['Mevcut']);
+      await service.export(database: main, hexKey: _keyA, target: backup, passphrase: _pass);
+
+      await expectLater(
+        service.verify(backup: backup, passphrase: 'yanlış parola'),
+        throwsA(isA<BackupException>().having((e) => e.failure, 'failure', BackupFailure.wrongPassphraseOrCorrupt)),
+      );
+
+      final raw = sqlite3.open(backup.path)
+        ..execute("PRAGMA key = '$_pass';")
+        ..execute('PRAGMA user_version = ${service.currentSchemaVersion + 1};');
+      raw.close();
+      await expectLater(
+        service.verify(backup: backup, passphrase: _pass),
+        throwsA(isA<BackupException>().having((e) => e.failure, 'failure', BackupFailure.newerVersion)),
+      );
+
+      backup.writeAsBytesSync(List.filled(4096, 7));
+      await expectLater(service.verify(backup: backup, passphrase: _pass), throwsA(isA<BackupException>()));
+    });
+  });
+
   test('daha yeni şema sürümünden yedek reddedilir', () async {
     await makeDb(main, _keyA, ['Mevcut']);
     await service.export(database: main, hexKey: _keyA, target: backup, passphrase: _pass);
