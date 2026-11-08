@@ -53,6 +53,7 @@ dependencies:
   local_auth: ^3.0.2
   flutter_timezone: ^5.1.1
   file_picker: ^11.0.3
+  image_picker: ^1.2.4
 
 # Yerel veritabanı SQLCipher ile şifrelenir. sqlcipher_flutter_libs paketi artık
 # kullanılmıyor (0.7.0+eol); sqlite3 3.x derleme kancası (hook) ile SQLCipher seçilir.

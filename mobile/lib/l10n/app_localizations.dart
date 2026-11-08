@@ -2080,6 +2080,156 @@ abstract class AppLocalizations {
   /// **'Tüm kayıtlarınızı bu telefondan kalıcı olarak siler; geri alınamaz.'**
   String get settingsWipeHint;
 
+  /// No description provided for @settingsProfileTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil'**
+  String get settingsProfileTitle;
+
+  /// No description provided for @settingsProfileEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adınızı ve temel bilgilerinizi ekleyin'**
+  String get settingsProfileEmpty;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil'**
+  String get profileTitle;
+
+  /// No description provided for @profileIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu bilgiler yalnızca bu telefonda, şifreli veritabanınızda durur. Hepsi isteğe bağlıdır.'**
+  String get profileIntro;
+
+  /// No description provided for @profileFirstName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ad'**
+  String get profileFirstName;
+
+  /// No description provided for @profileLastName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Soyad'**
+  String get profileLastName;
+
+  /// No description provided for @profileBirthDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum tarihi'**
+  String get profileBirthDate;
+
+  /// No description provided for @profileBirthDateNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçilmedi'**
+  String get profileBirthDateNone;
+
+  /// No description provided for @profileBirthDateClear.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarihi temizle'**
+  String get profileBirthDateClear;
+
+  /// No description provided for @profileGender.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cinsiyet'**
+  String get profileGender;
+
+  /// No description provided for @profileGenderNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Belirtmek istemiyorum'**
+  String get profileGenderNone;
+
+  /// No description provided for @profileGenderFemale.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kadın'**
+  String get profileGenderFemale;
+
+  /// No description provided for @profileGenderMale.
+  ///
+  /// In tr, this message translates to:
+  /// **'Erkek'**
+  String get profileGenderMale;
+
+  /// No description provided for @profileGenderOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get profileGenderOther;
+
+  /// No description provided for @profilePhotoAdd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf ekle'**
+  String get profilePhotoAdd;
+
+  /// No description provided for @profilePhotoChange.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğrafı değiştir'**
+  String get profilePhotoChange;
+
+  /// No description provided for @profilePhotoGallery.
+  ///
+  /// In tr, this message translates to:
+  /// **'Galeriden seç'**
+  String get profilePhotoGallery;
+
+  /// No description provided for @profilePhotoCamera.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kamerayla çek'**
+  String get profilePhotoCamera;
+
+  /// No description provided for @profilePhotoRemove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğrafı kaldır'**
+  String get profilePhotoRemove;
+
+  /// No description provided for @profilePhotoFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf alınamadı.'**
+  String get profilePhotoFailed;
+
+  /// No description provided for @profileSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get profileSave;
+
+  /// No description provided for @profileSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil kaydedildi'**
+  String get profileSaved;
+
+  /// No description provided for @profileSaveFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil kaydedilemedi.'**
+  String get profileSaveFailed;
+
+  /// No description provided for @profileLoadFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil okunamadı.'**
+  String get profileLoadFailed;
+
+  /// No description provided for @profileRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeniden dene'**
+  String get profileRetry;
+
   /// No description provided for @settingsBackupSection.
   ///
   /// In tr, this message translates to:

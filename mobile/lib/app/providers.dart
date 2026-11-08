@@ -16,6 +16,7 @@ import '../data/repositories/dose_skip_repository.dart';
 import '../data/repositories/episode_repository.dart';
 import '../data/repositories/medication_log_repository.dart';
 import '../data/repositories/medication_repository.dart';
+import '../data/repositories/profile_repository.dart';
 import '../data/repositories/settings_repository.dart';
 import '../data/repositories/support.dart';
 import '../data/repositories/symptom_entry_repository.dart';
@@ -98,6 +99,18 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
     ref.watch(databaseProvider),
     clock: ref.watch(clockProvider),
   ),
+);
+
+final profileRepositoryProvider = Provider<ProfileRepository>(
+  (ref) => DriftProfileRepository(
+    ref.watch(databaseProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+/// Yerel profil (tek satır). Kaydedildikten sonra `ref.invalidate` ile tazelenir.
+final profileProvider = FutureProvider.autoDispose<Profile>(
+  (ref) => ref.watch(profileRepositoryProvider).get(),
 );
 
 // ------------------------------------------------------------------ servisler

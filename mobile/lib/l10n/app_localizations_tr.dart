@@ -1137,6 +1137,82 @@ class AppLocalizationsTr extends AppLocalizations {
       'Tüm kayıtlarınızı bu telefondan kalıcı olarak siler; geri alınamaz.';
 
   @override
+  String get settingsProfileTitle => 'Profil';
+
+  @override
+  String get settingsProfileEmpty => 'Adınızı ve temel bilgilerinizi ekleyin';
+
+  @override
+  String get profileTitle => 'Profil';
+
+  @override
+  String get profileIntro =>
+      'Bu bilgiler yalnızca bu telefonda, şifreli veritabanınızda durur. Hepsi isteğe bağlıdır.';
+
+  @override
+  String get profileFirstName => 'Ad';
+
+  @override
+  String get profileLastName => 'Soyad';
+
+  @override
+  String get profileBirthDate => 'Doğum tarihi';
+
+  @override
+  String get profileBirthDateNone => 'Seçilmedi';
+
+  @override
+  String get profileBirthDateClear => 'Tarihi temizle';
+
+  @override
+  String get profileGender => 'Cinsiyet';
+
+  @override
+  String get profileGenderNone => 'Belirtmek istemiyorum';
+
+  @override
+  String get profileGenderFemale => 'Kadın';
+
+  @override
+  String get profileGenderMale => 'Erkek';
+
+  @override
+  String get profileGenderOther => 'Diğer';
+
+  @override
+  String get profilePhotoAdd => 'Fotoğraf ekle';
+
+  @override
+  String get profilePhotoChange => 'Fotoğrafı değiştir';
+
+  @override
+  String get profilePhotoGallery => 'Galeriden seç';
+
+  @override
+  String get profilePhotoCamera => 'Kamerayla çek';
+
+  @override
+  String get profilePhotoRemove => 'Fotoğrafı kaldır';
+
+  @override
+  String get profilePhotoFailed => 'Fotoğraf alınamadı.';
+
+  @override
+  String get profileSave => 'Kaydet';
+
+  @override
+  String get profileSaved => 'Profil kaydedildi';
+
+  @override
+  String get profileSaveFailed => 'Profil kaydedilemedi.';
+
+  @override
+  String get profileLoadFailed => 'Profil okunamadı.';
+
+  @override
+  String get profileRetry => 'Yeniden dene';
+
+  @override
   String get settingsBackupSection => 'Yedek';
 
   @override

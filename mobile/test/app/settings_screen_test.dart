@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mobile/app/providers.dart';
 import 'package:mobile/core/theme/app_theme.dart';
 import 'package:mobile/features/lock/app_lock_store.dart';
 import 'package:mobile/features/home/home_screen.dart';
@@ -8,9 +9,12 @@ import 'package:mobile/features/lock/app_lock_controller.dart';
 import 'package:mobile/features/lock/app_lock_gate.dart';
 import 'package:mobile/features/lock/app_lock_platform.dart';
 import 'package:mobile/features/lock/lock_settings_card.dart';
+import 'package:mobile/features/profile/profile_screen.dart';
 import 'package:mobile/features/settings/settings_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../support/fake_profile_repository.dart';
 
 class _Wiper implements DataWiper {
   int calls = 0;
@@ -62,7 +66,8 @@ Future<_Env> _env({String? pin}) async {
 }
 
 /// Ana ekranın üstüne Ayarlar'ı açar (gerçek tema, gerçek rota adları).
-Future<void> _mount(WidgetTester tester, _Env env, {String? unlockWith}) async {
+Future<void> _mount(WidgetTester tester, _Env env,
+    {String? unlockWith, FakeProfileRepository? profile}) async {
   tester.view.physicalSize = const Size(800, 3000);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
@@ -74,6 +79,7 @@ Future<void> _mount(WidgetTester tester, _Env env, {String? unlockWith}) async {
       biometricAuthenticatorProvider.overrideWithValue(_NoBiometric()),
       screenSecurityProvider.overrideWithValue(_NoSecurity()),
       dataWiperProvider.overrideWithValue(env.wiper),
+      profileRepositoryProvider.overrideWithValue(profile ?? FakeProfileRepository()),
       appRestartProvider.overrideWithValue(() async => env.restarts++),
     ],
     child: MaterialApp(
@@ -87,6 +93,7 @@ Future<void> _mount(WidgetTester tester, _Env env, {String? unlockWith}) async {
               return const HomeScreen();
             }),
         '/settings': (context) => const SettingsScreen(),
+        '/profile': (context) => const ProfileScreen(),
         '/backup': (context) => const Scaffold(body: Text('yedek ekranı')),
         '/restore': (context) => const Scaffold(body: Text('geri yükleme ekranı')),
       },
@@ -242,6 +249,62 @@ void main() {
       expect(env.wiper.calls, 1);
       expect(env.restarts, 1);
       expect(_c.read(appLockProvider).enabled, isFalse);
+    });
+  });
+
+  group('profil kartı', () {
+    testWidgets('profil boşsa ipucu görünür; dokununca Profil ekranı açılır', (tester) async {
+      final env = (await tester.runAsync(() => _env()))!;
+      await _mount(tester, env);
+      await _openSettings(tester);
+
+      expect(find.text('Adınızı ve temel bilgilerinizi ekleyin'), findsOneWidget);
+      await _tap(tester, find.byKey(const Key('ayar_profil')));
+      expect(find.byType(ProfileScreen), findsOneWidget);
+    });
+
+    testWidgets('profil kaydedilince Ayarlar kartı yeni adı gösterir', (tester) async {
+      final env = (await tester.runAsync(() => _env()))!;
+      await _mount(tester, env);
+      await _openSettings(tester);
+
+      await _tap(tester, find.byKey(const Key('ayar_profil')));
+      await tester.enterText(find.byKey(const Key('profil_ad')), 'Ada');
+      await tester.enterText(find.byKey(const Key('profil_soyad')), 'Lovelace');
+      await _tap(tester, find.byKey(const Key('profil_kaydet')));
+
+      expect(find.byType(ProfileScreen), findsNothing);
+      expect(find.text('Ada Lovelace'), findsOneWidget);
+    });
+
+    testWidgets('ad ve soyad kartta görünür', (tester) async {
+      final env = (await tester.runAsync(() => _env()))!;
+      final repo = FakeProfileRepository();
+      repo.current = repo.current.copyWith(firstName: 'Ada', lastName: 'Lovelace');
+      await _mount(tester, env, profile: repo);
+      await _openSettings(tester);
+
+      expect(find.text('Ada Lovelace'), findsOneWidget);
+      expect(find.text('Adınızı ve temel bilgilerinizi ekleyin'), findsNothing);
+    });
+
+    testWidgets('yalnız ad girilmişse yalnız ad görünür', (tester) async {
+      final env = (await tester.runAsync(() => _env()))!;
+      final repo = FakeProfileRepository();
+      repo.current = repo.current.copyWith(firstName: 'Ada');
+      await _mount(tester, env, profile: repo);
+      await _openSettings(tester);
+
+      expect(find.text('Ada'), findsOneWidget);
+    });
+
+    testWidgets('profil okunamazsa kart yine açılır', (tester) async {
+      final env = (await tester.runAsync(() => _env()))!;
+      await _mount(tester, env, profile: FakeProfileRepository(failLoads: 5));
+      await _openSettings(tester);
+
+      expect(find.byKey(const Key('ayar_profil')), findsOneWidget);
+      expect(find.text('Adınızı ve temel bilgilerinizi ekleyin'), findsOneWidget);
     });
   });
 }

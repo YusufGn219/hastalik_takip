@@ -4,7 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/providers.dart';
 import '../../l10n/l10n.dart';
+import '../profile/profile_avatar.dart';
 import '../lock/app_lock_controller.dart';
 import '../lock/app_lock_platform.dart';
 import '../lock/lock_settings_card.dart';
@@ -70,6 +72,7 @@ class SettingsScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            const _ProfileCard(),
             const AppLockSettingsCard(),
             Padding(
               padding: const EdgeInsets.only(top: 12, bottom: 8),
@@ -116,6 +119,30 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Ayarların en üstündeki profil kartı: fotoğraf, ad ve soyad; dokununca Profil
+/// ekranı açılır. Profil okunamazsa kart yine açılır, ad yerine ipucu görünür.
+class _ProfileCard extends ConsumerWidget {
+  const _ProfileCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final profile = ref.watch(profileProvider).valueOrNull;
+    final name = profile == null ? '' : '${profile.firstName} ${profile.lastName}'.trim();
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        key: const Key('ayar_profil'),
+        leading: ProfileAvatar(photo: profile?.photo, radius: 24),
+        title: Text(name.isEmpty ? l10n.settingsProfileTitle : name),
+        subtitle: name.isEmpty ? Text(l10n.settingsProfileEmpty) : Text(l10n.settingsProfileTitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => Navigator.of(context).pushNamed('/profile'),
       ),
     );
   }

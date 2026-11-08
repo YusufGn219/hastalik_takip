@@ -25,6 +25,7 @@ import 'features/medication/screens/chronic_condition_screen.dart';
 import 'features/medication/screens/medication_log_screen.dart';
 import 'features/medication/screens/recurring_screen.dart';
 import 'features/onboarding/start_screen.dart';
+import 'features/profile/profile_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/timeline/screens/day_timeline_screen.dart';
 import 'l10n/app_localizations.dart';
@@ -137,6 +138,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const StartScreen(),
         '/home': (context) => const HomeScreen(),
         '/settings': (context) => const SettingsScreen(),
+        '/profile': (context) => const ProfileScreen(),
         '/backup': (context) => const BackupExportScreen(),
         '/restore': (context) => const BackupRestoreScreen(),
         '/timeline': (context) => const DayTimelineScreen(),
