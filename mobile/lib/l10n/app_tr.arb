@@ -700,5 +700,48 @@
   "restoreErrWrong": "Parola yanlış ya da dosya bozuk. Mevcut verileriniz değişmedi.",
   "restoreErrNewer": "Bu yedek uygulamanın daha yeni bir sürümüyle alınmış. Önce uygulamayı güncelleyin. Mevcut verileriniz değişmedi.",
   "restoreErrNotBackup": "Bu dosya bir Vitapuls yedeği değil. Mevcut verileriniz değişmedi.",
-  "restoreErrIo": "Geri yüklenemedi. Mevcut verileriniz değişmedi; tekrar deneyin."
+  "restoreErrIo": "Geri yüklenemedi. Mevcut verileriniz değişmedi; tekrar deneyin.",
+  "extraFieldsTitle": "Ek alanlar",
+  "extraFieldsEdit": "Alanları düzenle",
+  "extraFieldsEmpty": "Henüz açık ek alan yok. Kafein, spor, ağrı gibi hazır alanları açabilir ya da kendi alanınızı ekleyebilirsiniz.",
+  "extraFieldsSaveError": "Günlük kaydedildi ama ek alanlar kaydedilemedi. Tekrar deneyin.",
+  "extraFieldYes": "Evet",
+  "extraFieldNo": "Hayır",
+  "fieldsScreenTitle": "Günlük alanları",
+  "fieldsIntro": "Açık alanlar günlük kaydınızda görünür. Bir alanı kapatmak eski değerlerini silmez.",
+  "fieldsAdd": "Alan ekle",
+  "fieldsAddTitle": "Yeni alan",
+  "fieldsEditTitle": "Alanı düzenle",
+  "fieldsName": "Alan adı",
+  "fieldsKind": "Tür",
+  "fieldsKindNumber": "Sayı",
+  "fieldsKindScale": "1–5 ölçek",
+  "fieldsKindYesNo": "Evet / hayır",
+  "fieldsUnit": "Birim (isteğe bağlı)",
+  "fieldsMin": "En az",
+  "fieldsMax": "En çok",
+  "fieldsBuiltin": "Hazır alan",
+  "fieldsSave": "Kaydet",
+  "fieldsSaved": "Alan kaydedildi",
+  "fieldsRetry": "Tekrar dene",
+  "fieldsLoadError": "Alanlar yüklenemedi.",
+  "fieldsSaveError": "Kaydedilemedi, tekrar deneyin.",
+  "fieldsToggleError": "Alan değiştirilemedi.",
+  "fieldsErrNameEmpty": "Alan adı boş olamaz.",
+  "fieldsErrNameTooLong": "Alan adı en çok 40 karakter olabilir.",
+  "fieldsErrNameExists": "Bu adda bir alan zaten var.",
+  "fieldsErrUnitTooLong": "Birim en çok 12 karakter olabilir.",
+  "fieldsErrRange": "En az değer, en çok değerden küçük olmalı.",
+  "fieldsErrTooMany": "En çok 30 özel alan ekleyebilirsiniz.",
+  "extraFieldInvalid": "{name} için geçerli bir değer girin ({range}).",
+  "@extraFieldInvalid": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -13,6 +13,7 @@ import 'features/analytics/screens/analytics_dashboard_screen.dart';
 import 'features/backup/backup_export_screen.dart';
 import 'features/backup/backup_restore_screen.dart';
 import 'features/episode/screens/episode_list_screen.dart';
+import 'features/health/screens/daily_fields_screen.dart';
 import 'features/health/screens/daily_log_screen.dart';
 import 'features/health/screens/symptom_screen.dart';
 import 'features/home/home_screen.dart';
@@ -143,6 +144,7 @@ class MyApp extends StatelessWidget {
         '/restore': (context) => const BackupRestoreScreen(),
         '/timeline': (context) => const DayTimelineScreen(),
         '/daily-log': (context) => const DailyLogScreen(),
+        '/daily-fields': (context) => const DailyFieldsScreen(),
         '/symptoms': (context) => const SymptomScreen(),
         '/episodes': (context) => const EpisodeListScreen(),
         '/medication-log': (context) => const MedicationLogScreen(),

@@ -1476,4 +1476,108 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get restoreErrIo =>
       'Geri yüklenemedi. Mevcut verileriniz değişmedi; tekrar deneyin.';
+
+  @override
+  String get extraFieldsTitle => 'Ek alanlar';
+
+  @override
+  String get extraFieldsEdit => 'Alanları düzenle';
+
+  @override
+  String get extraFieldsEmpty =>
+      'Henüz açık ek alan yok. Kafein, spor, ağrı gibi hazır alanları açabilir ya da kendi alanınızı ekleyebilirsiniz.';
+
+  @override
+  String get extraFieldsSaveError =>
+      'Günlük kaydedildi ama ek alanlar kaydedilemedi. Tekrar deneyin.';
+
+  @override
+  String get extraFieldYes => 'Evet';
+
+  @override
+  String get extraFieldNo => 'Hayır';
+
+  @override
+  String get fieldsScreenTitle => 'Günlük alanları';
+
+  @override
+  String get fieldsIntro =>
+      'Açık alanlar günlük kaydınızda görünür. Bir alanı kapatmak eski değerlerini silmez.';
+
+  @override
+  String get fieldsAdd => 'Alan ekle';
+
+  @override
+  String get fieldsAddTitle => 'Yeni alan';
+
+  @override
+  String get fieldsEditTitle => 'Alanı düzenle';
+
+  @override
+  String get fieldsName => 'Alan adı';
+
+  @override
+  String get fieldsKind => 'Tür';
+
+  @override
+  String get fieldsKindNumber => 'Sayı';
+
+  @override
+  String get fieldsKindScale => '1–5 ölçek';
+
+  @override
+  String get fieldsKindYesNo => 'Evet / hayır';
+
+  @override
+  String get fieldsUnit => 'Birim (isteğe bağlı)';
+
+  @override
+  String get fieldsMin => 'En az';
+
+  @override
+  String get fieldsMax => 'En çok';
+
+  @override
+  String get fieldsBuiltin => 'Hazır alan';
+
+  @override
+  String get fieldsSave => 'Kaydet';
+
+  @override
+  String get fieldsSaved => 'Alan kaydedildi';
+
+  @override
+  String get fieldsRetry => 'Tekrar dene';
+
+  @override
+  String get fieldsLoadError => 'Alanlar yüklenemedi.';
+
+  @override
+  String get fieldsSaveError => 'Kaydedilemedi, tekrar deneyin.';
+
+  @override
+  String get fieldsToggleError => 'Alan değiştirilemedi.';
+
+  @override
+  String get fieldsErrNameEmpty => 'Alan adı boş olamaz.';
+
+  @override
+  String get fieldsErrNameTooLong => 'Alan adı en çok 40 karakter olabilir.';
+
+  @override
+  String get fieldsErrNameExists => 'Bu adda bir alan zaten var.';
+
+  @override
+  String get fieldsErrUnitTooLong => 'Birim en çok 12 karakter olabilir.';
+
+  @override
+  String get fieldsErrRange => 'En az değer, en çok değerden küçük olmalı.';
+
+  @override
+  String get fieldsErrTooMany => 'En çok 30 özel alan ekleyebilirsiniz.';
+
+  @override
+  String extraFieldInvalid(String name, String range) {
+    return '$name için geçerli bir değer girin ($range).';
+  }
 }

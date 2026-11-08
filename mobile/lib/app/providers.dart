@@ -154,6 +154,15 @@ final dailyFieldServiceProvider = Provider<DailyFieldService>(
   ),
 );
 
+/// Günlük ek alanlarının tümü (kapalılar dahil). Hazır alanlar yoksa eklenir.
+final dailyFieldsProvider = FutureProvider.autoDispose<List<DailyField>>((
+  ref,
+) async {
+  final service = ref.watch(dailyFieldServiceProvider);
+  await service.ensurePresets();
+  return service.list();
+});
+
 final episodeServiceProvider = Provider<EpisodeService>(
   (ref) => EpisodeService(
     episodes: ref.watch(episodeRepositoryProvider),

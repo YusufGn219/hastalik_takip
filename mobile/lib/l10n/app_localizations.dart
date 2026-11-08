@@ -2727,6 +2727,204 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Geri yüklenemedi. Mevcut verileriniz değişmedi; tekrar deneyin.'**
   String get restoreErrIo;
+
+  /// No description provided for @extraFieldsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ek alanlar'**
+  String get extraFieldsTitle;
+
+  /// No description provided for @extraFieldsEdit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alanları düzenle'**
+  String get extraFieldsEdit;
+
+  /// No description provided for @extraFieldsEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz açık ek alan yok. Kafein, spor, ağrı gibi hazır alanları açabilir ya da kendi alanınızı ekleyebilirsiniz.'**
+  String get extraFieldsEmpty;
+
+  /// No description provided for @extraFieldsSaveError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük kaydedildi ama ek alanlar kaydedilemedi. Tekrar deneyin.'**
+  String get extraFieldsSaveError;
+
+  /// No description provided for @extraFieldYes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evet'**
+  String get extraFieldYes;
+
+  /// No description provided for @extraFieldNo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hayır'**
+  String get extraFieldNo;
+
+  /// No description provided for @fieldsScreenTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük alanları'**
+  String get fieldsScreenTitle;
+
+  /// No description provided for @fieldsIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açık alanlar günlük kaydınızda görünür. Bir alanı kapatmak eski değerlerini silmez.'**
+  String get fieldsIntro;
+
+  /// No description provided for @fieldsAdd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alan ekle'**
+  String get fieldsAdd;
+
+  /// No description provided for @fieldsAddTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni alan'**
+  String get fieldsAddTitle;
+
+  /// No description provided for @fieldsEditTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alanı düzenle'**
+  String get fieldsEditTitle;
+
+  /// No description provided for @fieldsName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alan adı'**
+  String get fieldsName;
+
+  /// No description provided for @fieldsKind.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tür'**
+  String get fieldsKind;
+
+  /// No description provided for @fieldsKindNumber.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayı'**
+  String get fieldsKindNumber;
+
+  /// No description provided for @fieldsKindScale.
+  ///
+  /// In tr, this message translates to:
+  /// **'1–5 ölçek'**
+  String get fieldsKindScale;
+
+  /// No description provided for @fieldsKindYesNo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evet / hayır'**
+  String get fieldsKindYesNo;
+
+  /// No description provided for @fieldsUnit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Birim (isteğe bağlı)'**
+  String get fieldsUnit;
+
+  /// No description provided for @fieldsMin.
+  ///
+  /// In tr, this message translates to:
+  /// **'En az'**
+  String get fieldsMin;
+
+  /// No description provided for @fieldsMax.
+  ///
+  /// In tr, this message translates to:
+  /// **'En çok'**
+  String get fieldsMax;
+
+  /// No description provided for @fieldsBuiltin.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazır alan'**
+  String get fieldsBuiltin;
+
+  /// No description provided for @fieldsSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get fieldsSave;
+
+  /// No description provided for @fieldsSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alan kaydedildi'**
+  String get fieldsSaved;
+
+  /// No description provided for @fieldsRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar dene'**
+  String get fieldsRetry;
+
+  /// No description provided for @fieldsLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alanlar yüklenemedi.'**
+  String get fieldsLoadError;
+
+  /// No description provided for @fieldsSaveError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydedilemedi, tekrar deneyin.'**
+  String get fieldsSaveError;
+
+  /// No description provided for @fieldsToggleError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alan değiştirilemedi.'**
+  String get fieldsToggleError;
+
+  /// No description provided for @fieldsErrNameEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alan adı boş olamaz.'**
+  String get fieldsErrNameEmpty;
+
+  /// No description provided for @fieldsErrNameTooLong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alan adı en çok 40 karakter olabilir.'**
+  String get fieldsErrNameTooLong;
+
+  /// No description provided for @fieldsErrNameExists.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu adda bir alan zaten var.'**
+  String get fieldsErrNameExists;
+
+  /// No description provided for @fieldsErrUnitTooLong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Birim en çok 12 karakter olabilir.'**
+  String get fieldsErrUnitTooLong;
+
+  /// No description provided for @fieldsErrRange.
+  ///
+  /// In tr, this message translates to:
+  /// **'En az değer, en çok değerden küçük olmalı.'**
+  String get fieldsErrRange;
+
+  /// No description provided for @fieldsErrTooMany.
+  ///
+  /// In tr, this message translates to:
+  /// **'En çok 30 özel alan ekleyebilirsiniz.'**
+  String get fieldsErrTooMany;
+
+  /// No description provided for @extraFieldInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} için geçerli bir değer girin ({range}).'**
+  String extraFieldInvalid(String name, String range);
 }
 
 class _AppLocalizationsDelegate

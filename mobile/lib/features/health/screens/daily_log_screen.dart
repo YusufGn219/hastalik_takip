@@ -5,6 +5,8 @@ import '../../../app/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/repositories/support.dart';
 import '../../../l10n/app_localizations.dart';
+import '../extra_fields_controller.dart';
+import '../widgets/extra_fields_section.dart';
 
 class DailyLogScreen extends ConsumerStatefulWidget {
   const DailyLogScreen({super.key});
@@ -24,6 +26,10 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
   String? _errorMessage;
   String? _existingLogId;
 
+  /// Ek alanlar (kafein, spor...). Kurulamazsa null: bölüm görünmez ve günlük
+  /// kaydı bundan etkilenmez.
+  ExtraFieldsController? _extras;
+
   /// Ekran açıldığındaki yerel gün ('YYYY-MM-DD'). Gece yarısı geçilse bile
   /// okunan ve yazılan gün aynı kalır.
   late final String _logDate;
@@ -36,6 +42,15 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
   void initState() {
     super.initState();
     _logDate = dayKey(ref.read(clockProvider)());
+    try {
+      _extras = ExtraFieldsController(
+        service: ref.read(dailyFieldServiceProvider),
+        day: _logDate,
+        formatNumber: _numText,
+      )..load();
+    } catch (_) {
+      // Ek alanlar kurulamazsa bölüm gösterilmez.
+    }
     _loadTodayLog();
   }
 
@@ -44,6 +59,7 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     _sleepController.dispose();
     _waterController.dispose();
     _notesController.dispose();
+    _extras?.dispose();
     super.dispose();
   }
 
@@ -116,6 +132,17 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
       return;
     }
 
+    final badExtra = _extras?.firstInvalid();
+    if (badExtra != null) {
+      setState(
+        () => _errorMessage = l10n.extraFieldInvalid(
+          badExtra.name,
+          '${_numText(badExtra.minValue)}–${_numText(badExtra.maxValue)}',
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -132,6 +159,14 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
             energyLevel: _energyLevel,
             notes: notes.isEmpty ? null : notes,
           );
+      try {
+        await _extras?.save();
+      } catch (_) {
+        // Günlük kaydı yazıldı; yalnız ek alanlar yazılamadı. Ekran açık kalır.
+        if (!mounted) return;
+        setState(() => _errorMessage = l10n.extraFieldsSaveError);
+        return;
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -149,6 +184,12 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _editFields() async {
+    await Navigator.pushNamed(context, '/daily-fields');
+    if (!mounted) return;
+    await _extras?.reloadFields();
   }
 
   String _moodEmoji(int mood) {
@@ -419,6 +460,16 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
             ),
 
             const SizedBox(height: 12),
+
+            // Ek alanlar (kafein, spor, ağrı, kendi alanları)
+            if (_extras != null)
+              ListenableBuilder(
+                listenable: _extras!,
+                builder: (context, _) => ExtraFieldsSection(
+                  controller: _extras!,
+                  onEdit: _editFields,
+                ),
+              ),
 
             // Notlar kartı
             _buildSectionCard(
