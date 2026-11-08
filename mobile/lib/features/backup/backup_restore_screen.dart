@@ -97,6 +97,27 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
       final pin = await confirmCurrentPin(context);
       if (pin == null || !mounted) return;
     }
+
+    // Yanlış parola ya da bozuk dosya, "tüm kayıtlarınız silinir" uyarısı
+    // gösterilmeden önce yakalanır.
+    setState(() {
+      _working = true;
+      _resultError = null;
+    });
+    try {
+      await _restorer.verify(backup: file, passphrase: pass);
+    } catch (e) {
+      debugPrint('Yedek denetlenemedi: ${e.runtimeType}');
+      if (!mounted) return;
+      setState(() {
+        _working = false;
+        _resultError = _errorText(e);
+      });
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _working = false);
+
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

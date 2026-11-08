@@ -50,7 +50,18 @@ class _FakeRestorer extends BackupRestorer {
   /// true ise hata yalnız ilk çağrıda fırlatılır (yeniden deneme senaryosu).
   final bool errorOnce;
   final calls = <(String, String)>[];
+  final verifyCalls = <(String, String)>[];
+
+  /// `verify` için ayrı hata (yanlış parolayı onaydan önce yakalama senaryosu).
+  Object? verifyError;
   final discarded = <String>[];
+
+  @override
+  Future<void> verify({required File backup, required String passphrase}) async {
+    verifyCalls.add((backup.path, passphrase));
+    final e = verifyError;
+    if (e != null) throw e;
+  }
 
   @override
   Future<void> run({required File backup, required String passphrase}) async {
@@ -194,6 +205,27 @@ void main() {
     expect(find.text('Yedek parolasını yazın'), findsOneWidget);
     expect(env.restorer.calls, isEmpty);
     expect(find.text('Geri yüklensin mi?'), findsNothing);
+  });
+
+  testWidgets('yanlış parola, "silinecek" uyarısı gösterilmeden önce yakalanır', (tester) async {
+    final env = (await tester.runAsync(() => _env()))!;
+    env.restorer.verifyError = BackupException(BackupFailure.wrongPassphraseOrCorrupt);
+    await _mount(tester, env);
+    await _pickAndType(tester, 'yanlış parola 1');
+    await _tap(tester, find.byKey(const Key('geri_yukle_baslat')));
+
+    expect(find.text('Geri yüklensin mi?'), findsNothing, reason: 'uyarıdan önce hata');
+    expect(find.textContaining('Parola yanlış'), findsOneWidget);
+    expect(env.restorer.verifyCalls, hasLength(1));
+    expect(env.restorer.calls, isEmpty);
+    expect(env.restarts, 0);
+
+    // Düzeltilen parolayla aynı dosyadan devam edilir.
+    env.restorer.verifyError = null;
+    await tester.enterText(find.byKey(const Key('geri_yukle_parola')), 'doğru parola 2026');
+    await tester.pump();
+    await _tap(tester, find.byKey(const Key('geri_yukle_baslat')));
+    expect(find.text('Geri yüklensin mi?'), findsOneWidget);
   });
 
   testWidgets('onay penceresinde vazgeçilirse hiçbir şey yapılmaz', (tester) async {

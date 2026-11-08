@@ -21,6 +21,11 @@ class BackupRestorer {
   final BackupStorage storage;
   final DatabaseSwapper swapper;
 
+  /// Yedeği veritabanına dokunmadan denetler (parola, sürüm, bütünlük). Ekran,
+  /// "silinecek" uyarısını göstermeden önce yanlış parolayı yakalamak için kullanır.
+  Future<void> verify({required File backup, required String passphrase}) =>
+      service.verify(backup: backup, passphrase: passphrase);
+
   /// Hata olursa [BackupException] fırlatır; denetim aşamasında olursa mevcut
   /// veritabanı hiç kapatılmaz. Başarıda veritabanı yeni içerikle açıktır;
   /// uygulamanın baştan kurulması çağırana kalır.
