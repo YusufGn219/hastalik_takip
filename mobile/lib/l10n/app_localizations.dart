@@ -2049,6 +2049,36 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kayıtlarınızdan hesaplanan grafikleri ve ilaç etkisini inceleyin. Tıbbi tavsiye değildir.'**
   String get onboardingBody4;
+
+  /// No description provided for @homeSettings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarlar'**
+  String get homeSettings;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarlar'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsDataSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Veriler'**
+  String get settingsDataSection;
+
+  /// No description provided for @settingsWipeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm verimi sil'**
+  String get settingsWipeTitle;
+
+  /// No description provided for @settingsWipeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm kayıtlarınızı bu telefondan kalıcı olarak siler; geri alınamaz.'**
+  String get settingsWipeHint;
 }
 
 class _AppLocalizationsDelegate

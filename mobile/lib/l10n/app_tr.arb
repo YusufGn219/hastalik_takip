@@ -586,5 +586,10 @@
   "onboardingBody4": "Kayıtlarınızdan hesaplanan grafikleri ve ilaç etkisini inceleyin. Tıbbi tavsiye değildir.",
   "@onboardingTitle3": {
     "description": "Üçüncü tanıtım sayfası; kullanıcıya 'atak' değil 'dönem' denir."
-  }
+  },
+  "homeSettings": "Ayarlar",
+  "settingsTitle": "Ayarlar",
+  "settingsDataSection": "Veriler",
+  "settingsWipeTitle": "Tüm verimi sil",
+  "settingsWipeHint": "Tüm kayıtlarınızı bu telefondan kalıcı olarak siler; geri alınamaz."
 }

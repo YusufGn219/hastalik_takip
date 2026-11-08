@@ -1119,4 +1119,20 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get onboardingBody4 =>
       'Kayıtlarınızdan hesaplanan grafikleri ve ilaç etkisini inceleyin. Tıbbi tavsiye değildir.';
+
+  @override
+  String get homeSettings => 'Ayarlar';
+
+  @override
+  String get settingsTitle => 'Ayarlar';
+
+  @override
+  String get settingsDataSection => 'Veriler';
+
+  @override
+  String get settingsWipeTitle => 'Tüm verimi sil';
+
+  @override
+  String get settingsWipeHint =>
+      'Tüm kayıtlarınızı bu telefondan kalıcı olarak siler; geri alınamaz.';
 }

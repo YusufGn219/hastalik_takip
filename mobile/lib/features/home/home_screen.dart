@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
-import '../lock/lock_settings_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -14,7 +13,17 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.homeTitle)),
+      appBar: AppBar(
+        title: Text(l10n.homeTitle),
+        actions: [
+          IconButton(
+            key: const Key('ana_ayarlar'),
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: l10n.homeSettings,
+            onPressed: () => Navigator.of(context).pushNamed('/settings'),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -90,8 +99,6 @@ class HomeScreen extends StatelessWidget {
               hint: l10n.homeAnalyticsHint,
               route: '/analytics',
             ),
-            // GEÇİCİ: ayarlar ekranı gelene kadar kilidi buradan yönetiyoruz.
-            const AppLockSettingsCard(),
           ],
         ),
       ),

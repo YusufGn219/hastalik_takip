@@ -1,6 +1,5 @@
-// GEÇİCİ: ayarlar ekranı gelene kadar kilidi ana ekrandan açıp kapatmak ve
-// telefonda denemek için küçük kart. Ayarlar ekranı yazılınca oraya taşınır
-// (PIN değiştirme ve kurtarma kodunu yenileme de orada olacak).
+// Uygulama kilidi kartı: Ayarlar ekranında (`features/settings`) durur. PIN
+// değiştirme ve kurtarma kodunu yenileme sonra buraya eklenecek.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
