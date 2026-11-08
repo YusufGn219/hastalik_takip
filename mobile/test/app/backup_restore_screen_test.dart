@@ -38,21 +38,28 @@ class _FakePicker implements BackupFilePicker {
 
 /// Gerçek dosya/veritabanı işi yapmadan sonucu önceden belirlenen geri yükleme.
 class _FakeRestorer extends BackupRestorer {
-  _FakeRestorer({this.error})
+  _FakeRestorer({this.error, this.errorOnce = false})
       : super(
           service: BackupService(currentSchemaVersion: 3),
           storage: _FakeStorage(),
           swapper: const UnconfiguredDatabaseSwapper(),
         );
 
-  final Object? error;
+  Object? error;
+
+  /// true ise hata yalnız ilk çağrıda fırlatılır (yeniden deneme senaryosu).
+  final bool errorOnce;
   final calls = <(String, String)>[];
   final discarded = <String>[];
 
   @override
   Future<void> run({required File backup, required String passphrase}) async {
     calls.add((backup.path, passphrase));
-    if (error != null) throw error!;
+    final e = error;
+    if (e != null) {
+      if (errorOnce) error = null;
+      throw e;
+    }
   }
 
   @override
@@ -67,9 +74,9 @@ class _NoBiometric implements BiometricAuthenticator {
 }
 
 class _Env {
-  _Env(this.prefs, {File? picked, Object? error})
+  _Env(this.prefs, {File? picked, Object? error, bool errorOnce = false})
       : picker = _FakePicker(picked ?? File('/cache/file_picker/yedek.vpbak')),
-        restorer = _FakeRestorer(error: error);
+        restorer = _FakeRestorer(error: error, errorOnce: errorOnce);
 
   final SharedPreferences prefs;
   final _FakePicker picker;
@@ -77,7 +84,7 @@ class _Env {
   int restarts = 0;
 }
 
-Future<_Env> _env({String? pin, Object? error}) async {
+Future<_Env> _env({String? pin, Object? error, bool errorOnce = false}) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
   if (pin != null) {
@@ -88,7 +95,7 @@ Future<_Env> _env({String? pin, Object? error}) async {
     await c.read(appLockProvider.notifier).enable(pin);
     c.dispose();
   }
-  return _Env(prefs, error: error);
+  return _Env(prefs, error: error, errorOnce: errorOnce);
 }
 
 Future<void> _mount(WidgetTester tester, _Env env) async {
@@ -235,8 +242,36 @@ void main() {
       expect(find.textContaining(entry.value), findsOneWidget, reason: entry.key.name);
       expect(find.textContaining('Mevcut verileriniz değişmedi'), findsOneWidget);
       expect(env.restarts, 0);
-      expect(env.restorer.discarded, isNotEmpty, reason: 'hata olsa da seçici kopyası silinir');
+      expect(env.restorer.discarded, isEmpty, reason: 'hatada kopya yeniden deneme için kalır');
+
+      // Ekrandan çıkılınca kopya silinir.
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+      expect(env.restorer.discarded, ['/cache/file_picker/yedek.vpbak'], reason: entry.key.name);
     }
+  });
+
+  testWidgets('yanlış parolanın ardından aynı dosyayla doğru parola denenebilir', (tester) async {
+    final env = (await tester.runAsync(
+      () => _env(error: BackupException(BackupFailure.wrongPassphraseOrCorrupt), errorOnce: true),
+    ))!;
+    await _mount(tester, env);
+    await _pickAndType(tester, 'yanlış parola 1');
+    await _tap(tester, find.byKey(const Key('geri_yukle_baslat')));
+    await _tap(tester, find.byKey(const Key('geri_yukle_onay')));
+    expect(find.textContaining('Parola yanlış'), findsOneWidget);
+    expect(env.restorer.discarded, isEmpty);
+
+    await tester.enterText(find.byKey(const Key('geri_yukle_parola')), 'doğru parola 2026');
+    await tester.pump();
+    expect(find.textContaining('Parola yanlış'), findsNothing, reason: 'yazmaya başlayınca eski hata kalkar');
+    await _tap(tester, find.byKey(const Key('geri_yukle_baslat')));
+    await _tap(tester, find.byKey(const Key('geri_yukle_onay')));
+
+    expect(env.restorer.calls.map((c) => c.$1).toSet(), {'/cache/file_picker/yedek.vpbak'});
+    expect(env.restorer.calls.last.$2, 'doğru parola 2026');
+    expect(find.text('Geri yüklendi'), findsOneWidget);
+    expect(env.restorer.discarded, ['/cache/file_picker/yedek.vpbak'], reason: 'başarıda kopya silinir');
   });
 
   testWidgets('parola göster/gizle çalışır', (tester) async {

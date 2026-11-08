@@ -1,6 +1,7 @@
 // "Yedekten geri yükle" ekranı: dosya seç → parola → (kilit açıksa PIN) → onay →
 // geri yükle → uygulama baştan kurulur. Mevcut veri yedektekiyle DEĞİŞTİRİLİR.
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import '../lock/app_lock_controller.dart';
 import '../lock/app_lock_platform.dart';
 import '../lock/pin_setup_screen.dart';
 import 'backup_platform.dart';
+import 'backup_restorer.dart';
 
 class BackupRestoreScreen extends ConsumerStatefulWidget {
   const BackupRestoreScreen({super.key});
@@ -30,15 +32,33 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
   String? _passError;
   String? _resultError;
 
+  /// Seçici kopyasını silmek için tutulur (`dispose` içinde `ref` okunmaz).
+  late final BackupRestorer _restorer = ref.read(backupRestorerProvider);
+
   @override
   void dispose() {
     _pass.dispose();
+    // Seçici kopyası yanlış parola gibi hatalarda yeniden denemek için kalır;
+    // ekrandan çıkılınca silinir.
+    final file = _file;
+    if (file != null) unawaited(_discard(file));
     super.dispose();
+  }
+
+  Future<void> _discard(File file) async {
+    try {
+      await _restorer.discardPickedCopy(file);
+    } catch (_) {
+      // Önbellek kopyası silinemezse akış durmaz.
+    }
   }
 
   Future<void> _pick() async {
     final file = await ref.read(backupFilePickerProvider).pick();
     if (file == null || !mounted) return;
+    final previous = _file;
+    if (previous != null && previous.path != file.path) await _discard(previous);
+    if (!mounted) return;
     setState(() {
       _file = file;
       _fileError = null;
@@ -100,7 +120,7 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
     if (ok != true || !mounted) return;
 
     // Başarıda uygulama baştan kurulur ve bu ekran ağaçtan kalkar; önce gerekenleri al.
-    final restorer = ref.read(backupRestorerProvider);
+    final restorer = _restorer;
     final restart = ref.read(appRestartProvider);
     setState(() => _working = true);
     String? error;
@@ -110,12 +130,6 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
       // Parola ve içerik günlüğe yazılmaz; yalnız hata türü.
       debugPrint('Geri yüklenemedi: ${e.runtimeType}');
       error = _errorText(e);
-    } finally {
-      try {
-        await restorer.discardPickedCopy(file);
-      } catch (_) {
-        // Önbellek kopyası silinemezse akış durmaz.
-      }
     }
     if (!mounted) return;
     if (error != null) {
@@ -126,6 +140,10 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
       return;
     }
 
+    // Başarılı: seçici kopyası artık gerekmez.
+    await _discard(file);
+    _file = null;
+    if (!mounted) return;
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
