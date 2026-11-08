@@ -1,7 +1,6 @@
 import 'dart:ui' show Locale;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app/app_root.dart';
 import 'app/database_error_app.dart';
@@ -14,8 +13,6 @@ import 'data/repositories/medication_repository.dart';
 import 'domain/services/reminder_service.dart';
 import 'features/analytics/screens/analytics_dashboard_screen.dart';
 import 'features/auth/onboarding_screen.dart';
-import 'features/auth/screens/login_screen.dart';
-import 'features/auth/screens/register_screen.dart';
 import 'features/episode/screens/episode_list_screen.dart';
 import 'features/health/screens/daily_log_screen.dart';
 import 'features/health/screens/symptom_screen.dart';
@@ -26,14 +23,11 @@ import 'features/lock/app_lock_platform.dart';
 import 'features/medication/screens/chronic_condition_screen.dart';
 import 'features/medication/screens/medication_log_screen.dart';
 import 'features/medication/screens/recurring_screen.dart';
-import 'features/profile/screens/change_password_screen.dart';
-import 'features/profile/screens/profile_screen.dart';
 import 'features/timeline/screens/day_timeline_screen.dart';
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
   // Bildirim altyapısı hazırlanır ama izin İSTENMEZ (izinler ilk rutinde sorulur).
   try {
     await NotificationService.instance.initialize();
@@ -127,11 +121,7 @@ class MyApp extends StatelessWidget {
         // Giriş/kayıt yok (hesap yok); uygulama doğrudan ana ekrana açılır.
         '/': (context) => const HomeScreen(),
         '/home': (context) => const HomeScreen(),
-        // Aşağıdakiler henüz eski sunucu koduna bağlı; Sprint 3-6'da yeni
-        // servislere bağlanır ya da kaldırılır.
         '/timeline': (context) => const DayTimelineScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
         '/daily-log': (context) => const DailyLogScreen(),
         '/symptoms': (context) => const SymptomScreen(),
         '/episodes': (context) => const EpisodeListScreen(),
@@ -140,8 +130,6 @@ class MyApp extends StatelessWidget {
         '/recurring': (context) => const RecurringScreen(),
         '/analytics': (context) => const AnalyticsDashboardScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
-        '/profile': (context) => const ProfileScreen(),
-        '/change-password': (context) => const ChangePasswordScreen(),
       },
     );
   }
