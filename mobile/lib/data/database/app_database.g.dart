@@ -50,27 +50,37 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _displayNameMeta = const VerificationMeta(
-    'displayName',
+  static const VerificationMeta _firstNameMeta = const VerificationMeta(
+    'firstName',
   );
   @override
-  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
-    'display_name',
+  late final GeneratedColumn<String> firstName = GeneratedColumn<String>(
+    'first_name',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
-  static const VerificationMeta _photoPathMeta = const VerificationMeta(
-    'photoPath',
+  static const VerificationMeta _lastNameMeta = const VerificationMeta(
+    'lastName',
   );
   @override
-  late final GeneratedColumn<String> photoPath = GeneratedColumn<String>(
-    'photo_path',
+  late final GeneratedColumn<String> lastName = GeneratedColumn<String>(
+    'last_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _photoMeta = const VerificationMeta('photo');
+  @override
+  late final GeneratedColumn<Uint8List> photo = GeneratedColumn<Uint8List>(
+    'photo',
     aliasedName,
     true,
-    type: DriftSqlType.string,
+    type: DriftSqlType.blob,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _birthDateMeta = const VerificationMeta(
@@ -169,8 +179,9 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     createdAt,
     updatedAt,
     deletedAt,
-    displayName,
-    photoPath,
+    firstName,
+    lastName,
+    photo,
     birthDate,
     bloodType,
     allergies,
@@ -219,19 +230,22 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
       );
     }
-    if (data.containsKey('display_name')) {
+    if (data.containsKey('first_name')) {
       context.handle(
-        _displayNameMeta,
-        displayName.isAcceptableOrUnknown(
-          data['display_name']!,
-          _displayNameMeta,
-        ),
+        _firstNameMeta,
+        firstName.isAcceptableOrUnknown(data['first_name']!, _firstNameMeta),
       );
     }
-    if (data.containsKey('photo_path')) {
+    if (data.containsKey('last_name')) {
       context.handle(
-        _photoPathMeta,
-        photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
+        _lastNameMeta,
+        lastName.isAcceptableOrUnknown(data['last_name']!, _lastNameMeta),
+      );
+    }
+    if (data.containsKey('photo')) {
+      context.handle(
+        _photoMeta,
+        photo.isAcceptableOrUnknown(data['photo']!, _photoMeta),
       );
     }
     if (data.containsKey('birth_date')) {
@@ -316,13 +330,17 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}deleted_at'],
       ),
-      displayName: attachedDatabase.typeMapping.read(
+      firstName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}display_name'],
+        data['${effectivePrefix}first_name'],
       )!,
-      photoPath: attachedDatabase.typeMapping.read(
+      lastName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}photo_path'],
+        data['${effectivePrefix}last_name'],
+      )!,
+      photo: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}photo'],
       ),
       birthDate: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -372,10 +390,15 @@ class Profile extends DataClass implements Insertable<Profile> {
 
   /// Boş değilse kayıt silinmiş sayılır (veri fiziksel silinmez).
   final DateTime? deletedAt;
-  final String displayName;
 
-  /// Fotoğraf uygulama klasöründe tutulur; burada göreli yol.
-  final String? photoPath;
+  /// Ad ve soyad ayrı, ikisi de isteğe bağlı (boş metin = girilmemiş).
+  final String firstName;
+  final String lastName;
+
+  /// Profil fotoğrafı: küçültülmüş JPEG baytları. Dosya olarak değil
+  /// veritabanının içinde tutulur; böylece şifreli kalır, yedeğe girer ve
+  /// "tüm verimi sil" ile birlikte gider.
+  final Uint8List? photo;
 
   /// 'YYYY-MM-DD'
   final String? birthDate;
@@ -399,8 +422,9 @@ class Profile extends DataClass implements Insertable<Profile> {
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
-    required this.displayName,
-    this.photoPath,
+    required this.firstName,
+    required this.lastName,
+    this.photo,
     this.birthDate,
     this.bloodType,
     required this.allergies,
@@ -419,9 +443,10 @@ class Profile extends DataClass implements Insertable<Profile> {
     if (!nullToAbsent || deletedAt != null) {
       map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
-    map['display_name'] = Variable<String>(displayName);
-    if (!nullToAbsent || photoPath != null) {
-      map['photo_path'] = Variable<String>(photoPath);
+    map['first_name'] = Variable<String>(firstName);
+    map['last_name'] = Variable<String>(lastName);
+    if (!nullToAbsent || photo != null) {
+      map['photo'] = Variable<Uint8List>(photo);
     }
     if (!nullToAbsent || birthDate != null) {
       map['birth_date'] = Variable<String>(birthDate);
@@ -454,10 +479,11 @@ class Profile extends DataClass implements Insertable<Profile> {
       deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(deletedAt),
-      displayName: Value(displayName),
-      photoPath: photoPath == null && nullToAbsent
+      firstName: Value(firstName),
+      lastName: Value(lastName),
+      photo: photo == null && nullToAbsent
           ? const Value.absent()
-          : Value(photoPath),
+          : Value(photo),
       birthDate: birthDate == null && nullToAbsent
           ? const Value.absent()
           : Value(birthDate),
@@ -491,8 +517,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
-      displayName: serializer.fromJson<String>(json['displayName']),
-      photoPath: serializer.fromJson<String?>(json['photoPath']),
+      firstName: serializer.fromJson<String>(json['firstName']),
+      lastName: serializer.fromJson<String>(json['lastName']),
+      photo: serializer.fromJson<Uint8List?>(json['photo']),
       birthDate: serializer.fromJson<String?>(json['birthDate']),
       bloodType: serializer.fromJson<String?>(json['bloodType']),
       allergies: serializer.fromJson<String>(json['allergies']),
@@ -517,8 +544,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
-      'displayName': serializer.toJson<String>(displayName),
-      'photoPath': serializer.toJson<String?>(photoPath),
+      'firstName': serializer.toJson<String>(firstName),
+      'lastName': serializer.toJson<String>(lastName),
+      'photo': serializer.toJson<Uint8List?>(photo),
       'birthDate': serializer.toJson<String?>(birthDate),
       'bloodType': serializer.toJson<String?>(bloodType),
       'allergies': serializer.toJson<String>(allergies),
@@ -537,8 +565,9 @@ class Profile extends DataClass implements Insertable<Profile> {
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
-    String? displayName,
-    Value<String?> photoPath = const Value.absent(),
+    String? firstName,
+    String? lastName,
+    Value<Uint8List?> photo = const Value.absent(),
     Value<String?> birthDate = const Value.absent(),
     Value<String?> bloodType = const Value.absent(),
     String? allergies,
@@ -552,8 +581,9 @@ class Profile extends DataClass implements Insertable<Profile> {
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
-    displayName: displayName ?? this.displayName,
-    photoPath: photoPath.present ? photoPath.value : this.photoPath,
+    firstName: firstName ?? this.firstName,
+    lastName: lastName ?? this.lastName,
+    photo: photo.present ? photo.value : this.photo,
     birthDate: birthDate.present ? birthDate.value : this.birthDate,
     bloodType: bloodType.present ? bloodType.value : this.bloodType,
     allergies: allergies ?? this.allergies,
@@ -573,10 +603,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
-      displayName: data.displayName.present
-          ? data.displayName.value
-          : this.displayName,
-      photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
+      firstName: data.firstName.present ? data.firstName.value : this.firstName,
+      lastName: data.lastName.present ? data.lastName.value : this.lastName,
+      photo: data.photo.present ? data.photo.value : this.photo,
       birthDate: data.birthDate.present ? data.birthDate.value : this.birthDate,
       bloodType: data.bloodType.present ? data.bloodType.value : this.bloodType,
       allergies: data.allergies.present ? data.allergies.value : this.allergies,
@@ -601,8 +630,9 @@ class Profile extends DataClass implements Insertable<Profile> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
-          ..write('displayName: $displayName, ')
-          ..write('photoPath: $photoPath, ')
+          ..write('firstName: $firstName, ')
+          ..write('lastName: $lastName, ')
+          ..write('photo: $photo, ')
           ..write('birthDate: $birthDate, ')
           ..write('bloodType: $bloodType, ')
           ..write('allergies: $allergies, ')
@@ -621,8 +651,9 @@ class Profile extends DataClass implements Insertable<Profile> {
     createdAt,
     updatedAt,
     deletedAt,
-    displayName,
-    photoPath,
+    firstName,
+    lastName,
+    $driftBlobEquality.hash(photo),
     birthDate,
     bloodType,
     allergies,
@@ -640,8 +671,9 @@ class Profile extends DataClass implements Insertable<Profile> {
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
-          other.displayName == this.displayName &&
-          other.photoPath == this.photoPath &&
+          other.firstName == this.firstName &&
+          other.lastName == this.lastName &&
+          $driftBlobEquality.equals(other.photo, this.photo) &&
           other.birthDate == this.birthDate &&
           other.bloodType == this.bloodType &&
           other.allergies == this.allergies &&
@@ -657,8 +689,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
-  final Value<String> displayName;
-  final Value<String?> photoPath;
+  final Value<String> firstName;
+  final Value<String> lastName;
+  final Value<Uint8List?> photo;
   final Value<String?> birthDate;
   final Value<String?> bloodType;
   final Value<String> allergies;
@@ -673,8 +706,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
-    this.displayName = const Value.absent(),
-    this.photoPath = const Value.absent(),
+    this.firstName = const Value.absent(),
+    this.lastName = const Value.absent(),
+    this.photo = const Value.absent(),
     this.birthDate = const Value.absent(),
     this.bloodType = const Value.absent(),
     this.allergies = const Value.absent(),
@@ -690,8 +724,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     required DateTime createdAt,
     required DateTime updatedAt,
     this.deletedAt = const Value.absent(),
-    this.displayName = const Value.absent(),
-    this.photoPath = const Value.absent(),
+    this.firstName = const Value.absent(),
+    this.lastName = const Value.absent(),
+    this.photo = const Value.absent(),
     this.birthDate = const Value.absent(),
     this.bloodType = const Value.absent(),
     this.allergies = const Value.absent(),
@@ -709,8 +744,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
-    Expression<String>? displayName,
-    Expression<String>? photoPath,
+    Expression<String>? firstName,
+    Expression<String>? lastName,
+    Expression<Uint8List>? photo,
     Expression<String>? birthDate,
     Expression<String>? bloodType,
     Expression<String>? allergies,
@@ -726,8 +762,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
-      if (displayName != null) 'display_name': displayName,
-      if (photoPath != null) 'photo_path': photoPath,
+      if (firstName != null) 'first_name': firstName,
+      if (lastName != null) 'last_name': lastName,
+      if (photo != null) 'photo': photo,
       if (birthDate != null) 'birth_date': birthDate,
       if (bloodType != null) 'blood_type': bloodType,
       if (allergies != null) 'allergies': allergies,
@@ -748,8 +785,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
-    Value<String>? displayName,
-    Value<String?>? photoPath,
+    Value<String>? firstName,
+    Value<String>? lastName,
+    Value<Uint8List?>? photo,
     Value<String?>? birthDate,
     Value<String?>? bloodType,
     Value<String>? allergies,
@@ -765,8 +803,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
-      displayName: displayName ?? this.displayName,
-      photoPath: photoPath ?? this.photoPath,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      photo: photo ?? this.photo,
       birthDate: birthDate ?? this.birthDate,
       bloodType: bloodType ?? this.bloodType,
       allergies: allergies ?? this.allergies,
@@ -795,11 +834,14 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     if (deletedAt.present) {
       map['deleted_at'] = Variable<DateTime>(deletedAt.value);
     }
-    if (displayName.present) {
-      map['display_name'] = Variable<String>(displayName.value);
+    if (firstName.present) {
+      map['first_name'] = Variable<String>(firstName.value);
     }
-    if (photoPath.present) {
-      map['photo_path'] = Variable<String>(photoPath.value);
+    if (lastName.present) {
+      map['last_name'] = Variable<String>(lastName.value);
+    }
+    if (photo.present) {
+      map['photo'] = Variable<Uint8List>(photo.value);
     }
     if (birthDate.present) {
       map['birth_date'] = Variable<String>(birthDate.value);
@@ -844,8 +886,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
-          ..write('displayName: $displayName, ')
-          ..write('photoPath: $photoPath, ')
+          ..write('firstName: $firstName, ')
+          ..write('lastName: $lastName, ')
+          ..write('photo: $photo, ')
           ..write('birthDate: $birthDate, ')
           ..write('bloodType: $bloodType, ')
           ..write('allergies: $allergies, ')
@@ -4232,7 +4275,8 @@ class Medication extends DataClass implements Insertable<Medication> {
   final String? recurringDays;
 
   /// Yerel bildirim için ayrı sayısal numara (UUID bildirim kimliği olamaz).
-  /// Bildirim kimliği = notificationId * 10 + gün.
+  /// Bildirim kimliği = notificationId * 100 + doz sırası * 10 + gün (doz sırası
+  /// saat listesindeki yer 0..9, gün pazartesi 0 .. pazar 6; bkz. ReminderService).
   final int? notificationId;
   const Medication({
     required this.id,
@@ -10404,8 +10448,9 @@ typedef $$ProfilesTableCreateCompanionBuilder =
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<DateTime?> deletedAt,
-      Value<String> displayName,
-      Value<String?> photoPath,
+      Value<String> firstName,
+      Value<String> lastName,
+      Value<Uint8List?> photo,
       Value<String?> birthDate,
       Value<String?> bloodType,
       Value<String> allergies,
@@ -10422,8 +10467,9 @@ typedef $$ProfilesTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
-      Value<String> displayName,
-      Value<String?> photoPath,
+      Value<String> firstName,
+      Value<String> lastName,
+      Value<Uint8List?> photo,
       Value<String?> birthDate,
       Value<String?> bloodType,
       Value<String> allergies,
@@ -10464,13 +10510,18 @@ class $$ProfilesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get displayName => $composableBuilder(
-    column: $table.displayName,
+  ColumnFilters<String> get firstName => $composableBuilder(
+    column: $table.firstName,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get photoPath => $composableBuilder(
-    column: $table.photoPath,
+  ColumnFilters<String> get lastName => $composableBuilder(
+    column: $table.lastName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get photo => $composableBuilder(
+    column: $table.photo,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10544,13 +10595,18 @@ class $$ProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get displayName => $composableBuilder(
-    column: $table.displayName,
+  ColumnOrderings<String> get firstName => $composableBuilder(
+    column: $table.firstName,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get photoPath => $composableBuilder(
-    column: $table.photoPath,
+  ColumnOrderings<String> get lastName => $composableBuilder(
+    column: $table.lastName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get photo => $composableBuilder(
+    column: $table.photo,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -10616,13 +10672,14 @@ class $$ProfilesTableAnnotationComposer
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 
-  GeneratedColumn<String> get displayName => $composableBuilder(
-    column: $table.displayName,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get firstName =>
+      $composableBuilder(column: $table.firstName, builder: (column) => column);
 
-  GeneratedColumn<String> get photoPath =>
-      $composableBuilder(column: $table.photoPath, builder: (column) => column);
+  GeneratedColumn<String> get lastName =>
+      $composableBuilder(column: $table.lastName, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get photo =>
+      $composableBuilder(column: $table.photo, builder: (column) => column);
 
   GeneratedColumn<String> get birthDate =>
       $composableBuilder(column: $table.birthDate, builder: (column) => column);
@@ -10687,8 +10744,9 @@ class $$ProfilesTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
-                Value<String> displayName = const Value.absent(),
-                Value<String?> photoPath = const Value.absent(),
+                Value<String> firstName = const Value.absent(),
+                Value<String> lastName = const Value.absent(),
+                Value<Uint8List?> photo = const Value.absent(),
                 Value<String?> birthDate = const Value.absent(),
                 Value<String?> bloodType = const Value.absent(),
                 Value<String> allergies = const Value.absent(),
@@ -10703,8 +10761,9 @@ class $$ProfilesTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
-                displayName: displayName,
-                photoPath: photoPath,
+                firstName: firstName,
+                lastName: lastName,
+                photo: photo,
                 birthDate: birthDate,
                 bloodType: bloodType,
                 allergies: allergies,
@@ -10721,8 +10780,9 @@ class $$ProfilesTableTableManager
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<DateTime?> deletedAt = const Value.absent(),
-                Value<String> displayName = const Value.absent(),
-                Value<String?> photoPath = const Value.absent(),
+                Value<String> firstName = const Value.absent(),
+                Value<String> lastName = const Value.absent(),
+                Value<Uint8List?> photo = const Value.absent(),
                 Value<String?> birthDate = const Value.absent(),
                 Value<String?> bloodType = const Value.absent(),
                 Value<String> allergies = const Value.absent(),
@@ -10737,8 +10797,9 @@ class $$ProfilesTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
-                displayName: displayName,
-                photoPath: photoPath,
+                firstName: firstName,
+                lastName: lastName,
+                photo: photo,
                 birthDate: birthDate,
                 bloodType: bloodType,
                 allergies: allergies,

@@ -26,3 +26,14 @@ DateTime utc(int y, int mo, int d, [int h = 0, int mi = 0, int s = 0]) =>
 
 /// `Value` kısaltması (testlerde okunurluk için).
 Value<T> v<T extends Object>(T x) => Value(x);
+
+/// Şema 3'teki `profiles` tablosu (geçiş testleri için eski yapı).
+const oldProfilesTableV3 =
+    'CREATE TABLE "profiles" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NULL, '
+    '"updated_at" INTEGER NOT NULL, "deleted_at" INTEGER NULL, '
+    '"display_name" TEXT NOT NULL DEFAULT \'\', "photo_path" TEXT NULL, '
+    '"birth_date" TEXT NULL, "blood_type" TEXT NULL, '
+    '"allergies" TEXT NOT NULL DEFAULT \'\', "emergency_contact_name" TEXT NULL, '
+    '"emergency_contact_phone" TEXT NULL, "gender" TEXT NULL, '
+    '"cycle_tracking_enabled" INTEGER NOT NULL DEFAULT 0 CHECK ("cycle_tracking_enabled" IN (0, 1)), '
+    '"consent_at" INTEGER NULL, PRIMARY KEY ("id"))';

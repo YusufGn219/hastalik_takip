@@ -42,8 +42,11 @@ class AppDatabase extends _$AppDatabase {
   ///    (alımın hangi dozu için olduğu) ve `dose_skips` tablosu (açıkça
   ///    atlanan dozlar) geldi; ilaçta birden fazla doz saati
   ///    (`recurring_time` virgüllü liste) desteklenir (şema aynı).
+  ///  * 4: profil kimliği. `profiles.display_name` yerine ayrı `first_name` /
+  ///    `last_name`; kullanılmayan `photo_path` yerine veritabanı içi `photo`
+  ///    (BLOB). Eski `display_name` değeri `first_name`'e taşınır.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -69,6 +72,15 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(doseSkips);
             await customStatement(_medicationLogDoseIndex);
             await customStatement(_doseSkipDoseIndex);
+          }
+          if (from < 4) {
+            await m.addColumn(profiles, profiles.firstName);
+            await m.addColumn(profiles, profiles.lastName);
+            await m.addColumn(profiles, profiles.photo);
+            await customStatement(
+                'UPDATE profiles SET first_name = display_name');
+            await m.dropColumn(profiles, 'display_name');
+            await m.dropColumn(profiles, 'photo_path');
           }
         },
         beforeOpen: (details) async {

@@ -10,8 +10,8 @@ void main() {
   setUp(() => db = createTestDb());
   tearDown(() => db.close());
 
-  test('şema sürümü 3 ve 19 tablo oluşur', () async {
-    expect(db.schemaVersion, 3);
+  test('şema sürümü 4 ve 19 tablo oluşur', () async {
+    expect(db.schemaVersion, 4);
     final rows = await db
         .customSelect(
           "SELECT name FROM sqlite_master WHERE type='table' "

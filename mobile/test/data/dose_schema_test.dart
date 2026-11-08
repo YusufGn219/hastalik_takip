@@ -202,6 +202,8 @@ void main() {
 CREATE TABLE "medications" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NULL, "updated_at" INTEGER NOT NULL, "deleted_at" INTEGER NULL, "name" TEXT NOT NULL, "category_id" TEXT NULL, "is_catalog" INTEGER NOT NULL DEFAULT 0 CHECK ("is_catalog" IN (0, 1)), "is_recurring" INTEGER NOT NULL DEFAULT 0 CHECK ("is_recurring" IN (0, 1)), "recurring_time" TEXT NULL, "recurring_days" TEXT NULL, "notification_id" INTEGER NULL, PRIMARY KEY ("id"))''');
         rdb.execute('''
 CREATE TABLE "medication_logs" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NULL, "updated_at" INTEGER NOT NULL, "deleted_at" INTEGER NULL, "medication_id" TEXT NOT NULL REFERENCES medications (id), "taken_at" INTEGER NOT NULL, "utc_offset_minutes" INTEGER NOT NULL, "dose_amount" REAL NULL, "dose_unit" TEXT NOT NULL DEFAULT 'tablet', "episode_id" TEXT NULL, "condition_id" TEXT NULL, "notes" TEXT NOT NULL DEFAULT '', PRIMARY KEY ("id"))''');
+        // Şema 4 adımı da çalışır; eski şemadaki profil tablosu gerekir.
+        rdb.execute(oldProfilesTableV3);
         rdb.execute(
             "INSERT INTO medications (id, created_at, updated_at, name, is_recurring, recurring_time, recurring_days, notification_id) VALUES ('m1', 1000, 1000, 'Eski ilaç', 1, '08:30:00', '[\"monday\"]', 7)");
         rdb.execute(
@@ -257,7 +259,7 @@ CREATE TABLE "medication_logs" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NUL
         skippedAt: taken,
       );
       final v = await old.customSelect('PRAGMA user_version').getSingle();
-      expect(v.read<int>('user_version'), 3);
+      expect(v.read<int>('user_version'), 4);
     });
   });
 

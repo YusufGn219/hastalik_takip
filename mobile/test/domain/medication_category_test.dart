@@ -152,6 +152,8 @@ CREATE TABLE "medication_logs" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NUL
             "INSERT INTO medications (id, created_at, updated_at, name, type, is_catalog, notification_id) VALUES ('m1', 1000, 1000, 'Eski ilaç', 'chronic', 0, 7)");
         rdb.execute(
             "INSERT INTO medication_logs (id, created_at, updated_at, medication_id, taken_at, utc_offset_minutes, dose_amount, dose_unit, notes) VALUES ('l1', 1000, 1000, 'm1', 2000, 180, 2.5, 'ml', 'not')");
+        // Şema 4 adımı da çalışır; eski şemadaki profil tablosu gerekir.
+        rdb.execute(oldProfilesTableV3);
         rdb.execute('PRAGMA user_version = 1');
       });
       final old = AppDatabase(raw);
@@ -186,7 +188,7 @@ CREATE TABLE "medication_logs" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NUL
       expect((await r.getById('m1'))!.categoryId, c.id);
       final v = await old.customSelect('PRAGMA user_version').getSingle();
       // Eski v1 veritabanı güncel sürüme (3) kadar tüm adımlardan geçer.
-      expect(v.read<int>('user_version'), 3);
+      expect(v.read<int>('user_version'), 4);
     });
   });
 }

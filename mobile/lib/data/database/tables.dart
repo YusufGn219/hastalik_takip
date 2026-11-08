@@ -30,10 +30,14 @@ mixin BaseColumns on Table {
 
 /// Tek satırlık yerel profil.
 class Profiles extends Table with BaseColumns {
-  TextColumn get displayName => text().withDefault(const Constant(''))();
+  /// Ad ve soyad ayrı, ikisi de isteğe bağlı (boş metin = girilmemiş).
+  TextColumn get firstName => text().withDefault(const Constant(''))();
+  TextColumn get lastName => text().withDefault(const Constant(''))();
 
-  /// Fotoğraf uygulama klasöründe tutulur; burada göreli yol.
-  TextColumn get photoPath => text().nullable()();
+  /// Profil fotoğrafı: küçültülmüş JPEG baytları. Dosya olarak değil
+  /// veritabanının içinde tutulur; böylece şifreli kalır, yedeğe girer ve
+  /// "tüm verimi sil" ile birlikte gider.
+  BlobColumn get photo => blob().nullable()();
 
   /// 'YYYY-MM-DD'
   TextColumn get birthDate => text().nullable()();

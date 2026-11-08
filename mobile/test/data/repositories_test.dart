@@ -354,13 +354,13 @@ void main() {
 
       final saved = await repo.save(
         const ProfilesCompanion(
-          displayName: Value('Yusuf'),
+          firstName: Value('Yusuf'),
           bloodType: Value('0 Rh+'),
           cycleTrackingEnabled: Value(true),
         ),
       );
       expect(saved.id, p1.id);
-      expect(saved.displayName, 'Yusuf');
+      expect(saved.firstName, 'Yusuf');
       expect(saved.cycleTrackingEnabled, isTrue);
 
       await repo.recordConsent(utc(2026, 11, 3, 12));

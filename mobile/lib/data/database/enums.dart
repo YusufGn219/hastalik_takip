@@ -19,6 +19,15 @@ enum CycleStatusKind {
   hormonalContraception,
 }
 
+/// Profildeki cinsiyet değerleri (`profiles.gender`, serbest metin sütunu).
+/// Boş (null) = "belirtmek istemiyorum".
+abstract final class Genders {
+  static const female = 'female';
+  static const male = 'male';
+  static const other = 'other';
+  static const all = {female, male, other};
+}
+
 /// Ölçüm türü anahtarları. Tablo sütunu serbest metindir (yeni takip alanı
 /// eklemek şema değişikliği gerektirmesin); bilinen anahtarlar burada.
 abstract final class MeasurementTypes {
