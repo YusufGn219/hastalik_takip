@@ -355,7 +355,7 @@ void main() {
       final saved = await repo.save(
         const ProfilesCompanion(
           firstName: Value('Yusuf'),
-          bloodType: Value('0 Rh+'),
+          bloodType: Value('0+'),
           cycleTrackingEnabled: Value(true),
         ),
       );

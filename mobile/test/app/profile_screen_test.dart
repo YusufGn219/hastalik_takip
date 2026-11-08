@@ -239,4 +239,86 @@ void main() {
     await tester.pumpAndSettle();
     expect(_text(tester, 'profil_ad'), 'Ada');
   });
+
+  group('sağlık kartı', () {
+    testWidgets('kayıtlı değerler alanlara yüklenir', (tester) async {
+      final repo = FakeProfileRepository();
+      repo.current = repo.current.copyWith(
+        bloodType: const Value('AB-'),
+        allergies: 'penisilin\nfıstık',
+        emergencyContactName: const Value('Ayşe'),
+        emergencyContactPhone: const Value('0532 123 45 67'),
+      );
+      await _open(tester, repo);
+      await tester.ensureVisible(find.byKey(const Key('profil_kan')));
+      expect(find.text('AB Rh-'), findsOneWidget);
+      expect(_text(tester, 'profil_alerji'), 'penisilin\nfıstık');
+      expect(_text(tester, 'profil_acil_ad'), 'Ayşe');
+      expect(_text(tester, 'profil_acil_tel'), '0532 123 45 67');
+    });
+
+    testWidgets('boş profilde alanlar boş, kan grubu "Belirtilmedi"', (tester) async {
+      await _open(tester, FakeProfileRepository());
+      await tester.ensureVisible(find.byKey(const Key('profil_kan')));
+      expect(find.text('Belirtilmedi'), findsOneWidget);
+      expect(_text(tester, 'profil_alerji'), '');
+      expect(_text(tester, 'profil_acil_ad'), '');
+      expect(_text(tester, 'profil_acil_tel'), '');
+    });
+
+    testWidgets('kan grubu seçilir, alerji ve acil durum kişisi yazılıp kaydedilir', (tester) async {
+      final repo = FakeProfileRepository();
+      await _open(tester, repo);
+      await _tap(tester, 'profil_kan');
+      await tester.tap(find.text('0 Rh+').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('profil_alerji')), 'penisilin\nfıstık');
+      await tester.enterText(find.byKey(const Key('profil_acil_ad')), 'Ayşe');
+      await tester.enterText(find.byKey(const Key('profil_acil_tel')), '0532 123 45 67');
+      await _tap(tester, 'profil_kaydet');
+
+      final s = repo.saves.single;
+      expect(s.bloodType.value, '0+');
+      expect(s.allergies.value, 'penisilin\nfıstık');
+      expect(s.emergencyContactName.value, 'Ayşe');
+      expect(s.emergencyContactPhone.value, '0532 123 45 67');
+      expect(find.byType(ProfileScreen), findsNothing);
+    });
+
+    testWidgets('kan grubu "Belirtilmedi"ye çevrilince boş değer yazılır', (tester) async {
+      final repo = FakeProfileRepository();
+      repo.current = repo.current.copyWith(bloodType: const Value('A+'));
+      await _open(tester, repo);
+      await _tap(tester, 'profil_kan');
+      await tester.tap(find.text('Belirtilmedi').last);
+      await tester.pumpAndSettle();
+      await _tap(tester, 'profil_kaydet');
+      expect(repo.saves.single.bloodType.value, isNull);
+    });
+
+    testWidgets('telefon geçersizse alanın altında uyarı çıkar, ekran açık kalır; yazınca uyarı kalkar',
+        (tester) async {
+      final repo = FakeProfileRepository()
+        ..saveError = ArgumentError.value('abc', 'emergencyContactPhone', 'geçersiz');
+      await _open(tester, repo);
+      await tester.enterText(find.byKey(const Key('profil_acil_tel')), 'abc');
+      await _tap(tester, 'profil_kaydet');
+      expect(find.text('Geçerli bir telefon numarası girin (7-15 rakam).'), findsOneWidget);
+      expect(find.text('Profil kaydedilemedi.'), findsNothing);
+      expect(find.byType(ProfileScreen), findsOneWidget);
+
+      await tester.enterText(find.byKey(const Key('profil_acil_tel')), 'abcd');
+      await tester.pump();
+      expect(find.text('Geçerli bir telefon numarası girin (7-15 rakam).'), findsNothing);
+    });
+
+    testWidgets('başka alanın doğrulama hatası genel uyarı verir, telefon uyarısı çıkmaz', (tester) async {
+      final repo = FakeProfileRepository()
+        ..saveError = ArgumentError.value('x', 'bloodType', 'bilinmeyen');
+      await _open(tester, repo);
+      await _tap(tester, 'profil_kaydet');
+      expect(find.text('Profil kaydedilemedi.'), findsOneWidget);
+      expect(find.text('Geçerli bir telefon numarası girin (7-15 rakam).'), findsNothing);
+    });
+  });
 }

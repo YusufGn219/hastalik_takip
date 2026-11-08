@@ -28,14 +28,19 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _first = TextEditingController();
   final _last = TextEditingController();
+  final _allergies = TextEditingController();
+  final _contactName = TextEditingController();
+  final _contactPhone = TextEditingController();
 
   bool _loading = true;
   bool _loadFailed = false;
   bool _saving = false;
   String? _error;
+  String? _phoneError;
 
   String? _birth;
   String? _gender;
+  String? _blood;
   Uint8List? _photo;
   bool _photoChanged = false;
 
@@ -49,6 +54,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   void dispose() {
     _first.dispose();
     _last.dispose();
+    _allergies.dispose();
+    _contactName.dispose();
+    _contactPhone.dispose();
     super.dispose();
   }
 
@@ -65,6 +73,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         _last.text = p.lastName;
         _birth = p.birthDate;
         _gender = p.gender;
+        _blood = p.bloodType;
+        _allergies.text = p.allergies;
+        _contactName.text = p.emergencyContactName ?? '';
+        _contactPhone.text = p.emergencyContactPhone ?? '';
         _photo = p.photo;
         _photoChanged = false;
         _loading = false;
@@ -175,6 +187,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     setState(() {
       _saving = true;
       _error = null;
+      _phoneError = null;
     });
     try {
       await ref.read(profileRepositoryProvider).save(
@@ -183,6 +196,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               lastName: Value(_last.text),
               birthDate: Value(_birth),
               gender: Value(_gender),
+              bloodType: Value(_blood),
+              allergies: Value(_allergies.text),
+              emergencyContactName: Value(_contactName.text),
+              emergencyContactPhone: Value(_contactPhone.text),
               // Fotoğrafa yalnız değiştiyse dokunulur.
               photo: _photoChanged ? Value(_photo) : const Value.absent(),
             ),
@@ -190,9 +207,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } catch (e) {
       debugPrint('Profil kaydedilemedi: ${e.runtimeType}');
       if (!mounted) return;
+      final phoneProblem = e is ArgumentError && e.name == 'emergencyContactPhone';
       setState(() {
         _saving = false;
-        _error = l10n.profileSaveFailed;
+        if (phoneProblem) {
+          _phoneError = l10n.profilePhoneInvalid;
+        } else {
+          _error = l10n.profileSaveFailed;
+        }
       });
       return;
     }
@@ -202,6 +224,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   // ------------------------------------------------------------------- görünüm
+
+  /// 'A+' -> 'A Rh+'.
+  String _bloodLabel(String blood) =>
+      '${blood.substring(0, blood.length - 1)} Rh${blood.substring(blood.length - 1)}';
 
   String _genderLabel(String? gender) {
     final l10n = context.l10n;
@@ -317,6 +343,63 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 DropdownMenuItem<String?>(value: g, child: Text(_genderLabel(g))),
             ],
             onChanged: _saving ? null : (g) => setState(() => _gender = g),
+          ),
+          const SizedBox(height: 28),
+          Text(l10n.profileHealthSection, style: text.titleSmall),
+          const SizedBox(height: 4),
+          Text(l10n.profileHealthIntro, style: text.bodySmall),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String?>(
+            key: const Key('profil_kan'),
+            initialValue: _blood,
+            decoration: InputDecoration(labelText: l10n.profileBloodType),
+            items: [
+              DropdownMenuItem<String?>(value: null, child: Text(l10n.profileBloodNone)),
+              for (final b in BloodTypes.all)
+                DropdownMenuItem<String?>(value: b, child: Text(_bloodLabel(b))),
+            ],
+            onChanged: _saving ? null : (b) => setState(() => _blood = b),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('profil_alerji'),
+            controller: _allergies,
+            enabled: !_saving,
+            minLines: 3,
+            maxLines: 6,
+            maxLength: maxAllergiesLength,
+            keyboardType: TextInputType.multiline,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: InputDecoration(
+              labelText: l10n.profileAllergies,
+              helperText: l10n.profileAllergiesHint,
+              alignLabelWithHint: true,
+              counterText: '',
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('profil_acil_ad'),
+            controller: _contactName,
+            enabled: !_saving,
+            maxLength: maxProfileNameLength,
+            textCapitalization: TextCapitalization.words,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(labelText: l10n.profileContactName, counterText: ''),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('profil_acil_tel'),
+            controller: _contactPhone,
+            enabled: !_saving,
+            keyboardType: TextInputType.phone,
+            decoration: InputDecoration(
+              labelText: l10n.profileContactPhone,
+              errorText: _phoneError,
+            ),
+            onChanged: (_) {
+              if (_phoneError != null) setState(() => _phoneError = null);
+            },
           ),
           if (_error != null) ...[
             const SizedBox(height: 16),

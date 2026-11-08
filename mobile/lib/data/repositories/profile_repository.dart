@@ -14,13 +14,22 @@ const maxProfilePhotoBytes = 1024 * 1024;
 /// En eski kabul edilen doğum yılı.
 const minBirthYear = 1900;
 
+/// Alerji metninin en çok uzunluğu (satırlar kırpılıp boş satırlar atıldıktan sonra).
+const maxAllergiesLength = 1000;
+
+/// Acil durum telefonundaki rakam sayısı sınırları.
+const minPhoneDigits = 7;
+const maxPhoneDigits = 15;
+
 /// Tek satırlık yerel profil. Satır yoksa ilk okumada varsayılanlarla açılır.
 abstract class ProfileRepository {
   Future<Profile> get();
 
   /// Yalnız dolu (`Value`) alanları yazar; `updatedAt` otomatik güncellenir.
-  /// Ad ve soyad kırpılarak saklanır. Geçersiz değerde [ArgumentError] fırlatır
-  /// ve hiçbir şey yazılmaz.
+  /// Ad, soyad, alerjiler (satır satır) ve acil durum kişisi kırpılarak saklanır;
+  /// boş acil durum adı/telefonu "yok" (null) olur. Geçersiz değerde
+  /// [ArgumentError] fırlatır ve hiçbir şey yazılmaz; hatanın `name` alanı
+  /// sorunlu alanın adını verir.
   Future<Profile> save(ProfilesCompanion changes);
 
   /// Yerel KVKK onayını kaydeder.
@@ -29,8 +38,8 @@ abstract class ProfileRepository {
 
 class DriftProfileRepository implements ProfileRepository {
   DriftProfileRepository(this._db, {Clock? clock, IdGenerator? newId})
-      : _clock = clock ?? DateTime.now,
-        _newId = newId ?? newUuid;
+    : _clock = clock ?? DateTime.now,
+      _newId = newId ?? newUuid;
 
   final AppDatabase _db;
   final Clock _clock;
@@ -49,8 +58,14 @@ class DriftProfileRepository implements ProfileRepository {
       final existing = await _find();
       if (existing != null) return existing;
       final now = _clock();
-      return _db.into(_db.profiles).insertReturning(
-            ProfilesCompanion.insert(id: _newId(), createdAt: now, updatedAt: now),
+      return _db
+          .into(_db.profiles)
+          .insertReturning(
+            ProfilesCompanion.insert(
+              id: _newId(),
+              createdAt: now,
+              updatedAt: now,
+            ),
           );
     });
   }
@@ -79,13 +94,18 @@ class DriftProfileRepository implements ProfileRepository {
       final trimmed = value.trim();
       if (trimmed.length > maxProfileNameLength) {
         throw ArgumentError.value(
-            value, field, 'en çok $maxProfileNameLength karakter olabilir');
+          value,
+          field,
+          'en çok $maxProfileNameLength karakter olabilir',
+        );
       }
       return trimmed;
     }
 
     if (c.firstName.present) {
-      out = out.copyWith(firstName: Value(name('firstName', c.firstName.value)));
+      out = out.copyWith(
+        firstName: Value(name('firstName', c.firstName.value)),
+      );
     }
     if (c.lastName.present) {
       out = out.copyWith(lastName: Value(name('lastName', c.lastName.value)));
@@ -94,8 +114,11 @@ class DriftProfileRepository implements ProfileRepository {
     if (c.birthDate.present) {
       final day = c.birthDate.value;
       if (day != null && !_isValidBirthDay(day)) {
-        throw ArgumentError.value(day, 'birthDate',
-            'geçerli bir YYYY-MM-DD günü olmalı, gelecekte olmamalı');
+        throw ArgumentError.value(
+          day,
+          'birthDate',
+          'geçerli bir YYYY-MM-DD günü olmalı, gelecekte olmamalı',
+        );
       }
     }
 
@@ -106,14 +129,76 @@ class DriftProfileRepository implements ProfileRepository {
       }
     }
 
+    if (c.bloodType.present) {
+      final blood = c.bloodType.value;
+      if (blood != null && !BloodTypes.all.contains(blood)) {
+        throw ArgumentError.value(blood, 'bloodType', 'bilinmeyen değer');
+      }
+    }
+
+    if (c.allergies.present) {
+      // Her satır bir alerji: satırlar kırpılır, boş satırlar atılır.
+      final lines = c.allergies.value
+          .split(RegExp(r'\r?\n'))
+          .map((l) => l.trim())
+          .where((l) => l.isNotEmpty)
+          .toList();
+      final text = lines.join('\n');
+
+      if (text.length > maxAllergiesLength) {
+        throw ArgumentError.value(
+          text.length,
+          'allergies',
+          'en çok $maxAllergiesLength karakter olabilir',
+        );
+      }
+      out = out.copyWith(allergies: Value(text));
+    }
+
+    if (c.emergencyContactName.present) {
+      final raw = c.emergencyContactName.value?.trim() ?? '';
+      if (raw.length > maxProfileNameLength) {
+        throw ArgumentError.value(
+          raw.length,
+          'emergencyContactName',
+          'en çok $maxProfileNameLength karakter olabilir',
+        );
+      }
+      out = out.copyWith(emergencyContactName: Value(raw.isEmpty ? null : raw));
+    }
+
+    if (c.emergencyContactPhone.present) {
+      final raw = c.emergencyContactPhone.value?.trim() ?? '';
+      if (raw.isNotEmpty && !_isValidPhone(raw)) {
+        throw ArgumentError.value(
+          raw,
+          'emergencyContactPhone',
+          'rakam, boşluk, -, ( ) ve baştaki + olabilir; $minPhoneDigits-$maxPhoneDigits rakam',
+        );
+      }
+      out = out.copyWith(
+        emergencyContactPhone: Value(raw.isEmpty ? null : raw),
+      );
+    }
+
     if (c.photo.present) {
       final photo = c.photo.value;
       if (photo != null && !_isAcceptablePhoto(photo)) {
-        throw ArgumentError.value(photo.length, 'photo',
-            'boş olamaz, en çok $maxProfilePhotoBytes bayt');
+        throw ArgumentError.value(
+          photo.length,
+          'photo',
+          'boş olamaz, en çok $maxProfilePhotoBytes bayt',
+        );
       }
     }
     return out;
+  }
+
+  /// Yalnız rakam, boşluk, '-', '(' ')' ve en baştaki '+'; rakam sayısı sınırlı.
+  bool _isValidPhone(String phone) {
+    if (!RegExp(r'^\+?[0-9 ()\-]+$').hasMatch(phone)) return false;
+    final digits = phone.replaceAll(RegExp(r'[^0-9]'), '').length;
+    return digits >= minPhoneDigits && digits <= maxPhoneDigits;
   }
 
   bool _isAcceptablePhoto(Uint8List bytes) =>

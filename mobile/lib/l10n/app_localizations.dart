@@ -2392,6 +2392,60 @@ abstract class AppLocalizations {
   /// **'Ölçümler okunamadı.'**
   String get bodyLoadFailed;
 
+  /// No description provided for @profileHealthSection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağlık kartı'**
+  String get profileHealthSection;
+
+  /// No description provided for @profileHealthIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yalnızca bu ekranda görünür; kilit ekranında ya da bildirimlerde gösterilmez.'**
+  String get profileHealthIntro;
+
+  /// No description provided for @profileBloodType.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kan grubu'**
+  String get profileBloodType;
+
+  /// No description provided for @profileBloodNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Belirtilmedi'**
+  String get profileBloodNone;
+
+  /// No description provided for @profileAllergies.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alerjiler'**
+  String get profileAllergies;
+
+  /// No description provided for @profileAllergiesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her satıra bir alerji yazın'**
+  String get profileAllergiesHint;
+
+  /// No description provided for @profileContactName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Acil durum kişisi'**
+  String get profileContactName;
+
+  /// No description provided for @profileContactPhone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Acil durum telefonu'**
+  String get profileContactPhone;
+
+  /// No description provided for @profilePhoneInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli bir telefon numarası girin (7-15 rakam).'**
+  String get profilePhoneInvalid;
+
   /// No description provided for @settingsBackupSection.
   ///
   /// In tr, this message translates to:

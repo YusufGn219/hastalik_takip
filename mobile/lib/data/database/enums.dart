@@ -28,6 +28,11 @@ abstract final class Genders {
   static const all = {female, male, other};
 }
 
+/// Profildeki kan grubu değerleri (`profiles.blood_type`). Boş (null) = belirtilmedi.
+abstract final class BloodTypes {
+  static const all = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-'];
+}
+
 /// Ölçüm türü anahtarları. Tablo sütunu serbest metindir (yeni takip alanı
 /// eklemek şema değişikliği gerektirmesin); bilinen anahtarlar burada.
 abstract final class MeasurementTypes {

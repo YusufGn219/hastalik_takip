@@ -13,6 +13,9 @@ class FakeProfileRepository implements ProfileRepository {
   /// Sıradaki bu kadar `get` çağrısı hata verir.
   int failLoads;
   bool failSaves;
+
+  /// Doluysa `save` bu hatayı fırlatır (ör. alan adlı [ArgumentError]).
+  Object? saveError;
   final saves = <ProfilesCompanion>[];
 
   static Profile emptyProfile() => Profile(
@@ -37,6 +40,7 @@ class FakeProfileRepository implements ProfileRepository {
   @override
   Future<Profile> save(ProfilesCompanion changes) async {
     if (failSaves) throw StateError('yazılamadı');
+    if (saveError != null) throw saveError!;
     saves.add(changes);
     current = current.copyWith(
       firstName: changes.firstName.present ? changes.firstName.value : null,
@@ -44,6 +48,10 @@ class FakeProfileRepository implements ProfileRepository {
       birthDate: changes.birthDate,
       gender: changes.gender,
       photo: changes.photo,
+      bloodType: changes.bloodType,
+      allergies: changes.allergies.present ? changes.allergies.value : null,
+      emergencyContactName: changes.emergencyContactName,
+      emergencyContactPhone: changes.emergencyContactPhone,
     );
     return current;
   }

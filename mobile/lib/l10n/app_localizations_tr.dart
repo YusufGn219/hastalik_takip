@@ -1294,6 +1294,35 @@ class AppLocalizationsTr extends AppLocalizations {
   String get bodyLoadFailed => 'Ölçümler okunamadı.';
 
   @override
+  String get profileHealthSection => 'Sağlık kartı';
+
+  @override
+  String get profileHealthIntro =>
+      'Yalnızca bu ekranda görünür; kilit ekranında ya da bildirimlerde gösterilmez.';
+
+  @override
+  String get profileBloodType => 'Kan grubu';
+
+  @override
+  String get profileBloodNone => 'Belirtilmedi';
+
+  @override
+  String get profileAllergies => 'Alerjiler';
+
+  @override
+  String get profileAllergiesHint => 'Her satıra bir alerji yazın';
+
+  @override
+  String get profileContactName => 'Acil durum kişisi';
+
+  @override
+  String get profileContactPhone => 'Acil durum telefonu';
+
+  @override
+  String get profilePhoneInvalid =>
+      'Geçerli bir telefon numarası girin (7-15 rakam).';
+
+  @override
   String get settingsBackupSection => 'Yedek';
 
   @override
