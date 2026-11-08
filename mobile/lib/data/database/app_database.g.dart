@@ -7984,6 +7984,718 @@ class MeasurementsCompanion extends UpdateCompanion<Measurement> {
   }
 }
 
+class $DailyFieldsTable extends DailyFields
+    with TableInfo<$DailyFieldsTable, DailyField> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DailyFieldsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 40,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _minValueMeta = const VerificationMeta(
+    'minValue',
+  );
+  @override
+  late final GeneratedColumn<double> minValue = GeneratedColumn<double>(
+    'min_value',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _maxValueMeta = const VerificationMeta(
+    'maxValue',
+  );
+  @override
+  late final GeneratedColumn<double> maxValue = GeneratedColumn<double>(
+    'max_value',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _builtinKeyMeta = const VerificationMeta(
+    'builtinKey',
+  );
+  @override
+  late final GeneratedColumn<String> builtinKey = GeneratedColumn<String>(
+    'builtin_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    name,
+    kind,
+    unit,
+    minValue,
+    maxValue,
+    isActive,
+    sortOrder,
+    builtinKey,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'daily_fields';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DailyField> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    }
+    if (data.containsKey('min_value')) {
+      context.handle(
+        _minValueMeta,
+        minValue.isAcceptableOrUnknown(data['min_value']!, _minValueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_minValueMeta);
+    }
+    if (data.containsKey('max_value')) {
+      context.handle(
+        _maxValueMeta,
+        maxValue.isAcceptableOrUnknown(data['max_value']!, _maxValueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_maxValueMeta);
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('builtin_key')) {
+      context.handle(
+        _builtinKeyMeta,
+        builtinKey.isAcceptableOrUnknown(data['builtin_key']!, _builtinKeyMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DailyField map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DailyField(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      )!,
+      minValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}min_value'],
+      )!,
+      maxValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}max_value'],
+      )!,
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      builtinKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}builtin_key'],
+      ),
+    );
+  }
+
+  @override
+  $DailyFieldsTable createAlias(String alias) {
+    return $DailyFieldsTable(attachedDatabase, alias);
+  }
+}
+
+class DailyField extends DataClass implements Insertable<DailyField> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  /// Boş değilse kayıt silinmiş sayılır (veri fiziksel silinmez).
+  final DateTime? deletedAt;
+  final String name;
+
+  /// Bkz. `DailyFieldKinds`.
+  final String kind;
+  final String unit;
+
+  /// Kabul edilen değer aralığı (dahil). Ölçekte 1-5, evet/hayırda 0-1.
+  final double minValue;
+  final double maxValue;
+  final bool isActive;
+  final int sortOrder;
+
+  /// Hazır alanlarda ölçüm türü anahtarı (örn. 'caffeine'); kullanıcının kendi
+  /// alanında boş.
+  final String? builtinKey;
+  const DailyField({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.name,
+    required this.kind,
+    required this.unit,
+    required this.minValue,
+    required this.maxValue,
+    required this.isActive,
+    required this.sortOrder,
+    this.builtinKey,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['name'] = Variable<String>(name);
+    map['kind'] = Variable<String>(kind);
+    map['unit'] = Variable<String>(unit);
+    map['min_value'] = Variable<double>(minValue);
+    map['max_value'] = Variable<double>(maxValue);
+    map['is_active'] = Variable<bool>(isActive);
+    map['sort_order'] = Variable<int>(sortOrder);
+    if (!nullToAbsent || builtinKey != null) {
+      map['builtin_key'] = Variable<String>(builtinKey);
+    }
+    return map;
+  }
+
+  DailyFieldsCompanion toCompanion(bool nullToAbsent) {
+    return DailyFieldsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      name: Value(name),
+      kind: Value(kind),
+      unit: Value(unit),
+      minValue: Value(minValue),
+      maxValue: Value(maxValue),
+      isActive: Value(isActive),
+      sortOrder: Value(sortOrder),
+      builtinKey: builtinKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(builtinKey),
+    );
+  }
+
+  factory DailyField.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DailyField(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      name: serializer.fromJson<String>(json['name']),
+      kind: serializer.fromJson<String>(json['kind']),
+      unit: serializer.fromJson<String>(json['unit']),
+      minValue: serializer.fromJson<double>(json['minValue']),
+      maxValue: serializer.fromJson<double>(json['maxValue']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      builtinKey: serializer.fromJson<String?>(json['builtinKey']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'name': serializer.toJson<String>(name),
+      'kind': serializer.toJson<String>(kind),
+      'unit': serializer.toJson<String>(unit),
+      'minValue': serializer.toJson<double>(minValue),
+      'maxValue': serializer.toJson<double>(maxValue),
+      'isActive': serializer.toJson<bool>(isActive),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'builtinKey': serializer.toJson<String?>(builtinKey),
+    };
+  }
+
+  DailyField copyWith({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? name,
+    String? kind,
+    String? unit,
+    double? minValue,
+    double? maxValue,
+    bool? isActive,
+    int? sortOrder,
+    Value<String?> builtinKey = const Value.absent(),
+  }) => DailyField(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    name: name ?? this.name,
+    kind: kind ?? this.kind,
+    unit: unit ?? this.unit,
+    minValue: minValue ?? this.minValue,
+    maxValue: maxValue ?? this.maxValue,
+    isActive: isActive ?? this.isActive,
+    sortOrder: sortOrder ?? this.sortOrder,
+    builtinKey: builtinKey.present ? builtinKey.value : this.builtinKey,
+  );
+  DailyField copyWithCompanion(DailyFieldsCompanion data) {
+    return DailyField(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      name: data.name.present ? data.name.value : this.name,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      minValue: data.minValue.present ? data.minValue.value : this.minValue,
+      maxValue: data.maxValue.present ? data.maxValue.value : this.maxValue,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      builtinKey: data.builtinKey.present
+          ? data.builtinKey.value
+          : this.builtinKey,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyField(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('name: $name, ')
+          ..write('kind: $kind, ')
+          ..write('unit: $unit, ')
+          ..write('minValue: $minValue, ')
+          ..write('maxValue: $maxValue, ')
+          ..write('isActive: $isActive, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('builtinKey: $builtinKey')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    name,
+    kind,
+    unit,
+    minValue,
+    maxValue,
+    isActive,
+    sortOrder,
+    builtinKey,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DailyField &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.name == this.name &&
+          other.kind == this.kind &&
+          other.unit == this.unit &&
+          other.minValue == this.minValue &&
+          other.maxValue == this.maxValue &&
+          other.isActive == this.isActive &&
+          other.sortOrder == this.sortOrder &&
+          other.builtinKey == this.builtinKey);
+}
+
+class DailyFieldsCompanion extends UpdateCompanion<DailyField> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> name;
+  final Value<String> kind;
+  final Value<String> unit;
+  final Value<double> minValue;
+  final Value<double> maxValue;
+  final Value<bool> isActive;
+  final Value<int> sortOrder;
+  final Value<String?> builtinKey;
+  final Value<int> rowid;
+  const DailyFieldsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.name = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.minValue = const Value.absent(),
+    this.maxValue = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.builtinKey = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DailyFieldsCompanion.insert({
+    required String id,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String name,
+    required String kind,
+    this.unit = const Value.absent(),
+    required double minValue,
+    required double maxValue,
+    this.isActive = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.builtinKey = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       name = Value(name),
+       kind = Value(kind),
+       minValue = Value(minValue),
+       maxValue = Value(maxValue);
+  static Insertable<DailyField> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? name,
+    Expression<String>? kind,
+    Expression<String>? unit,
+    Expression<double>? minValue,
+    Expression<double>? maxValue,
+    Expression<bool>? isActive,
+    Expression<int>? sortOrder,
+    Expression<String>? builtinKey,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (name != null) 'name': name,
+      if (kind != null) 'kind': kind,
+      if (unit != null) 'unit': unit,
+      if (minValue != null) 'min_value': minValue,
+      if (maxValue != null) 'max_value': maxValue,
+      if (isActive != null) 'is_active': isActive,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (builtinKey != null) 'builtin_key': builtinKey,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DailyFieldsCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? name,
+    Value<String>? kind,
+    Value<String>? unit,
+    Value<double>? minValue,
+    Value<double>? maxValue,
+    Value<bool>? isActive,
+    Value<int>? sortOrder,
+    Value<String?>? builtinKey,
+    Value<int>? rowid,
+  }) {
+    return DailyFieldsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      name: name ?? this.name,
+      kind: kind ?? this.kind,
+      unit: unit ?? this.unit,
+      minValue: minValue ?? this.minValue,
+      maxValue: maxValue ?? this.maxValue,
+      isActive: isActive ?? this.isActive,
+      sortOrder: sortOrder ?? this.sortOrder,
+      builtinKey: builtinKey ?? this.builtinKey,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (minValue.present) {
+      map['min_value'] = Variable<double>(minValue.value);
+    }
+    if (maxValue.present) {
+      map['max_value'] = Variable<double>(maxValue.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (builtinKey.present) {
+      map['builtin_key'] = Variable<String>(builtinKey.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyFieldsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('name: $name, ')
+          ..write('kind: $kind, ')
+          ..write('unit: $unit, ')
+          ..write('minValue: $minValue, ')
+          ..write('maxValue: $maxValue, ')
+          ..write('isActive: $isActive, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('builtinKey: $builtinKey, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $TagsTable extends Tags with TableInfo<$TagsTable, Tag> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -10410,6 +11122,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DoseSkipsTable doseSkips = $DoseSkipsTable(this);
   late final $DailyLogsTable dailyLogs = $DailyLogsTable(this);
   late final $MeasurementsTable measurements = $MeasurementsTable(this);
+  late final $DailyFieldsTable dailyFields = $DailyFieldsTable(this);
   late final $TagsTable tags = $TagsTable(this);
   late final $TagEntriesTable tagEntries = $TagEntriesTable(this);
   late final $CyclePeriodsTable cyclePeriods = $CyclePeriodsTable(this);
@@ -10434,6 +11147,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     doseSkips,
     dailyLogs,
     measurements,
+    dailyFields,
     tags,
     tagEntries,
     cyclePeriods,
@@ -16669,6 +17383,341 @@ typedef $$MeasurementsTableProcessedTableManager =
       Measurement,
       PrefetchHooks Function()
     >;
+typedef $$DailyFieldsTableCreateCompanionBuilder =
+    DailyFieldsCompanion Function({
+      required String id,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String name,
+      required String kind,
+      Value<String> unit,
+      required double minValue,
+      required double maxValue,
+      Value<bool> isActive,
+      Value<int> sortOrder,
+      Value<String?> builtinKey,
+      Value<int> rowid,
+    });
+typedef $$DailyFieldsTableUpdateCompanionBuilder =
+    DailyFieldsCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> name,
+      Value<String> kind,
+      Value<String> unit,
+      Value<double> minValue,
+      Value<double> maxValue,
+      Value<bool> isActive,
+      Value<int> sortOrder,
+      Value<String?> builtinKey,
+      Value<int> rowid,
+    });
+
+class $$DailyFieldsTableFilterComposer
+    extends Composer<_$AppDatabase, $DailyFieldsTable> {
+  $$DailyFieldsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get minValue => $composableBuilder(
+    column: $table.minValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get maxValue => $composableBuilder(
+    column: $table.maxValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get builtinKey => $composableBuilder(
+    column: $table.builtinKey,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DailyFieldsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DailyFieldsTable> {
+  $$DailyFieldsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get minValue => $composableBuilder(
+    column: $table.minValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get maxValue => $composableBuilder(
+    column: $table.maxValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get builtinKey => $composableBuilder(
+    column: $table.builtinKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DailyFieldsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DailyFieldsTable> {
+  $$DailyFieldsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<double> get minValue =>
+      $composableBuilder(column: $table.minValue, builder: (column) => column);
+
+  GeneratedColumn<double> get maxValue =>
+      $composableBuilder(column: $table.maxValue, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<String> get builtinKey => $composableBuilder(
+    column: $table.builtinKey,
+    builder: (column) => column,
+  );
+}
+
+class $$DailyFieldsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DailyFieldsTable,
+          DailyField,
+          $$DailyFieldsTableFilterComposer,
+          $$DailyFieldsTableOrderingComposer,
+          $$DailyFieldsTableAnnotationComposer,
+          $$DailyFieldsTableCreateCompanionBuilder,
+          $$DailyFieldsTableUpdateCompanionBuilder,
+          (
+            DailyField,
+            BaseReferences<_$AppDatabase, $DailyFieldsTable, DailyField>,
+          ),
+          DailyField,
+          PrefetchHooks Function()
+        > {
+  $$DailyFieldsTableTableManager(_$AppDatabase db, $DailyFieldsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DailyFieldsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DailyFieldsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DailyFieldsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> unit = const Value.absent(),
+                Value<double> minValue = const Value.absent(),
+                Value<double> maxValue = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<String?> builtinKey = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DailyFieldsCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                name: name,
+                kind: kind,
+                unit: unit,
+                minValue: minValue,
+                maxValue: maxValue,
+                isActive: isActive,
+                sortOrder: sortOrder,
+                builtinKey: builtinKey,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String name,
+                required String kind,
+                Value<String> unit = const Value.absent(),
+                required double minValue,
+                required double maxValue,
+                Value<bool> isActive = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<String?> builtinKey = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DailyFieldsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                name: name,
+                kind: kind,
+                unit: unit,
+                minValue: minValue,
+                maxValue: maxValue,
+                isActive: isActive,
+                sortOrder: sortOrder,
+                builtinKey: builtinKey,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DailyFieldsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DailyFieldsTable,
+      DailyField,
+      $$DailyFieldsTableFilterComposer,
+      $$DailyFieldsTableOrderingComposer,
+      $$DailyFieldsTableAnnotationComposer,
+      $$DailyFieldsTableCreateCompanionBuilder,
+      $$DailyFieldsTableUpdateCompanionBuilder,
+      (
+        DailyField,
+        BaseReferences<_$AppDatabase, $DailyFieldsTable, DailyField>,
+      ),
+      DailyField,
+      PrefetchHooks Function()
+    >;
 typedef $$TagsTableCreateCompanionBuilder =
     TagsCompanion Function({
       required String id,
@@ -18347,6 +19396,8 @@ class $AppDatabaseManager {
       $$DailyLogsTableTableManager(_db, _db.dailyLogs);
   $$MeasurementsTableTableManager get measurements =>
       $$MeasurementsTableTableManager(_db, _db.measurements);
+  $$DailyFieldsTableTableManager get dailyFields =>
+      $$DailyFieldsTableTableManager(_db, _db.dailyFields);
   $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
   $$TagEntriesTableTableManager get tagEntries =>
       $$TagEntriesTableTableManager(_db, _db.tagEntries);

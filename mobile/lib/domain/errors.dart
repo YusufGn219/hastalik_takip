@@ -35,4 +35,15 @@ abstract final class RuleCodes {
   static const weightOutOfRange = 'weight_out_of_range';
   static const measurementDayInvalid = 'measurement_day_invalid';
   static const measurementDayInFuture = 'measurement_day_in_future';
+  static const dailyFieldNameEmpty = 'daily_field_name_empty';
+  static const dailyFieldNameTooLong = 'daily_field_name_too_long';
+  static const dailyFieldNameExists = 'daily_field_name_exists';
+  static const dailyFieldKindInvalid = 'daily_field_kind_invalid';
+  static const dailyFieldUnitTooLong = 'daily_field_unit_too_long';
+  static const dailyFieldRangeInvalid = 'daily_field_range_invalid';
+  static const dailyFieldTooMany = 'daily_field_too_many';
+  static const dailyFieldNotFound = 'daily_field_not_found';
+  static const dailyFieldBuiltin = 'daily_field_builtin';
+  static const dailyFieldInactive = 'daily_field_inactive';
+  static const dailyFieldValueInvalid = 'daily_field_value_invalid';
 }

@@ -223,6 +223,28 @@ class Measurements extends Table with BaseColumns {
   TextColumn get notes => text().nullable()();
 }
 
+/// Ek günlük alanlarının tanımı (kafein, spor, ağrı düzeyi, kullanıcının kendi
+/// alanları...). Değerler bu tabloda değil `measurements` içinde tutulur
+/// (tür: hazır alanda [builtinKey], kendi alanında `field:` önekli kimlik). Alan kapatılınca
+/// ([isActive] = false) eski değerleri silinmez.
+class DailyFields extends Table with BaseColumns {
+  TextColumn get name => text().withLength(min: 1, max: 40)();
+
+  /// Bkz. `DailyFieldKinds`.
+  TextColumn get kind => text()();
+  TextColumn get unit => text().withDefault(const Constant(''))();
+
+  /// Kabul edilen değer aralığı (dahil). Ölçekte 1-5, evet/hayırda 0-1.
+  RealColumn get minValue => real()();
+  RealColumn get maxValue => real()();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+
+  /// Hazır alanlarda ölçüm türü anahtarı (örn. 'caffeine'); kullanıcının kendi
+  /// alanında boş.
+  TextColumn get builtinKey => text().nullable()();
+}
+
 // -------------------------------------------------------------- etiket
 
 class Tags extends Table with BaseColumns {

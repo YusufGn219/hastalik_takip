@@ -44,7 +44,26 @@ abstract final class MeasurementTypes {
   static const exercise = 'exercise'; // dakika
   static const mealPattern = 'meal_pattern';
   static const smoking = 'smoking';
+  static const pain = 'pain'; // 0-10
   // Vücut ölçüleri (zaman serisi)
   static const weight = 'weight'; // kg
   static const height = 'height'; // cm
+
+  /// Kullanıcının kendi günlük alanlarının ölçüm türü öneki
+  /// (`field:` ve alanın kimliği art arda).
+  static const customFieldPrefix = 'field:';
+}
+
+/// Ek günlük alanının türü (`daily_fields.kind`).
+abstract final class DailyFieldKinds {
+  /// Serbest sayı (alanın kendi en az/en çok sınırı ve birimi vardır).
+  static const number = 'number';
+
+  /// 1-5 ölçeği (tam sayı).
+  static const scale = 'scale';
+
+  /// Evet/hayır; değer 1 ya da 0 saklanır.
+  static const yesNo = 'yesno';
+
+  static const all = [number, scale, yesNo];
 }

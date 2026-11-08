@@ -21,6 +21,7 @@ part 'app_database.g.dart';
     DoseSkips,
     DailyLogs,
     Measurements,
+    DailyFields,
     Tags,
     TagEntries,
     CyclePeriods,
@@ -45,8 +46,11 @@ class AppDatabase extends _$AppDatabase {
   ///  * 4: profil kimliği. `profiles.display_name` yerine ayrı `first_name` /
   ///    `last_name`; kullanılmayan `photo_path` yerine veritabanı içi `photo`
   ///    (BLOB). Eski `display_name` değeri `first_name`'e taşınır.
+  ///  * 5: ek günlük alanları. Yeni `daily_fields` tablosu (alan tanımları);
+  ///    değerler mevcut `measurements` tablosunda tutulur. Var olan tablolara
+  ///    dokunulmaz.
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -82,6 +86,11 @@ class AppDatabase extends _$AppDatabase {
             await m.dropColumn(profiles, 'display_name');
             await m.dropColumn(profiles, 'photo_path');
           }
+          if (from < 5) {
+            await m.createTable(dailyFields);
+            await customStatement(_dailyFieldNameIndex);
+            await customStatement(_dailyFieldBuiltinIndex);
+          }
         },
         beforeOpen: (details) async {
           // Yabancı anahtar kısıtları SQLite'ta varsayılan olarak kapalıdır.
@@ -107,10 +116,23 @@ class AppDatabase extends _$AppDatabase {
       'ON dose_skips (medication_id, scheduled_day, scheduled_time) '
       'WHERE deleted_at IS NULL';
 
+  /// Aynı adlı iki ek günlük alanı olmaz (Türkçe büyük/küçük harf farkını
+  /// servis ayrıca denetler; burada birebir aynı ad engellenir).
+  static const _dailyFieldNameIndex =
+      'CREATE UNIQUE INDEX uq_daily_fields_name ON daily_fields (name) '
+      'WHERE deleted_at IS NULL';
+
+  /// Her hazır alan (kafein, spor, ağrı) en çok bir kez bulunur.
+  static const _dailyFieldBuiltinIndex =
+      'CREATE UNIQUE INDEX uq_daily_fields_builtin '
+      'ON daily_fields (builtin_key) WHERE builtin_key IS NOT NULL';
+
   static const _extraIndexes = <String>[
     _medicationCategoryNameIndex,
     _medicationLogDoseIndex,
     _doseSkipDoseIndex,
+    _dailyFieldNameIndex,
+    _dailyFieldBuiltinIndex,
     'CREATE UNIQUE INDEX uq_symptoms_name ON symptoms (name) '
         'WHERE deleted_at IS NULL',
     'CREATE UNIQUE INDEX uq_tags_name ON tags (name) '
