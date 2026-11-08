@@ -12,7 +12,6 @@ import 'data/database/seed_loader.dart';
 import 'data/repositories/medication_repository.dart';
 import 'domain/services/reminder_service.dart';
 import 'features/analytics/screens/analytics_dashboard_screen.dart';
-import 'features/auth/onboarding_screen.dart';
 import 'features/episode/screens/episode_list_screen.dart';
 import 'features/health/screens/daily_log_screen.dart';
 import 'features/health/screens/symptom_screen.dart';
@@ -23,6 +22,7 @@ import 'features/lock/app_lock_platform.dart';
 import 'features/medication/screens/chronic_condition_screen.dart';
 import 'features/medication/screens/medication_log_screen.dart';
 import 'features/medication/screens/recurring_screen.dart';
+import 'features/onboarding/start_screen.dart';
 import 'features/timeline/screens/day_timeline_screen.dart';
 import 'l10n/app_localizations.dart';
 
@@ -118,8 +118,8 @@ class MyApp extends StatelessWidget {
       builder: (context, child) => AppLockGate(child: child!),
       initialRoute: '/',
       routes: {
-        // Giriş/kayıt yok (hesap yok); uygulama doğrudan ana ekrana açılır.
-        '/': (context) => const HomeScreen(),
+        // Giriş/kayıt yok (hesap yok): ilk açılışta tanıtım, sonra ana ekran.
+        '/': (context) => const StartScreen(),
         '/home': (context) => const HomeScreen(),
         '/timeline': (context) => const DayTimelineScreen(),
         '/daily-log': (context) => const DailyLogScreen(),
@@ -129,7 +129,6 @@ class MyApp extends StatelessWidget {
         '/chronic-conditions': (context) => const ChronicConditionScreen(),
         '/recurring': (context) => const RecurringScreen(),
         '/analytics': (context) => const AnalyticsDashboardScreen(),
-        '/onboarding': (context) => const OnboardingScreen(),
       },
     );
   }

@@ -1,9 +1,16 @@
+// İlk açılışta bir kez gösterilen dört sayfalık tanıtım. Hesap ya da giriş yok;
+// bitince (ya da "Geç" ile) `onDone` çağrılır, sonrasını `StartScreen` yönetir.
+
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/theme/app_theme.dart';
+
+import '../../core/theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({super.key, required this.onDone});
+
+  /// Tanıtım bitince ya da geçilince çağrılır.
+  final VoidCallback onDone;
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -13,46 +20,48 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, dynamic>> _pages = [
-    {
-      'icon': Icons.assignment_outlined,
-      'title': 'Sağlığını Takip Et',
-      'description': 'Günlük uyku, su, ruh halin ve enerji seviyeni kolayca kaydet.',
-      'color': AppColors.primary400,
-      'bgColor': AppColors.primary50,
-    },
-    {
-      'icon': Icons.sick_outlined,
-      'title': 'Semptomlarını Kaydet',
-      'description': 'Yaşadığın semptomları zaman ve şiddetiyle not al.',
-      'color': AppColors.symptom,
-      'bgColor': AppColors.symptomBg,
-    },
-    {
-      'icon': Icons.crisis_alert_outlined,
-      'title': 'Atakları Yönet',
-      'description': 'Semptom ataklarını başlat, takip et ve kapat.',
-      'color': AppColors.episode,
-      'bgColor': AppColors.episodeBg,
-    },
-    {
-      'icon': Icons.bar_chart_outlined,
-      'title': 'Analizlerini Gör',
-      'description': 'Verilerinin grafiklerini ve trendlerini incele.',
-      'color': AppColors.daily,
-      'bgColor': AppColors.dailyBg,
-    },
-  ];
-
-  Future<void> _completeOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_done', true);
-    if (!mounted) return;
-    Navigator.pushReplacementNamed(context, '/register');
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
+
+  List<_OnboardingPage> _pages(AppLocalizations l10n) => [
+        _OnboardingPage(
+          icon: Icons.assignment_outlined,
+          title: l10n.onboardingTitle1,
+          body: l10n.onboardingBody1,
+          color: AppColors.primary400,
+          background: AppColors.primary50,
+        ),
+        _OnboardingPage(
+          icon: Icons.sick_outlined,
+          title: l10n.onboardingTitle2,
+          body: l10n.onboardingBody2,
+          color: AppColors.symptom,
+          background: AppColors.symptomBg,
+        ),
+        _OnboardingPage(
+          icon: Icons.timeline,
+          title: l10n.onboardingTitle3,
+          body: l10n.onboardingBody3,
+          color: AppColors.episode,
+          background: AppColors.episodeBg,
+        ),
+        _OnboardingPage(
+          icon: Icons.bar_chart_outlined,
+          title: l10n.onboardingTitle4,
+          body: l10n.onboardingBody4,
+          color: AppColors.daily,
+          background: AppColors.dailyBg,
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final pages = _pages(l10n);
+    final isLast = _currentPage == pages.length - 1;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -62,10 +71,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 8, right: 16),
                 child: TextButton(
-                  onPressed: _completeOnboarding,
-                  child: const Text(
-                    'Geç',
-                    style: TextStyle(
+                  onPressed: widget.onDone,
+                  child: Text(
+                    l10n.onboardingSkip,
+                    style: const TextStyle(
                       color: AppColors.primary400,
                       fontWeight: FontWeight.w600,
                     ),
@@ -77,11 +86,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: PageView.builder(
                 controller: _pageController,
                 onPageChanged: (index) => setState(() => _currentPage = index),
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 itemBuilder: (context, index) {
-                  final page = _pages[index];
-                  final color = page['color'] as Color;
-                  final bgColor = page['bgColor'] as Color;
+                  final page = pages[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
@@ -91,18 +98,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            color: bgColor,
+                            color: page.background,
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            page['icon'] as IconData,
-                            size: 60,
-                            color: color,
-                          ),
+                          child: Icon(page.icon, size: 60, color: page.color),
                         ),
                         const SizedBox(height: 40),
                         Text(
-                          page['title'] as String,
+                          page.title,
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
@@ -111,7 +114,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          page['description'] as String,
+                          page.body,
                           style: TextStyle(
                             fontSize: 16,
                             color: Theme.of(context)
@@ -131,7 +134,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                _pages.length,
+                pages.length,
                 (index) => AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -154,20 +157,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: SizedBox(
                 width: double.infinity,
-                child: _currentPage == _pages.length - 1
-                    ? ElevatedButton(
-                        onPressed: _completeOnboarding,
-                        child: const Text('Başla'),
-                      )
-                    : ElevatedButton(
-                        onPressed: () {
-                          _pageController.nextPage(
+                child: ElevatedButton(
+                  onPressed: isLast
+                      ? widget.onDone
+                      : () => _pageController.nextPage(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
-                          );
-                        },
-                        child: const Text('İleri →'),
-                      ),
+                          ),
+                  child: Text(isLast ? l10n.onboardingStart : l10n.onboardingNext),
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -176,4 +174,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
+}
+
+class _OnboardingPage {
+  const _OnboardingPage({
+    required this.icon,
+    required this.title,
+    required this.body,
+    required this.color,
+    required this.background,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+  final Color color;
+  final Color background;
 }

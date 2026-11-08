@@ -572,5 +572,19 @@
   "lockTimeoutMinutes": "{n} dk sonra",
   "@lockTimeoutMinutes": { "placeholders": { "n": { "type": "int" } } },
   "@lockTimeoutSeconds": { "placeholders": { "n": { "type": "int" } } },
-  "lockSettingsLockNow": "Şimdi kilitle"
+  "lockSettingsLockNow": "Şimdi kilitle",
+  "onboardingSkip": "Geç",
+  "onboardingNext": "İleri",
+  "onboardingStart": "Başla",
+  "onboardingTitle1": "Sağlığınızı takip edin",
+  "onboardingBody1": "Uyku, su, ruh hali ve enerjinizi günlük kayıtla birkaç saniyede not edin.",
+  "onboardingTitle2": "Semptomlarınızı kaydedin",
+  "onboardingBody2": "Yaşadığınız şikâyetleri zamanı ve şiddetiyle yazın.",
+  "onboardingTitle3": "Dönemleri yönetin",
+  "onboardingBody3": "Bir şikâyet dönemini başlatın, seyrini izleyin ve bittiğinde kapatın.",
+  "onboardingTitle4": "Eğilimlerinizi görün",
+  "onboardingBody4": "Kayıtlarınızdan hesaplanan grafikleri ve ilaç etkisini inceleyin. Tıbbi tavsiye değildir.",
+  "@onboardingTitle3": {
+    "description": "Üçüncü tanıtım sayfası; kullanıcıya 'atak' değil 'dönem' denir."
+  }
 }

@@ -16,6 +16,7 @@ import '../data/repositories/dose_skip_repository.dart';
 import '../data/repositories/episode_repository.dart';
 import '../data/repositories/medication_log_repository.dart';
 import '../data/repositories/medication_repository.dart';
+import '../data/repositories/settings_repository.dart';
 import '../data/repositories/support.dart';
 import '../data/repositories/symptom_entry_repository.dart';
 import '../data/repositories/symptom_repository.dart';
@@ -87,6 +88,13 @@ final doseSkipRepositoryProvider = Provider<DoseSkipRepository>(
 
 final dailyLogRepositoryProvider = Provider<DailyLogRepository>(
   (ref) => DriftDailyLogRepository(
+    ref.watch(databaseProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+final settingsRepositoryProvider = Provider<SettingsRepository>(
+  (ref) => DriftSettingsRepository(
     ref.watch(databaseProvider),
     clock: ref.watch(clockProvider),
   ),

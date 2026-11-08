@@ -1082,4 +1082,41 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get lockSettingsLockNow => 'Şimdi kilitle';
+
+  @override
+  String get onboardingSkip => 'Geç';
+
+  @override
+  String get onboardingNext => 'İleri';
+
+  @override
+  String get onboardingStart => 'Başla';
+
+  @override
+  String get onboardingTitle1 => 'Sağlığınızı takip edin';
+
+  @override
+  String get onboardingBody1 =>
+      'Uyku, su, ruh hali ve enerjinizi günlük kayıtla birkaç saniyede not edin.';
+
+  @override
+  String get onboardingTitle2 => 'Semptomlarınızı kaydedin';
+
+  @override
+  String get onboardingBody2 =>
+      'Yaşadığınız şikâyetleri zamanı ve şiddetiyle yazın.';
+
+  @override
+  String get onboardingTitle3 => 'Dönemleri yönetin';
+
+  @override
+  String get onboardingBody3 =>
+      'Bir şikâyet dönemini başlatın, seyrini izleyin ve bittiğinde kapatın.';
+
+  @override
+  String get onboardingTitle4 => 'Eğilimlerinizi görün';
+
+  @override
+  String get onboardingBody4 =>
+      'Kayıtlarınızdan hesaplanan grafikleri ve ilaç etkisini inceleyin. Tıbbi tavsiye değildir.';
 }

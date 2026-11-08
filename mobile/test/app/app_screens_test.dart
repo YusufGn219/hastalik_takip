@@ -5,11 +5,13 @@ import 'package:mobile/app/database_error_app.dart';
 import 'package:mobile/app/providers.dart';
 import 'package:mobile/features/home/home_screen.dart';
 import 'package:mobile/features/lock/app_lock_store.dart';
+import 'package:mobile/features/onboarding/start_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 import 'package:mobile/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/test_support.dart';
+import '../support/fake_settings_repository.dart';
 
 late SharedPreferences _prefs;
 
@@ -78,7 +80,7 @@ void main() {
   });
 
   group('MyApp', () {
-    testWidgets('giriş ekranı olmadan doğrudan ana ekrana açılır',
+    testWidgets('giriş ekranı olmadan, tanıtım görüldüyse ana ekrana açılır',
         (tester) async {
       final db = createTestDb();
       addTearDown(db.close);
@@ -89,6 +91,9 @@ void main() {
         overrides: [
           databaseProvider.overrideWithValue(db),
           sharedPreferencesProvider.overrideWithValue(prefs),
+          settingsRepositoryProvider.overrideWithValue(
+            FakeSettingsRepository(initial: {onboardingDoneKey: 'true'}),
+          ),
         ],
         child: const MyApp(),
       ));
@@ -108,6 +113,9 @@ void main() {
         overrides: [
           databaseProvider.overrideWithValue(db),
           sharedPreferencesProvider.overrideWithValue(prefs),
+          settingsRepositoryProvider.overrideWithValue(
+            FakeSettingsRepository(initial: {onboardingDoneKey: 'true'}),
+          ),
         ],
         child: const MyApp(),
       ));

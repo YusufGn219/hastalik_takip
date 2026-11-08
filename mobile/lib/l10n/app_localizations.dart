@@ -1983,6 +1983,72 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Şimdi kilitle'**
   String get lockSettingsLockNow;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geç'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In tr, this message translates to:
+  /// **'İleri'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başla'**
+  String get onboardingStart;
+
+  /// No description provided for @onboardingTitle1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağlığınızı takip edin'**
+  String get onboardingTitle1;
+
+  /// No description provided for @onboardingBody1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku, su, ruh hali ve enerjinizi günlük kayıtla birkaç saniyede not edin.'**
+  String get onboardingBody1;
+
+  /// No description provided for @onboardingTitle2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptomlarınızı kaydedin'**
+  String get onboardingTitle2;
+
+  /// No description provided for @onboardingBody2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yaşadığınız şikâyetleri zamanı ve şiddetiyle yazın.'**
+  String get onboardingBody2;
+
+  /// Üçüncü tanıtım sayfası; kullanıcıya 'atak' değil 'dönem' denir.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dönemleri yönetin'**
+  String get onboardingTitle3;
+
+  /// No description provided for @onboardingBody3.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir şikâyet dönemini başlatın, seyrini izleyin ve bittiğinde kapatın.'**
+  String get onboardingBody3;
+
+  /// No description provided for @onboardingTitle4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eğilimlerinizi görün'**
+  String get onboardingTitle4;
+
+  /// No description provided for @onboardingBody4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıtlarınızdan hesaplanan grafikleri ve ilaç etkisini inceleyin. Tıbbi tavsiye değildir.'**
+  String get onboardingBody4;
 }
 
 class _AppLocalizationsDelegate
