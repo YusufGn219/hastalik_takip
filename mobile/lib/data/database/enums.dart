@@ -59,6 +59,18 @@ abstract final class MeasurementTypes {
   static const customFieldPrefix = 'field:';
 }
 
+/// Adım okumasını yapan yol (`step_samples.source`). İki yol birbirinden
+/// bağımsızdır: biri çalışmasa da diğeri okumasını yapar.
+abstract final class StepSampleSources {
+  /// Saatlik arka plan görevi.
+  static const routine = 'routine';
+
+  /// Uygulama açılırken / öne gelirken.
+  static const open = 'open';
+
+  static const all = [routine, open];
+}
+
 /// Ek günlük alanının türü (`daily_fields.kind`).
 abstract final class DailyFieldKinds {
   /// Serbest sayı (alanın kendi en az/en çok sınırı ve birimi vardır).

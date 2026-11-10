@@ -1,0 +1,4 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Adım sayacı (STEP_COUNTER) Android 10 ve üstünde bu izni ister. -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+</manifest>

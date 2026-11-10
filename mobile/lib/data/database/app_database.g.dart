@@ -8798,6 +8798,679 @@ class DailyFieldsCompanion extends UpdateCompanion<DailyField> {
   }
 }
 
+class $StepSamplesTable extends StepSamples
+    with TableInfo<$StepSamplesTable, StepSample> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StepSamplesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _counterMeta = const VerificationMeta(
+    'counter',
+  );
+  @override
+  late final GeneratedColumn<int> counter = GeneratedColumn<int>(
+    'counter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bootCountMeta = const VerificationMeta(
+    'bootCount',
+  );
+  @override
+  late final GeneratedColumn<int> bootCount = GeneratedColumn<int>(
+    'boot_count',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _uptimeMsMeta = const VerificationMeta(
+    'uptimeMs',
+  );
+  @override
+  late final GeneratedColumn<int> uptimeMs = GeneratedColumn<int>(
+    'uptime_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sampledAtMeta = const VerificationMeta(
+    'sampledAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> sampledAt = GeneratedColumn<DateTime>(
+    'sampled_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _utcOffsetMinutesMeta = const VerificationMeta(
+    'utcOffsetMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> utcOffsetMinutes = GeneratedColumn<int>(
+    'utc_offset_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _logDateMeta = const VerificationMeta(
+    'logDate',
+  );
+  @override
+  late final GeneratedColumn<String> logDate = GeneratedColumn<String>(
+    'log_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    counter,
+    bootCount,
+    uptimeMs,
+    sampledAt,
+    utcOffsetMinutes,
+    logDate,
+    source,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'step_samples';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StepSample> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('counter')) {
+      context.handle(
+        _counterMeta,
+        counter.isAcceptableOrUnknown(data['counter']!, _counterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_counterMeta);
+    }
+    if (data.containsKey('boot_count')) {
+      context.handle(
+        _bootCountMeta,
+        bootCount.isAcceptableOrUnknown(data['boot_count']!, _bootCountMeta),
+      );
+    }
+    if (data.containsKey('uptime_ms')) {
+      context.handle(
+        _uptimeMsMeta,
+        uptimeMs.isAcceptableOrUnknown(data['uptime_ms']!, _uptimeMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uptimeMsMeta);
+    }
+    if (data.containsKey('sampled_at')) {
+      context.handle(
+        _sampledAtMeta,
+        sampledAt.isAcceptableOrUnknown(data['sampled_at']!, _sampledAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sampledAtMeta);
+    }
+    if (data.containsKey('utc_offset_minutes')) {
+      context.handle(
+        _utcOffsetMinutesMeta,
+        utcOffsetMinutes.isAcceptableOrUnknown(
+          data['utc_offset_minutes']!,
+          _utcOffsetMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_utcOffsetMinutesMeta);
+    }
+    if (data.containsKey('log_date')) {
+      context.handle(
+        _logDateMeta,
+        logDate.isAcceptableOrUnknown(data['log_date']!, _logDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_logDateMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StepSample map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StepSample(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      counter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}counter'],
+      )!,
+      bootCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}boot_count'],
+      ),
+      uptimeMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}uptime_ms'],
+      )!,
+      sampledAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}sampled_at'],
+      )!,
+      utcOffsetMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}utc_offset_minutes'],
+      )!,
+      logDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}log_date'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+    );
+  }
+
+  @override
+  $StepSamplesTable createAlias(String alias) {
+    return $StepSamplesTable(attachedDatabase, alias);
+  }
+}
+
+class StepSample extends DataClass implements Insertable<StepSample> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  /// Boş değilse kayıt silinmiş sayılır (veri fiziksel silinmez).
+  final DateTime? deletedAt;
+
+  /// Sayacın ham değeri.
+  final int counter;
+
+  /// Telefonun açılış sayısı; okunamadıysa boş.
+  final int? bootCount;
+
+  /// Okuma anındaki yeniden başlatmadan beri geçen süre (ms).
+  final int uptimeMs;
+  final DateTime sampledAt;
+  final int utcOffsetMinutes;
+
+  /// Okumanın yerel günü, 'YYYY-MM-DD'.
+  final String logDate;
+
+  /// Okumayı hangi yol yaptı: bkz. [StepSampleSources].
+  final String source;
+  const StepSample({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.counter,
+    this.bootCount,
+    required this.uptimeMs,
+    required this.sampledAt,
+    required this.utcOffsetMinutes,
+    required this.logDate,
+    required this.source,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['counter'] = Variable<int>(counter);
+    if (!nullToAbsent || bootCount != null) {
+      map['boot_count'] = Variable<int>(bootCount);
+    }
+    map['uptime_ms'] = Variable<int>(uptimeMs);
+    map['sampled_at'] = Variable<DateTime>(sampledAt);
+    map['utc_offset_minutes'] = Variable<int>(utcOffsetMinutes);
+    map['log_date'] = Variable<String>(logDate);
+    map['source'] = Variable<String>(source);
+    return map;
+  }
+
+  StepSamplesCompanion toCompanion(bool nullToAbsent) {
+    return StepSamplesCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      counter: Value(counter),
+      bootCount: bootCount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bootCount),
+      uptimeMs: Value(uptimeMs),
+      sampledAt: Value(sampledAt),
+      utcOffsetMinutes: Value(utcOffsetMinutes),
+      logDate: Value(logDate),
+      source: Value(source),
+    );
+  }
+
+  factory StepSample.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StepSample(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      counter: serializer.fromJson<int>(json['counter']),
+      bootCount: serializer.fromJson<int?>(json['bootCount']),
+      uptimeMs: serializer.fromJson<int>(json['uptimeMs']),
+      sampledAt: serializer.fromJson<DateTime>(json['sampledAt']),
+      utcOffsetMinutes: serializer.fromJson<int>(json['utcOffsetMinutes']),
+      logDate: serializer.fromJson<String>(json['logDate']),
+      source: serializer.fromJson<String>(json['source']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'counter': serializer.toJson<int>(counter),
+      'bootCount': serializer.toJson<int?>(bootCount),
+      'uptimeMs': serializer.toJson<int>(uptimeMs),
+      'sampledAt': serializer.toJson<DateTime>(sampledAt),
+      'utcOffsetMinutes': serializer.toJson<int>(utcOffsetMinutes),
+      'logDate': serializer.toJson<String>(logDate),
+      'source': serializer.toJson<String>(source),
+    };
+  }
+
+  StepSample copyWith({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    int? counter,
+    Value<int?> bootCount = const Value.absent(),
+    int? uptimeMs,
+    DateTime? sampledAt,
+    int? utcOffsetMinutes,
+    String? logDate,
+    String? source,
+  }) => StepSample(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    counter: counter ?? this.counter,
+    bootCount: bootCount.present ? bootCount.value : this.bootCount,
+    uptimeMs: uptimeMs ?? this.uptimeMs,
+    sampledAt: sampledAt ?? this.sampledAt,
+    utcOffsetMinutes: utcOffsetMinutes ?? this.utcOffsetMinutes,
+    logDate: logDate ?? this.logDate,
+    source: source ?? this.source,
+  );
+  StepSample copyWithCompanion(StepSamplesCompanion data) {
+    return StepSample(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      counter: data.counter.present ? data.counter.value : this.counter,
+      bootCount: data.bootCount.present ? data.bootCount.value : this.bootCount,
+      uptimeMs: data.uptimeMs.present ? data.uptimeMs.value : this.uptimeMs,
+      sampledAt: data.sampledAt.present ? data.sampledAt.value : this.sampledAt,
+      utcOffsetMinutes: data.utcOffsetMinutes.present
+          ? data.utcOffsetMinutes.value
+          : this.utcOffsetMinutes,
+      logDate: data.logDate.present ? data.logDate.value : this.logDate,
+      source: data.source.present ? data.source.value : this.source,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StepSample(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('counter: $counter, ')
+          ..write('bootCount: $bootCount, ')
+          ..write('uptimeMs: $uptimeMs, ')
+          ..write('sampledAt: $sampledAt, ')
+          ..write('utcOffsetMinutes: $utcOffsetMinutes, ')
+          ..write('logDate: $logDate, ')
+          ..write('source: $source')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    counter,
+    bootCount,
+    uptimeMs,
+    sampledAt,
+    utcOffsetMinutes,
+    logDate,
+    source,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StepSample &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.counter == this.counter &&
+          other.bootCount == this.bootCount &&
+          other.uptimeMs == this.uptimeMs &&
+          other.sampledAt == this.sampledAt &&
+          other.utcOffsetMinutes == this.utcOffsetMinutes &&
+          other.logDate == this.logDate &&
+          other.source == this.source);
+}
+
+class StepSamplesCompanion extends UpdateCompanion<StepSample> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> counter;
+  final Value<int?> bootCount;
+  final Value<int> uptimeMs;
+  final Value<DateTime> sampledAt;
+  final Value<int> utcOffsetMinutes;
+  final Value<String> logDate;
+  final Value<String> source;
+  final Value<int> rowid;
+  const StepSamplesCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.counter = const Value.absent(),
+    this.bootCount = const Value.absent(),
+    this.uptimeMs = const Value.absent(),
+    this.sampledAt = const Value.absent(),
+    this.utcOffsetMinutes = const Value.absent(),
+    this.logDate = const Value.absent(),
+    this.source = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  StepSamplesCompanion.insert({
+    required String id,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required int counter,
+    this.bootCount = const Value.absent(),
+    required int uptimeMs,
+    required DateTime sampledAt,
+    required int utcOffsetMinutes,
+    required String logDate,
+    required String source,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       counter = Value(counter),
+       uptimeMs = Value(uptimeMs),
+       sampledAt = Value(sampledAt),
+       utcOffsetMinutes = Value(utcOffsetMinutes),
+       logDate = Value(logDate),
+       source = Value(source);
+  static Insertable<StepSample> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? counter,
+    Expression<int>? bootCount,
+    Expression<int>? uptimeMs,
+    Expression<DateTime>? sampledAt,
+    Expression<int>? utcOffsetMinutes,
+    Expression<String>? logDate,
+    Expression<String>? source,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (counter != null) 'counter': counter,
+      if (bootCount != null) 'boot_count': bootCount,
+      if (uptimeMs != null) 'uptime_ms': uptimeMs,
+      if (sampledAt != null) 'sampled_at': sampledAt,
+      if (utcOffsetMinutes != null) 'utc_offset_minutes': utcOffsetMinutes,
+      if (logDate != null) 'log_date': logDate,
+      if (source != null) 'source': source,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  StepSamplesCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? counter,
+    Value<int?>? bootCount,
+    Value<int>? uptimeMs,
+    Value<DateTime>? sampledAt,
+    Value<int>? utcOffsetMinutes,
+    Value<String>? logDate,
+    Value<String>? source,
+    Value<int>? rowid,
+  }) {
+    return StepSamplesCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      counter: counter ?? this.counter,
+      bootCount: bootCount ?? this.bootCount,
+      uptimeMs: uptimeMs ?? this.uptimeMs,
+      sampledAt: sampledAt ?? this.sampledAt,
+      utcOffsetMinutes: utcOffsetMinutes ?? this.utcOffsetMinutes,
+      logDate: logDate ?? this.logDate,
+      source: source ?? this.source,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (counter.present) {
+      map['counter'] = Variable<int>(counter.value);
+    }
+    if (bootCount.present) {
+      map['boot_count'] = Variable<int>(bootCount.value);
+    }
+    if (uptimeMs.present) {
+      map['uptime_ms'] = Variable<int>(uptimeMs.value);
+    }
+    if (sampledAt.present) {
+      map['sampled_at'] = Variable<DateTime>(sampledAt.value);
+    }
+    if (utcOffsetMinutes.present) {
+      map['utc_offset_minutes'] = Variable<int>(utcOffsetMinutes.value);
+    }
+    if (logDate.present) {
+      map['log_date'] = Variable<String>(logDate.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StepSamplesCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('counter: $counter, ')
+          ..write('bootCount: $bootCount, ')
+          ..write('uptimeMs: $uptimeMs, ')
+          ..write('sampledAt: $sampledAt, ')
+          ..write('utcOffsetMinutes: $utcOffsetMinutes, ')
+          ..write('logDate: $logDate, ')
+          ..write('source: $source, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $TagsTable extends Tags with TableInfo<$TagsTable, Tag> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -11225,6 +11898,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DailyLogsTable dailyLogs = $DailyLogsTable(this);
   late final $MeasurementsTable measurements = $MeasurementsTable(this);
   late final $DailyFieldsTable dailyFields = $DailyFieldsTable(this);
+  late final $StepSamplesTable stepSamples = $StepSamplesTable(this);
   late final $TagsTable tags = $TagsTable(this);
   late final $TagEntriesTable tagEntries = $TagEntriesTable(this);
   late final $CyclePeriodsTable cyclePeriods = $CyclePeriodsTable(this);
@@ -11250,6 +11924,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     dailyLogs,
     measurements,
     dailyFields,
+    stepSamples,
     tags,
     tagEntries,
     cyclePeriods,
@@ -17858,6 +18533,322 @@ typedef $$DailyFieldsTableProcessedTableManager =
       DailyField,
       PrefetchHooks Function()
     >;
+typedef $$StepSamplesTableCreateCompanionBuilder =
+    StepSamplesCompanion Function({
+      required String id,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required int counter,
+      Value<int?> bootCount,
+      required int uptimeMs,
+      required DateTime sampledAt,
+      required int utcOffsetMinutes,
+      required String logDate,
+      required String source,
+      Value<int> rowid,
+    });
+typedef $$StepSamplesTableUpdateCompanionBuilder =
+    StepSamplesCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> counter,
+      Value<int?> bootCount,
+      Value<int> uptimeMs,
+      Value<DateTime> sampledAt,
+      Value<int> utcOffsetMinutes,
+      Value<String> logDate,
+      Value<String> source,
+      Value<int> rowid,
+    });
+
+class $$StepSamplesTableFilterComposer
+    extends Composer<_$AppDatabase, $StepSamplesTable> {
+  $$StepSamplesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get counter => $composableBuilder(
+    column: $table.counter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get bootCount => $composableBuilder(
+    column: $table.bootCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get uptimeMs => $composableBuilder(
+    column: $table.uptimeMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get sampledAt => $composableBuilder(
+    column: $table.sampledAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get utcOffsetMinutes => $composableBuilder(
+    column: $table.utcOffsetMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get logDate => $composableBuilder(
+    column: $table.logDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$StepSamplesTableOrderingComposer
+    extends Composer<_$AppDatabase, $StepSamplesTable> {
+  $$StepSamplesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get counter => $composableBuilder(
+    column: $table.counter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get bootCount => $composableBuilder(
+    column: $table.bootCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get uptimeMs => $composableBuilder(
+    column: $table.uptimeMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get sampledAt => $composableBuilder(
+    column: $table.sampledAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get utcOffsetMinutes => $composableBuilder(
+    column: $table.utcOffsetMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get logDate => $composableBuilder(
+    column: $table.logDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$StepSamplesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StepSamplesTable> {
+  $$StepSamplesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get counter =>
+      $composableBuilder(column: $table.counter, builder: (column) => column);
+
+  GeneratedColumn<int> get bootCount =>
+      $composableBuilder(column: $table.bootCount, builder: (column) => column);
+
+  GeneratedColumn<int> get uptimeMs =>
+      $composableBuilder(column: $table.uptimeMs, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get sampledAt =>
+      $composableBuilder(column: $table.sampledAt, builder: (column) => column);
+
+  GeneratedColumn<int> get utcOffsetMinutes => $composableBuilder(
+    column: $table.utcOffsetMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get logDate =>
+      $composableBuilder(column: $table.logDate, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+}
+
+class $$StepSamplesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $StepSamplesTable,
+          StepSample,
+          $$StepSamplesTableFilterComposer,
+          $$StepSamplesTableOrderingComposer,
+          $$StepSamplesTableAnnotationComposer,
+          $$StepSamplesTableCreateCompanionBuilder,
+          $$StepSamplesTableUpdateCompanionBuilder,
+          (
+            StepSample,
+            BaseReferences<_$AppDatabase, $StepSamplesTable, StepSample>,
+          ),
+          StepSample,
+          PrefetchHooks Function()
+        > {
+  $$StepSamplesTableTableManager(_$AppDatabase db, $StepSamplesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StepSamplesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StepSamplesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StepSamplesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> counter = const Value.absent(),
+                Value<int?> bootCount = const Value.absent(),
+                Value<int> uptimeMs = const Value.absent(),
+                Value<DateTime> sampledAt = const Value.absent(),
+                Value<int> utcOffsetMinutes = const Value.absent(),
+                Value<String> logDate = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => StepSamplesCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                counter: counter,
+                bootCount: bootCount,
+                uptimeMs: uptimeMs,
+                sampledAt: sampledAt,
+                utcOffsetMinutes: utcOffsetMinutes,
+                logDate: logDate,
+                source: source,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required int counter,
+                Value<int?> bootCount = const Value.absent(),
+                required int uptimeMs,
+                required DateTime sampledAt,
+                required int utcOffsetMinutes,
+                required String logDate,
+                required String source,
+                Value<int> rowid = const Value.absent(),
+              }) => StepSamplesCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                counter: counter,
+                bootCount: bootCount,
+                uptimeMs: uptimeMs,
+                sampledAt: sampledAt,
+                utcOffsetMinutes: utcOffsetMinutes,
+                logDate: logDate,
+                source: source,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$StepSamplesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $StepSamplesTable,
+      StepSample,
+      $$StepSamplesTableFilterComposer,
+      $$StepSamplesTableOrderingComposer,
+      $$StepSamplesTableAnnotationComposer,
+      $$StepSamplesTableCreateCompanionBuilder,
+      $$StepSamplesTableUpdateCompanionBuilder,
+      (
+        StepSample,
+        BaseReferences<_$AppDatabase, $StepSamplesTable, StepSample>,
+      ),
+      StepSample,
+      PrefetchHooks Function()
+    >;
 typedef $$TagsTableCreateCompanionBuilder =
     TagsCompanion Function({
       required String id,
@@ -19538,6 +20529,8 @@ class $AppDatabaseManager {
       $$MeasurementsTableTableManager(_db, _db.measurements);
   $$DailyFieldsTableTableManager get dailyFields =>
       $$DailyFieldsTableTableManager(_db, _db.dailyFields);
+  $$StepSamplesTableTableManager get stepSamples =>
+      $$StepSamplesTableTableManager(_db, _db.stepSamples);
   $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
   $$TagEntriesTableTableManager get tagEntries =>
       $$TagEntriesTableTableManager(_db, _db.tagEntries);

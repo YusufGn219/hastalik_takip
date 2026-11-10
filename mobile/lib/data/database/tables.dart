@@ -231,6 +231,29 @@ class Measurements extends Table with BaseColumns {
   TextColumn get context => text().nullable()();
 }
 
+/// Telefonun adım sayacından alınan okumalar (şema 7). Her satır, sayacın o
+/// andaki HAM değeridir (son yeniden başlatmadan beri toplam adım). Saatlik ve
+/// günlük adım, ardışık iki okumanın farkından hesaplanır; ham değer saklandığı
+/// için yeniden başlatmada sayacın sıfırlanması sonradan fark edilebilir.
+class StepSamples extends Table with BaseColumns {
+  /// Sayacın ham değeri.
+  IntColumn get counter => integer()();
+
+  /// Telefonun açılış sayısı; okunamadıysa boş.
+  IntColumn get bootCount => integer().nullable()();
+
+  /// Okuma anındaki yeniden başlatmadan beri geçen süre (ms).
+  IntColumn get uptimeMs => integer()();
+  DateTimeColumn get sampledAt => dateTime()();
+  IntColumn get utcOffsetMinutes => integer()();
+
+  /// Okumanın yerel günü, 'YYYY-MM-DD'.
+  TextColumn get logDate => text()();
+
+  /// Okumayı hangi yol yaptı: bkz. [StepSampleSources].
+  TextColumn get source => text()();
+}
+
 /// Ek günlük alanlarının tanımı (kafein, spor, ağrı düzeyi, kullanıcının kendi
 /// alanları...). Değerler bu tabloda değil `measurements` içinde tutulur
 /// (tür: hazır alanda [builtinKey], kendi alanında `field:` önekli kimlik). Alan kapatılınca

@@ -22,6 +22,7 @@ part 'app_database.g.dart';
     DailyLogs,
     Measurements,
     DailyFields,
+    StepSamples,
     Tags,
     TagEntries,
     CyclePeriods,
@@ -52,8 +53,11 @@ class AppDatabase extends _$AppDatabase {
   ///  * 6: ölçüm kayıtları. `measurements`'a boş olabilen `value2` (tansiyonun
   ///    ikinci sayısı) ve `context` (şeker: açlık/tokluk...) sütunları eklendi.
   ///    Var olan satırlar ve türler değişmez.
+  ///  * 7: adım sayacı okumaları. Yeni `step_samples` tablosu (sayacın ham
+  ///    değeri + zaman); saatlik/günlük adım bunlardan hesaplanır. Var olan
+  ///    tablolara dokunulmaz.
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -98,6 +102,10 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(measurements, measurements.value2);
             await m.addColumn(measurements, measurements.context);
           }
+          if (from < 7) {
+            await m.createTable(stepSamples);
+            await customStatement(_stepSampleTimeIndex);
+          }
         },
         beforeOpen: (details) async {
           // Yabancı anahtar kısıtları SQLite'ta varsayılan olarak kapalıdır.
@@ -134,7 +142,13 @@ class AppDatabase extends _$AppDatabase {
       'CREATE UNIQUE INDEX uq_daily_fields_builtin '
       'ON daily_fields (builtin_key) WHERE builtin_key IS NOT NULL';
 
+  /// Adım okumaları zaman aralığıyla sorgulanır.
+  static const _stepSampleTimeIndex =
+      'CREATE INDEX ix_step_samples_sampled_at ON step_samples (sampled_at) '
+      'WHERE deleted_at IS NULL';
+
   static const _extraIndexes = <String>[
+    _stepSampleTimeIndex,
     _medicationCategoryNameIndex,
     _medicationLogDoseIndex,
     _doseSkipDoseIndex,

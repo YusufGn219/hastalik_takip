@@ -23,7 +23,7 @@ void main() {
     setUp(() => db = createTestDb());
     tearDown(() => db.close());
 
-    test('daily_fields tablosu beklenen sütunlarla açılır, sürüm 6', () async {
+    test('daily_fields tablosu beklenen sütunlarla açılır, sürüm 7', () async {
       final columns = await db.customSelect('PRAGMA table_info(daily_fields)').get();
       final names = columns.map((r) => r.read<String>('name')).toSet();
       expect(
@@ -34,7 +34,7 @@ void main() {
         ]),
       );
       final v = await db.customSelect('PRAGMA user_version').getSingle();
-      expect(v.read<int>('user_version'), 6);
+      expect(v.read<int>('user_version'), 7);
     });
 
     test('aynı ad ve aynı hazır anahtar ikinci kez yazılamaz; silinenin adı yeniden kullanılır', () async {
@@ -95,7 +95,7 @@ void main() {
       expect(names, containsAll(['uq_daily_fields_name', 'uq_daily_fields_builtin']));
 
       final v = await old.customSelect('PRAGMA user_version').getSingle();
-      expect(v.read<int>('user_version'), 6);
+      expect(v.read<int>('user_version'), 7);
     });
   });
 }
