@@ -46,4 +46,14 @@ abstract final class RuleCodes {
   static const dailyFieldBuiltin = 'daily_field_builtin';
   static const dailyFieldInactive = 'daily_field_inactive';
   static const dailyFieldValueInvalid = 'daily_field_value_invalid';
+  static const readingTypeUnknown = 'reading_type_unknown';
+  static const readingUnitInvalid = 'reading_unit_invalid';
+  static const readingValueOutOfRange = 'reading_value_out_of_range';
+  static const readingSecondValueRequired = 'reading_second_value_required';
+  static const readingSecondValueNotAllowed = 'reading_second_value_not_allowed';
+  static const readingSecondValueOutOfRange = 'reading_second_value_out_of_range';
+  static const readingFirstNotAboveSecond = 'reading_first_not_above_second';
+  static const readingContextInvalid = 'reading_context_invalid';
+  static const readingNoteTooLong = 'reading_note_too_long';
+  static const readingNotFound = 'reading_not_found';
 }

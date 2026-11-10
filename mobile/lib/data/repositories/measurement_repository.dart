@@ -28,6 +28,22 @@ abstract class MeasurementRepository {
   Future<Measurement?> latest(String type);
 
   Future<void> softDelete(String id);
+
+  /// Silinmemiş ölçüm (yoksa ya da silinmişse null).
+  Future<Measurement?> findById(String id);
+
+  /// Ölçümün değer alanlarını bütünüyle değiştirir (verilmeyen [value2],
+  /// [context] ve [notes] boşaltılır; tür değişmez). Günü [measuredAt]'ten
+  /// yeniden türetilir. Kayıt yoksa ya da silinmişse null.
+  Future<Measurement?> update(
+    String id, {
+    required double value,
+    required DateTime measuredAt,
+    String unit = '',
+    String? notes,
+    double? value2,
+    String? context,
+  });
 }
 
 class DriftMeasurementRepository implements MeasurementRepository {
@@ -96,6 +112,41 @@ class DriftMeasurementRepository implements MeasurementRepository {
           ..orderBy([(t) => OrderingTerm.desc(t.measuredAt)])
           ..limit(1))
         .getSingleOrNull();
+  }
+
+  @override
+  Future<Measurement?> findById(String id) {
+    return (_db.select(_db.measurements)
+          ..where((t) => t.deletedAt.isNull() & t.id.equals(id)))
+        .getSingleOrNull();
+  }
+
+  @override
+  Future<Measurement?> update(
+    String id, {
+    required double value,
+    required DateTime measuredAt,
+    String unit = '',
+    String? notes,
+    double? value2,
+    String? context,
+  }) async {
+    final rows = await (_db.update(_db.measurements)
+          ..where((t) => t.deletedAt.isNull() & t.id.equals(id)))
+        .writeReturning(
+      MeasurementsCompanion(
+        updatedAt: Value(_clock()),
+        value: Value(value),
+        value2: Value(value2),
+        unit: Value(unit),
+        context: Value(context),
+        notes: Value(notes),
+        logDate: Value(dayKey(measuredAt)),
+        measuredAt: Value(measuredAt),
+        utcOffsetMinutes: Value(utcOffsetOf(measuredAt)),
+      ),
+    );
+    return rows.isEmpty ? null : rows.single;
   }
 
   @override

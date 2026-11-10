@@ -80,6 +80,39 @@ class FakeMeasurementRepository implements MeasurementRepository {
   }
 
   @override
+  Future<Measurement?> findById(String id) async {
+    for (final m in rows) {
+      if (m.id == id && m.deletedAt == null) return m;
+    }
+    return null;
+  }
+
+  @override
+  Future<Measurement?> update(
+    String id, {
+    required double value,
+    required DateTime measuredAt,
+    String unit = '',
+    String? notes,
+    double? value2,
+    String? context,
+  }) async {
+    final i = rows.indexWhere((m) => m.id == id && m.deletedAt == null);
+    if (i < 0) return null;
+    rows[i] = rows[i].copyWith(
+      value: value,
+      value2: Value(value2),
+      unit: unit,
+      context: Value(context),
+      notes: Value(notes),
+      logDate: dayKey(measuredAt),
+      measuredAt: measuredAt,
+      utcOffsetMinutes: utcOffsetOf(measuredAt),
+    );
+    return rows[i];
+  }
+
+  @override
   Future<void> softDelete(String id) async {
     if (failDeletes) throw StateError('silinemedi');
     final i = rows.indexWhere((m) => m.id == id);
