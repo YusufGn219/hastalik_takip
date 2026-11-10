@@ -31,9 +31,11 @@ import '../domain/services/dose_adherence_service.dart';
 import '../domain/services/dose_service.dart';
 import '../domain/services/episode_service.dart';
 import '../domain/services/medication_service.dart';
+import '../domain/services/reading_service.dart';
 import '../domain/services/reminder_service.dart';
 import '../domain/services/timeline_service.dart';
 import '../features/analytics/analytics_overview.dart';
+import '../features/readings/readings_view.dart';
 import '../features/timeline/timeline_day.dart';
 import '../l10n/app_localizations.dart';
 import '../features/episode/episode_overview.dart';
@@ -139,6 +141,26 @@ final bodyMeasurementsProvider = FutureProvider.autoDispose<BodyMeasurements>(
   (ref) => ref.watch(bodyMeasurementServiceProvider).overview(),
 );
 
+/// Sağlık ölçümleri (tansiyon, nabız, kan şekeri).
+final readingServiceProvider = Provider<ReadingService>(
+  (ref) => ReadingService(
+    measurements: ref.watch(measurementRepositoryProvider),
+    settings: ref.watch(settingsRepositoryProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+/// Bir ölçüm türünün geçmişi ve gösterim birimi. Kayıttan sonra
+/// `ref.invalidate(readingsViewProvider(tür))` ile tazelenir.
+final readingsViewProvider = FutureProvider.autoDispose
+    .family<ReadingsView, String>((ref, type) async {
+      final service = ref.watch(readingServiceProvider);
+      return ReadingsView(
+        items: await service.list(type),
+        unit: await service.preferredUnit(type),
+      );
+    });
+
 final dailyFieldRepositoryProvider = Provider<DailyFieldRepository>(
   (ref) => DriftDailyFieldRepository(
     ref.watch(databaseProvider),
@@ -239,6 +261,7 @@ final timelineDayLoaderProvider = Provider<TimelineDayLoader>(
     medications: ref.watch(medicationRepositoryProvider),
     episodes: ref.watch(episodeOverviewLoaderProvider),
     fields: ref.watch(dailyFieldServiceProvider),
+    readings: ref.watch(readingServiceProvider),
   ),
 );
 

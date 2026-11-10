@@ -2991,6 +2991,270 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Çok günlük dönemlerde çizgiler 7 günlük hareketli ortalamadır; kayıt girilmeyen günler hesaba katılmaz.'**
   String get analyticsSmoothedNote;
+
+  /// No description provided for @homeReadings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağlık ölçümleri'**
+  String get homeReadings;
+
+  /// No description provided for @homeReadingsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tansiyon, nabız ve kan şekeri'**
+  String get homeReadingsHint;
+
+  /// No description provided for @readingsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağlık ölçümleri'**
+  String get readingsTitle;
+
+  /// No description provided for @readingTypeBloodPressure.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tansiyon'**
+  String get readingTypeBloodPressure;
+
+  /// No description provided for @readingTypePulse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nabız'**
+  String get readingTypePulse;
+
+  /// No description provided for @readingTypeGlucose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kan şekeri'**
+  String get readingTypeGlucose;
+
+  /// No description provided for @readingContextFasting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açlık'**
+  String get readingContextFasting;
+
+  /// No description provided for @readingContextAfterMeal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tokluk'**
+  String get readingContextAfterMeal;
+
+  /// No description provided for @readingContextBeforeSleep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yatmadan önce'**
+  String get readingContextBeforeSleep;
+
+  /// No description provided for @readingContextOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get readingContextOther;
+
+  /// No description provided for @readingAdd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçüm ekle'**
+  String get readingAdd;
+
+  /// No description provided for @readingAddTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçüm ekle'**
+  String get readingAddTitle;
+
+  /// No description provided for @readingEditTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçümü düzenle'**
+  String get readingEditTitle;
+
+  /// No description provided for @readingEditAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenle'**
+  String get readingEditAction;
+
+  /// No description provided for @readingSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get readingSave;
+
+  /// No description provided for @readingSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçüm kaydedildi'**
+  String get readingSaved;
+
+  /// No description provided for @readingDeleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçüm silindi'**
+  String get readingDeleted;
+
+  /// No description provided for @readingDeleteTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçüm silinsin mi?'**
+  String get readingDeleteTitle;
+
+  /// No description provided for @readingDeleteBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ölçüm silinecek.'**
+  String get readingDeleteBody;
+
+  /// No description provided for @readingDeleteAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get readingDeleteAction;
+
+  /// No description provided for @readingValueLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Değer ({unit})'**
+  String readingValueLabel(String unit);
+
+  /// No description provided for @readingSystolicLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Büyük tansiyon ({unit})'**
+  String readingSystolicLabel(String unit);
+
+  /// No description provided for @readingDiastolicLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Küçük tansiyon ({unit})'**
+  String readingDiastolicLabel(String unit);
+
+  /// No description provided for @readingUnitTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Birim'**
+  String get readingUnitTitle;
+
+  /// No description provided for @readingContextTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne zaman ölçüldü? (isteğe bağlı)'**
+  String get readingContextTitle;
+
+  /// No description provided for @readingDateLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarih'**
+  String get readingDateLabel;
+
+  /// No description provided for @readingTimeLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saat'**
+  String get readingTimeLabel;
+
+  /// No description provided for @readingNoteLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Not (isteğe bağlı)'**
+  String get readingNoteLabel;
+
+  /// No description provided for @readingLatest.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son ölçüm'**
+  String get readingLatest;
+
+  /// No description provided for @readingEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz ölçüm yok.'**
+  String get readingEmpty;
+
+  /// No description provided for @readingChartTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Değişim'**
+  String get readingChartTitle;
+
+  /// No description provided for @readingChartNeedMore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Grafik için en az iki ölçüm gerekir.'**
+  String get readingChartNeedMore;
+
+  /// No description provided for @readingHistoryTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş'**
+  String get readingHistoryTitle;
+
+  /// No description provided for @readingDisclaimer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu değerler yalnızca kayıt amaçlıdır; tıbbi tavsiye değildir.'**
+  String get readingDisclaimer;
+
+  /// No description provided for @readingLoadFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçümler okunamadı.'**
+  String get readingLoadFailed;
+
+  /// No description provided for @readingLegendSystolic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Büyük'**
+  String get readingLegendSystolic;
+
+  /// No description provided for @readingLegendDiastolic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Küçük'**
+  String get readingLegendDiastolic;
+
+  /// No description provided for @readingErrNumber.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli bir sayı girin.'**
+  String get readingErrNumber;
+
+  /// No description provided for @readingErrRange.
+  ///
+  /// In tr, this message translates to:
+  /// **'Değer {min} ile {max} {unit} arasında olmalı.'**
+  String readingErrRange(String min, String max, String unit);
+
+  /// No description provided for @readingErrOrder.
+  ///
+  /// In tr, this message translates to:
+  /// **'Büyük tansiyon küçük tansiyondan yüksek olmalı.'**
+  String get readingErrOrder;
+
+  /// No description provided for @readingErrFuture.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelecekte bir an seçilemez.'**
+  String get readingErrFuture;
+
+  /// No description provided for @readingErrDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli bir tarih seçin.'**
+  String get readingErrDate;
+
+  /// No description provided for @readingErrNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Not en çok 500 karakter olabilir.'**
+  String get readingErrNote;
+
+  /// No description provided for @readingErrGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydedilemedi.'**
+  String get readingErrGeneric;
 }
 
 class _AppLocalizationsDelegate

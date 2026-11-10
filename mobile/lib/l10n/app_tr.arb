@@ -758,5 +758,83 @@
   },
   "analyticsSleepTrend": "Uyku eğilimi (saat)",
   "analyticsWaterTrend": "Su eğilimi (litre)",
-  "analyticsSmoothedNote": "Çok günlük dönemlerde çizgiler 7 günlük hareketli ortalamadır; kayıt girilmeyen günler hesaba katılmaz."
+  "analyticsSmoothedNote": "Çok günlük dönemlerde çizgiler 7 günlük hareketli ortalamadır; kayıt girilmeyen günler hesaba katılmaz.",
+  "homeReadings": "Sağlık ölçümleri",
+  "homeReadingsHint": "Tansiyon, nabız ve kan şekeri",
+  "readingsTitle": "Sağlık ölçümleri",
+  "readingTypeBloodPressure": "Tansiyon",
+  "readingTypePulse": "Nabız",
+  "readingTypeGlucose": "Kan şekeri",
+  "readingContextFasting": "Açlık",
+  "readingContextAfterMeal": "Tokluk",
+  "readingContextBeforeSleep": "Yatmadan önce",
+  "readingContextOther": "Diğer",
+  "readingAdd": "Ölçüm ekle",
+  "readingAddTitle": "Ölçüm ekle",
+  "readingEditTitle": "Ölçümü düzenle",
+  "readingEditAction": "Düzenle",
+  "readingSave": "Kaydet",
+  "readingSaved": "Ölçüm kaydedildi",
+  "readingDeleted": "Ölçüm silindi",
+  "readingDeleteTitle": "Ölçüm silinsin mi?",
+  "readingDeleteBody": "Bu ölçüm silinecek.",
+  "readingDeleteAction": "Sil",
+  "readingValueLabel": "Değer ({unit})",
+  "@readingValueLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "readingSystolicLabel": "Büyük tansiyon ({unit})",
+  "@readingSystolicLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "readingDiastolicLabel": "Küçük tansiyon ({unit})",
+  "@readingDiastolicLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "readingUnitTitle": "Birim",
+  "readingContextTitle": "Ne zaman ölçüldü? (isteğe bağlı)",
+  "readingDateLabel": "Tarih",
+  "readingTimeLabel": "Saat",
+  "readingNoteLabel": "Not (isteğe bağlı)",
+  "readingLatest": "Son ölçüm",
+  "readingEmpty": "Henüz ölçüm yok.",
+  "readingChartTitle": "Değişim",
+  "readingChartNeedMore": "Grafik için en az iki ölçüm gerekir.",
+  "readingHistoryTitle": "Geçmiş",
+  "readingDisclaimer": "Bu değerler yalnızca kayıt amaçlıdır; tıbbi tavsiye değildir.",
+  "readingLoadFailed": "Ölçümler okunamadı.",
+  "readingLegendSystolic": "Büyük",
+  "readingLegendDiastolic": "Küçük",
+  "readingErrNumber": "Geçerli bir sayı girin.",
+  "readingErrRange": "Değer {min} ile {max} {unit} arasında olmalı.",
+  "@readingErrRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "readingErrOrder": "Büyük tansiyon küçük tansiyondan yüksek olmalı.",
+  "readingErrFuture": "Gelecekte bir an seçilemez.",
+  "readingErrDate": "Geçerli bir tarih seçin.",
+  "readingErrNote": "Not en çok 500 karakter olabilir.",
+  "readingErrGeneric": "Kaydedilemedi."
 }

@@ -1623,4 +1623,146 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get analyticsSmoothedNote =>
       'Çok günlük dönemlerde çizgiler 7 günlük hareketli ortalamadır; kayıt girilmeyen günler hesaba katılmaz.';
+
+  @override
+  String get homeReadings => 'Sağlık ölçümleri';
+
+  @override
+  String get homeReadingsHint => 'Tansiyon, nabız ve kan şekeri';
+
+  @override
+  String get readingsTitle => 'Sağlık ölçümleri';
+
+  @override
+  String get readingTypeBloodPressure => 'Tansiyon';
+
+  @override
+  String get readingTypePulse => 'Nabız';
+
+  @override
+  String get readingTypeGlucose => 'Kan şekeri';
+
+  @override
+  String get readingContextFasting => 'Açlık';
+
+  @override
+  String get readingContextAfterMeal => 'Tokluk';
+
+  @override
+  String get readingContextBeforeSleep => 'Yatmadan önce';
+
+  @override
+  String get readingContextOther => 'Diğer';
+
+  @override
+  String get readingAdd => 'Ölçüm ekle';
+
+  @override
+  String get readingAddTitle => 'Ölçüm ekle';
+
+  @override
+  String get readingEditTitle => 'Ölçümü düzenle';
+
+  @override
+  String get readingEditAction => 'Düzenle';
+
+  @override
+  String get readingSave => 'Kaydet';
+
+  @override
+  String get readingSaved => 'Ölçüm kaydedildi';
+
+  @override
+  String get readingDeleted => 'Ölçüm silindi';
+
+  @override
+  String get readingDeleteTitle => 'Ölçüm silinsin mi?';
+
+  @override
+  String get readingDeleteBody => 'Bu ölçüm silinecek.';
+
+  @override
+  String get readingDeleteAction => 'Sil';
+
+  @override
+  String readingValueLabel(String unit) {
+    return 'Değer ($unit)';
+  }
+
+  @override
+  String readingSystolicLabel(String unit) {
+    return 'Büyük tansiyon ($unit)';
+  }
+
+  @override
+  String readingDiastolicLabel(String unit) {
+    return 'Küçük tansiyon ($unit)';
+  }
+
+  @override
+  String get readingUnitTitle => 'Birim';
+
+  @override
+  String get readingContextTitle => 'Ne zaman ölçüldü? (isteğe bağlı)';
+
+  @override
+  String get readingDateLabel => 'Tarih';
+
+  @override
+  String get readingTimeLabel => 'Saat';
+
+  @override
+  String get readingNoteLabel => 'Not (isteğe bağlı)';
+
+  @override
+  String get readingLatest => 'Son ölçüm';
+
+  @override
+  String get readingEmpty => 'Henüz ölçüm yok.';
+
+  @override
+  String get readingChartTitle => 'Değişim';
+
+  @override
+  String get readingChartNeedMore => 'Grafik için en az iki ölçüm gerekir.';
+
+  @override
+  String get readingHistoryTitle => 'Geçmiş';
+
+  @override
+  String get readingDisclaimer =>
+      'Bu değerler yalnızca kayıt amaçlıdır; tıbbi tavsiye değildir.';
+
+  @override
+  String get readingLoadFailed => 'Ölçümler okunamadı.';
+
+  @override
+  String get readingLegendSystolic => 'Büyük';
+
+  @override
+  String get readingLegendDiastolic => 'Küçük';
+
+  @override
+  String get readingErrNumber => 'Geçerli bir sayı girin.';
+
+  @override
+  String readingErrRange(String min, String max, String unit) {
+    return 'Değer $min ile $max $unit arasında olmalı.';
+  }
+
+  @override
+  String get readingErrOrder =>
+      'Büyük tansiyon küçük tansiyondan yüksek olmalı.';
+
+  @override
+  String get readingErrFuture => 'Gelecekte bir an seçilemez.';
+
+  @override
+  String get readingErrDate => 'Geçerli bir tarih seçin.';
+
+  @override
+  String get readingErrNote => 'Not en çok 500 karakter olabilir.';
+
+  @override
+  String get readingErrGeneric => 'Kaydedilemedi.';
 }

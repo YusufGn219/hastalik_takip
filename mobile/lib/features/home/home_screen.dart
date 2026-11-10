@@ -84,6 +84,14 @@ class HomeScreen extends StatelessWidget {
               route: '/recurring',
             ),
             _HomeTile(
+              icon: Icons.favorite_border,
+              color: AppColors.daily,
+              background: AppColors.dailyBg,
+              title: l10n.homeReadings,
+              hint: l10n.homeReadingsHint,
+              route: '/readings',
+            ),
+            _HomeTile(
               icon: Icons.history,
               color: AppColors.primary400,
               background: AppColors.primary50,

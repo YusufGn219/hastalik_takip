@@ -9,13 +9,16 @@ import 'package:intl/intl.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../data/database/app_database.dart';
 import '../../../data/database/enums.dart';
 import '../../../data/repositories/support.dart';
 import '../../../domain/local_day.dart';
+import '../../../domain/reading_catalog.dart';
 import '../../../domain/services/daily_field_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../episode/episode_format.dart';
 import '../../episode/episode_overview.dart';
+import '../../readings/reading_format.dart';
 import '../timeline_day.dart';
 
 /// 'YYYY-MM-DD' gününü [delta] gün kaydırır (takvim günü; yaz saati etkilemez).
@@ -189,6 +192,11 @@ class _DayTimelineScreenState extends ConsumerState<DayTimelineScreen> {
             _extraFieldsCard(data, l10n),
             const SizedBox(height: 16),
           ],
+          if (data.readings.isNotEmpty) ...[
+            _heading(l10n.readingsTitle),
+            _readingsCard(data, l10n),
+            const SizedBox(height: 16),
+          ],
           _heading(l10n.timelineEventsTitle),
           if (data.items.isEmpty)
             Text(
@@ -305,6 +313,42 @@ class _DayTimelineScreenState extends ConsumerState<DayTimelineScreen> {
         ),
       ),
     );
+  }
+
+  /// O günün sağlık ölçümleri: "08:30 Tansiyon 120/80 mmHg · Açlık".
+  Widget _readingsCard(TimelineDay data, AppLocalizations l10n) {
+    final locale = Localizations.localeOf(context).toString();
+    return Card(
+      key: const ValueKey('timeline-readings'),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final m in data.readings)
+              Text(
+                _readingLine(m, data, l10n, locale),
+                key: ValueKey('timeline-reading-${m.id}'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _readingLine(
+    Measurement m,
+    TimelineDay data,
+    AppLocalizations l10n,
+    String locale,
+  ) {
+    final kind = ReadingCatalog.of(m.type)!;
+    final unit = data.readingUnits[m.type] ?? kind.baseUnit.code;
+    final c = m.context;
+    final base =
+        '${readingClock(m, locale)} ${readingTypeName(l10n, m.type)} '
+        '${formatReadingValue(kind, m, unit, locale)} $unit';
+    return c == null ? base : '$base · ${readingContextName(l10n, c)}';
   }
 
   String _fieldValueText(DailyFieldValue v, AppLocalizations l10n) {

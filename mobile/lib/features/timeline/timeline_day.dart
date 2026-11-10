@@ -5,6 +5,7 @@ import '../../data/database/app_database.dart';
 import '../../data/repositories/medication_repository.dart';
 import '../../data/repositories/symptom_repository.dart';
 import '../../domain/services/daily_field_service.dart';
+import '../../domain/services/reading_service.dart';
 import '../../domain/services/timeline_service.dart';
 import '../episode/episode_overview.dart';
 
@@ -72,6 +73,8 @@ class TimelineDay {
     required this.items,
     this.activeEpisodes = const [],
     this.fieldValues = const [],
+    this.readings = const [],
+    this.readingUnits = const {},
   });
 
   final String day;
@@ -85,7 +88,17 @@ class TimelineDay {
   /// alanlar da girilmiş değerleriyle görünür; değeri olmayanlar yoktur.
   final List<DailyFieldValue> fieldValues;
 
-  bool get isEmpty => dailyLog == null && items.isEmpty && fieldValues.isEmpty;
+  /// O günün sağlık ölçümleri (tansiyon, nabız, kan şekeri), saat sırasıyla.
+  final List<Measurement> readings;
+
+  /// Ölçüm türüne göre seçili gösterim birimi kodu (ör. şekerde 'mmol/L').
+  final Map<String, String> readingUnits;
+
+  bool get isEmpty =>
+      dailyLog == null &&
+      items.isEmpty &&
+      fieldValues.isEmpty &&
+      readings.isEmpty;
 }
 
 class TimelineDayLoader {
@@ -95,17 +108,20 @@ class TimelineDayLoader {
     required MedicationRepository medications,
     required EpisodeOverviewLoader episodes,
     DailyFieldService? fields,
+    ReadingService? readings,
   })  : _timeline = timeline,
         _symptoms = symptoms,
         _medications = medications,
         _episodes = episodes,
-        _fields = fields;
+        _fields = fields,
+        _readings = readings;
 
   final TimelineService _timeline;
   final SymptomRepository _symptoms;
   final MedicationRepository _medications;
   final EpisodeOverviewLoader _episodes;
   final DailyFieldService? _fields;
+  final ReadingService? _readings;
 
   Future<TimelineDay> load(String day, {bool withActiveEpisodes = false}) async {
     final t = await _timeline.forDay(day);
@@ -138,6 +154,22 @@ class TimelineDayLoader {
       } catch (_) {}
     }
 
+    // Sağlık ölçümleri de aynı şekilde: okunamazsa çizelge yine açılır.
+    var readings = const <Measurement>[];
+    var readingUnits = const <String, String>{};
+    final readingService = _readings;
+    if (readingService != null) {
+      try {
+        final list = await readingService.listForDay(day);
+        final units = <String, String>{};
+        for (final type in {for (final m in list) m.type}) {
+          units[type] = await readingService.preferredUnit(type);
+        }
+        readings = list;
+        readingUnits = units;
+      } catch (_) {}
+    }
+
     return TimelineDay(
       day: day,
       dailyLog: t.dailyLog,
@@ -145,6 +177,8 @@ class TimelineDayLoader {
       activeEpisodes:
           withActiveEpisodes ? (await _episodes.load()).active : const [],
       fieldValues: fieldValues,
+      readings: readings,
+      readingUnits: readingUnits,
     );
   }
 }
