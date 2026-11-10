@@ -13,6 +13,8 @@ abstract class MeasurementRepository {
     required DateTime measuredAt,
     String unit = '',
     String? notes,
+    double? value2,
+    String? context,
   });
 
   /// Tür için ölçümler, zamana göre artan. [fromDate]/[toDate] dahil ('YYYY-MM-DD').
@@ -44,6 +46,8 @@ class DriftMeasurementRepository implements MeasurementRepository {
     required DateTime measuredAt,
     String unit = '',
     String? notes,
+    double? value2,
+    String? context,
   }) {
     final now = _clock();
     return _db.into(_db.measurements).insertReturning(
@@ -58,6 +62,8 @@ class DriftMeasurementRepository implements MeasurementRepository {
             measuredAt: measuredAt,
             utcOffsetMinutes: utcOffsetOf(measuredAt),
             notes: Value(notes),
+            value2: Value(value2),
+            context: Value(context),
           ),
         );
   }

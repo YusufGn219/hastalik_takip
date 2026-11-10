@@ -7441,6 +7441,26 @@ class $MeasurementsTable extends Measurements
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _value2Meta = const VerificationMeta('value2');
+  @override
+  late final GeneratedColumn<double> value2 = GeneratedColumn<double>(
+    'value2',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contextMeta = const VerificationMeta(
+    'context',
+  );
+  @override
+  late final GeneratedColumn<String> context = GeneratedColumn<String>(
+    'context',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -7454,6 +7474,8 @@ class $MeasurementsTable extends Measurements
     measuredAt,
     utcOffsetMinutes,
     notes,
+    value2,
+    context,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -7549,6 +7571,18 @@ class $MeasurementsTable extends Measurements
         notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
       );
     }
+    if (data.containsKey('value2')) {
+      context.handle(
+        _value2Meta,
+        value2.isAcceptableOrUnknown(data['value2']!, _value2Meta),
+      );
+    }
+    if (data.containsKey('context')) {
+      context.handle(
+        _contextMeta,
+        this.context.isAcceptableOrUnknown(data['context']!, _contextMeta),
+      );
+    }
     return context;
   }
 
@@ -7602,6 +7636,14 @@ class $MeasurementsTable extends Measurements
         DriftSqlType.string,
         data['${effectivePrefix}notes'],
       ),
+      value2: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}value2'],
+      ),
+      context: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}context'],
+      ),
     );
   }
 
@@ -7629,6 +7671,14 @@ class Measurement extends DataClass implements Insertable<Measurement> {
   final DateTime measuredAt;
   final int utcOffsetMinutes;
   final String? notes;
+
+  /// İkinci değer (şema 6): yalnız iki sayılı ölçümlerde (tansiyon: [value]
+  /// büyük, [value2] küçük). Tek sayılı ölçümlerde boş.
+  final double? value2;
+
+  /// Ölçümün bağlamı (şema 6), ör. şekerde `fasting`. Kodlar
+  /// `ReadingContexts`'tedir; boş olabilir.
+  final String? context;
   const Measurement({
     required this.id,
     required this.createdAt,
@@ -7641,6 +7691,8 @@ class Measurement extends DataClass implements Insertable<Measurement> {
     required this.measuredAt,
     required this.utcOffsetMinutes,
     this.notes,
+    this.value2,
+    this.context,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -7659,6 +7711,12 @@ class Measurement extends DataClass implements Insertable<Measurement> {
     map['utc_offset_minutes'] = Variable<int>(utcOffsetMinutes);
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || value2 != null) {
+      map['value2'] = Variable<double>(value2);
+    }
+    if (!nullToAbsent || context != null) {
+      map['context'] = Variable<String>(context);
     }
     return map;
   }
@@ -7680,6 +7738,12 @@ class Measurement extends DataClass implements Insertable<Measurement> {
       notes: notes == null && nullToAbsent
           ? const Value.absent()
           : Value(notes),
+      value2: value2 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(value2),
+      context: context == null && nullToAbsent
+          ? const Value.absent()
+          : Value(context),
     );
   }
 
@@ -7700,6 +7764,8 @@ class Measurement extends DataClass implements Insertable<Measurement> {
       measuredAt: serializer.fromJson<DateTime>(json['measuredAt']),
       utcOffsetMinutes: serializer.fromJson<int>(json['utcOffsetMinutes']),
       notes: serializer.fromJson<String?>(json['notes']),
+      value2: serializer.fromJson<double?>(json['value2']),
+      context: serializer.fromJson<String?>(json['context']),
     );
   }
   @override
@@ -7717,6 +7783,8 @@ class Measurement extends DataClass implements Insertable<Measurement> {
       'measuredAt': serializer.toJson<DateTime>(measuredAt),
       'utcOffsetMinutes': serializer.toJson<int>(utcOffsetMinutes),
       'notes': serializer.toJson<String?>(notes),
+      'value2': serializer.toJson<double?>(value2),
+      'context': serializer.toJson<String?>(context),
     };
   }
 
@@ -7732,6 +7800,8 @@ class Measurement extends DataClass implements Insertable<Measurement> {
     DateTime? measuredAt,
     int? utcOffsetMinutes,
     Value<String?> notes = const Value.absent(),
+    Value<double?> value2 = const Value.absent(),
+    Value<String?> context = const Value.absent(),
   }) => Measurement(
     id: id ?? this.id,
     createdAt: createdAt ?? this.createdAt,
@@ -7744,6 +7814,8 @@ class Measurement extends DataClass implements Insertable<Measurement> {
     measuredAt: measuredAt ?? this.measuredAt,
     utcOffsetMinutes: utcOffsetMinutes ?? this.utcOffsetMinutes,
     notes: notes.present ? notes.value : this.notes,
+    value2: value2.present ? value2.value : this.value2,
+    context: context.present ? context.value : this.context,
   );
   Measurement copyWithCompanion(MeasurementsCompanion data) {
     return Measurement(
@@ -7762,6 +7834,8 @@ class Measurement extends DataClass implements Insertable<Measurement> {
           ? data.utcOffsetMinutes.value
           : this.utcOffsetMinutes,
       notes: data.notes.present ? data.notes.value : this.notes,
+      value2: data.value2.present ? data.value2.value : this.value2,
+      context: data.context.present ? data.context.value : this.context,
     );
   }
 
@@ -7778,7 +7852,9 @@ class Measurement extends DataClass implements Insertable<Measurement> {
           ..write('logDate: $logDate, ')
           ..write('measuredAt: $measuredAt, ')
           ..write('utcOffsetMinutes: $utcOffsetMinutes, ')
-          ..write('notes: $notes')
+          ..write('notes: $notes, ')
+          ..write('value2: $value2, ')
+          ..write('context: $context')
           ..write(')'))
         .toString();
   }
@@ -7796,6 +7872,8 @@ class Measurement extends DataClass implements Insertable<Measurement> {
     measuredAt,
     utcOffsetMinutes,
     notes,
+    value2,
+    context,
   );
   @override
   bool operator ==(Object other) =>
@@ -7811,7 +7889,9 @@ class Measurement extends DataClass implements Insertable<Measurement> {
           other.logDate == this.logDate &&
           other.measuredAt == this.measuredAt &&
           other.utcOffsetMinutes == this.utcOffsetMinutes &&
-          other.notes == this.notes);
+          other.notes == this.notes &&
+          other.value2 == this.value2 &&
+          other.context == this.context);
 }
 
 class MeasurementsCompanion extends UpdateCompanion<Measurement> {
@@ -7826,6 +7906,8 @@ class MeasurementsCompanion extends UpdateCompanion<Measurement> {
   final Value<DateTime> measuredAt;
   final Value<int> utcOffsetMinutes;
   final Value<String?> notes;
+  final Value<double?> value2;
+  final Value<String?> context;
   final Value<int> rowid;
   const MeasurementsCompanion({
     this.id = const Value.absent(),
@@ -7839,6 +7921,8 @@ class MeasurementsCompanion extends UpdateCompanion<Measurement> {
     this.measuredAt = const Value.absent(),
     this.utcOffsetMinutes = const Value.absent(),
     this.notes = const Value.absent(),
+    this.value2 = const Value.absent(),
+    this.context = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MeasurementsCompanion.insert({
@@ -7853,6 +7937,8 @@ class MeasurementsCompanion extends UpdateCompanion<Measurement> {
     required DateTime measuredAt,
     required int utcOffsetMinutes,
     this.notes = const Value.absent(),
+    this.value2 = const Value.absent(),
+    this.context = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        createdAt = Value(createdAt),
@@ -7874,6 +7960,8 @@ class MeasurementsCompanion extends UpdateCompanion<Measurement> {
     Expression<DateTime>? measuredAt,
     Expression<int>? utcOffsetMinutes,
     Expression<String>? notes,
+    Expression<double>? value2,
+    Expression<String>? context,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -7888,6 +7976,8 @@ class MeasurementsCompanion extends UpdateCompanion<Measurement> {
       if (measuredAt != null) 'measured_at': measuredAt,
       if (utcOffsetMinutes != null) 'utc_offset_minutes': utcOffsetMinutes,
       if (notes != null) 'notes': notes,
+      if (value2 != null) 'value2': value2,
+      if (context != null) 'context': context,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -7904,6 +7994,8 @@ class MeasurementsCompanion extends UpdateCompanion<Measurement> {
     Value<DateTime>? measuredAt,
     Value<int>? utcOffsetMinutes,
     Value<String?>? notes,
+    Value<double?>? value2,
+    Value<String?>? context,
     Value<int>? rowid,
   }) {
     return MeasurementsCompanion(
@@ -7918,6 +8010,8 @@ class MeasurementsCompanion extends UpdateCompanion<Measurement> {
       measuredAt: measuredAt ?? this.measuredAt,
       utcOffsetMinutes: utcOffsetMinutes ?? this.utcOffsetMinutes,
       notes: notes ?? this.notes,
+      value2: value2 ?? this.value2,
+      context: context ?? this.context,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -7958,6 +8052,12 @@ class MeasurementsCompanion extends UpdateCompanion<Measurement> {
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
+    if (value2.present) {
+      map['value2'] = Variable<double>(value2.value);
+    }
+    if (context.present) {
+      map['context'] = Variable<String>(context.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -7978,6 +8078,8 @@ class MeasurementsCompanion extends UpdateCompanion<Measurement> {
           ..write('measuredAt: $measuredAt, ')
           ..write('utcOffsetMinutes: $utcOffsetMinutes, ')
           ..write('notes: $notes, ')
+          ..write('value2: $value2, ')
+          ..write('context: $context, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -17078,6 +17180,8 @@ typedef $$MeasurementsTableCreateCompanionBuilder =
       required DateTime measuredAt,
       required int utcOffsetMinutes,
       Value<String?> notes,
+      Value<double?> value2,
+      Value<String?> context,
       Value<int> rowid,
     });
 typedef $$MeasurementsTableUpdateCompanionBuilder =
@@ -17093,6 +17197,8 @@ typedef $$MeasurementsTableUpdateCompanionBuilder =
       Value<DateTime> measuredAt,
       Value<int> utcOffsetMinutes,
       Value<String?> notes,
+      Value<double?> value2,
+      Value<String?> context,
       Value<int> rowid,
     });
 
@@ -17157,6 +17263,16 @@ class $$MeasurementsTableFilterComposer
 
   ColumnFilters<String> get notes => $composableBuilder(
     column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get value2 => $composableBuilder(
+    column: $table.value2,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get context => $composableBuilder(
+    column: $table.context,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -17224,6 +17340,16 @@ class $$MeasurementsTableOrderingComposer
     column: $table.notes,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get value2 => $composableBuilder(
+    column: $table.value2,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get context => $composableBuilder(
+    column: $table.context,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$MeasurementsTableAnnotationComposer
@@ -17271,6 +17397,12 @@ class $$MeasurementsTableAnnotationComposer
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<double> get value2 =>
+      $composableBuilder(column: $table.value2, builder: (column) => column);
+
+  GeneratedColumn<String> get context =>
+      $composableBuilder(column: $table.context, builder: (column) => column);
 }
 
 class $$MeasurementsTableTableManager
@@ -17315,6 +17447,8 @@ class $$MeasurementsTableTableManager
                 Value<DateTime> measuredAt = const Value.absent(),
                 Value<int> utcOffsetMinutes = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
+                Value<double?> value2 = const Value.absent(),
+                Value<String?> context = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MeasurementsCompanion(
                 id: id,
@@ -17328,6 +17462,8 @@ class $$MeasurementsTableTableManager
                 measuredAt: measuredAt,
                 utcOffsetMinutes: utcOffsetMinutes,
                 notes: notes,
+                value2: value2,
+                context: context,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -17343,6 +17479,8 @@ class $$MeasurementsTableTableManager
                 required DateTime measuredAt,
                 required int utcOffsetMinutes,
                 Value<String?> notes = const Value.absent(),
+                Value<double?> value2 = const Value.absent(),
+                Value<String?> context = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MeasurementsCompanion.insert(
                 id: id,
@@ -17356,6 +17494,8 @@ class $$MeasurementsTableTableManager
                 measuredAt: measuredAt,
                 utcOffsetMinutes: utcOffsetMinutes,
                 notes: notes,
+                value2: value2,
+                context: context,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

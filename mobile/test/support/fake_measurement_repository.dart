@@ -17,7 +17,14 @@ class FakeMeasurementRepository implements MeasurementRepository {
   var _next = 0;
 
   /// Testte hazır kayıt eklemek için.
-  Measurement seed(String type, double value, DateTime at, {String unit = ''}) {
+  Measurement seed(
+    String type,
+    double value,
+    DateTime at, {
+    String unit = '',
+    double? value2,
+    String? context,
+  }) {
     final m = Measurement(
       id: 'm${++_next}',
       createdAt: at,
@@ -28,6 +35,8 @@ class FakeMeasurementRepository implements MeasurementRepository {
       logDate: dayKey(at),
       measuredAt: at,
       utcOffsetMinutes: utcOffsetOf(at),
+      value2: value2,
+      context: context,
     );
     rows.add(m);
     return m;
@@ -47,9 +56,11 @@ class FakeMeasurementRepository implements MeasurementRepository {
     required DateTime measuredAt,
     String unit = '',
     String? notes,
+    double? value2,
+    String? context,
   }) async {
     if (failAdds) throw StateError('yazılamadı');
-    return seed(type, value, measuredAt, unit: unit);
+    return seed(type, value, measuredAt, unit: unit, value2: value2, context: context);
   }
 
   @override

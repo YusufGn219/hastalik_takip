@@ -49,6 +49,10 @@ abstract final class MeasurementTypes {
   // Vücut ölçüleri (zaman serisi)
   static const weight = 'weight'; // kg
   static const height = 'height'; // cm
+  // Sağlık ölçümleri (şema 6; tanımları `ReadingCatalog`'ta)
+  static const bloodPressure = 'blood_pressure'; // mmHg, value = büyük, value2 = küçük
+  static const pulse = 'pulse'; // atım/dk
+  static const bloodGlucose = 'blood_glucose'; // mg/dL (her zaman bu birimde saklanır)
 
   /// Kullanıcının kendi günlük alanlarının ölçüm türü öneki
   /// (`field:` ve alanın kimliği art arda).

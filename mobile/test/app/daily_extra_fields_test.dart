@@ -31,6 +31,8 @@ class _FailingAddRepository extends DriftMeasurementRepository {
     required DateTime measuredAt,
     String unit = '',
     String? notes,
+    double? value2,
+    String? context,
   }) =>
       throw StateError('yazılamadı');
 }

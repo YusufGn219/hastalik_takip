@@ -49,8 +49,11 @@ class AppDatabase extends _$AppDatabase {
   ///  * 5: ek günlük alanları. Yeni `daily_fields` tablosu (alan tanımları);
   ///    değerler mevcut `measurements` tablosunda tutulur. Var olan tablolara
   ///    dokunulmaz.
+  ///  * 6: ölçüm kayıtları. `measurements`'a boş olabilen `value2` (tansiyonun
+  ///    ikinci sayısı) ve `context` (şeker: açlık/tokluk...) sütunları eklendi.
+  ///    Var olan satırlar ve türler değişmez.
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -90,6 +93,10 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(dailyFields);
             await customStatement(_dailyFieldNameIndex);
             await customStatement(_dailyFieldBuiltinIndex);
+          }
+          if (from < 6) {
+            await m.addColumn(measurements, measurements.value2);
+            await m.addColumn(measurements, measurements.context);
           }
         },
         beforeOpen: (details) async {

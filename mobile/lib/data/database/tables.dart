@@ -221,6 +221,14 @@ class Measurements extends Table with BaseColumns {
   DateTimeColumn get measuredAt => dateTime()();
   IntColumn get utcOffsetMinutes => integer()();
   TextColumn get notes => text().nullable()();
+
+  /// İkinci değer (şema 6): yalnız iki sayılı ölçümlerde (tansiyon: [value]
+  /// büyük, [value2] küçük). Tek sayılı ölçümlerde boş.
+  RealColumn get value2 => real().nullable()();
+
+  /// Ölçümün bağlamı (şema 6), ör. şekerde `fasting`. Kodlar
+  /// `ReadingContexts`'tedir; boş olabilir.
+  TextColumn get context => text().nullable()();
 }
 
 /// Ek günlük alanlarının tanımı (kafein, spor, ağrı düzeyi, kullanıcının kendi

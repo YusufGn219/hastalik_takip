@@ -142,6 +142,7 @@ void main() {
       // setUp'taki ikinci bir veritabanı açık; uyarı gereksiz.
       driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
       final raw = NativeDatabase.memory(setup: (rdb) {
+        rdb.execute(oldMeasurementsTableV5);
         rdb.execute('''
 CREATE TABLE "medications" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NULL, "updated_at" INTEGER NOT NULL, "deleted_at" INTEGER NULL, "name" TEXT NOT NULL, "type" TEXT NOT NULL DEFAULT 'symptomatic', "is_catalog" INTEGER NOT NULL DEFAULT 0 CHECK ("is_catalog" IN (0, 1)), "is_recurring" INTEGER NOT NULL DEFAULT 0 CHECK ("is_recurring" IN (0, 1)), "recurring_time" TEXT NULL, "recurring_days" TEXT NULL, "notification_id" INTEGER NULL, PRIMARY KEY ("id"))''');
         rdb.execute(
@@ -188,7 +189,7 @@ CREATE TABLE "medication_logs" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NUL
       expect((await r.getById('m1'))!.categoryId, c.id);
       final v = await old.customSelect('PRAGMA user_version').getSingle();
       // Eski v1 veritabanı güncel sürüme (3) kadar tüm adımlardan geçer.
-      expect(v.read<int>('user_version'), 5);
+      expect(v.read<int>('user_version'), 6);
     });
   });
 }

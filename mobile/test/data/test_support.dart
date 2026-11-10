@@ -27,6 +27,16 @@ DateTime utc(int y, int mo, int d, [int h = 0, int mi = 0, int s = 0]) =>
 /// `Value` kısaltması (testlerde okunurluk için).
 Value<T> v<T extends Object>(T x) => Value(x);
 
+/// Şema 1–5'teki `measurements` tablosu (`value2`/`context` sütunları yok).
+/// Eski sürümden geçiş testleri bu tabloyu da kurar: gerçek eski veritabanında
+/// tablo her zaman vardır, 5 → 6 adımı ona sütun ekler.
+const oldMeasurementsTableV5 =
+    'CREATE TABLE "measurements" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NULL, '
+    '"updated_at" INTEGER NOT NULL, "deleted_at" INTEGER NULL, '
+    '"type" TEXT NOT NULL, "value" REAL NOT NULL, "unit" TEXT NOT NULL DEFAULT \'\', '
+    '"log_date" TEXT NOT NULL, "measured_at" INTEGER NOT NULL, '
+    '"utc_offset_minutes" INTEGER NOT NULL, "notes" TEXT NULL, PRIMARY KEY ("id"))';
+
 /// Şema 3'teki `profiles` tablosu (geçiş testleri için eski yapı).
 const oldProfilesTableV3 =
     'CREATE TABLE "profiles" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NULL, '

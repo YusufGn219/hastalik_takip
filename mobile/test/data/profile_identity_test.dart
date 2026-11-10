@@ -138,6 +138,7 @@ void main() {
     test('eski görünen ad ad alanına taşınır, diğer veri korunur, yeni yapı çalışır', () async {
       driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
       final raw = NativeDatabase.memory(setup: (rdb) {
+        rdb.execute(oldMeasurementsTableV5);
         rdb.execute(oldProfilesTableV3);
         rdb.execute(
             "INSERT INTO profiles (id, created_at, updated_at, display_name, photo_path, birth_date, blood_type, allergies, gender, cycle_tracking_enabled, consent_at) "
@@ -178,7 +179,7 @@ void main() {
       expect((await old.select(old.profiles).get()).length, 1);
 
       final v = await old.customSelect('PRAGMA user_version').getSingle();
-      expect(v.read<int>('user_version'), 5);
+      expect(v.read<int>('user_version'), 6);
     });
   });
 }
