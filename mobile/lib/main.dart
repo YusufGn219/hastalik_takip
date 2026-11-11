@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:workmanager/workmanager.dart';
 import 'app/app_root.dart';
 import 'app/database_error_app.dart';
 import 'core/notifications/notification_service.dart';
@@ -8,6 +9,7 @@ import 'data/database/app_database.dart';
 import 'data/database/database_opener.dart';
 import 'data/database/seed_loader.dart';
 import 'data/repositories/medication_repository.dart';
+import 'data/steps/step_background.dart';
 import 'domain/services/reminder_service.dart';
 import 'features/analytics/screens/analytics_dashboard_screen.dart';
 import 'features/backup/backup_export_screen.dart';
@@ -28,6 +30,7 @@ import 'features/profile/body_measurements_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/readings/readings_screen.dart';
 import 'features/settings/settings_screen.dart';
+import 'features/steps/steps_lifecycle_hook.dart';
 import 'features/timeline/screens/day_timeline_screen.dart';
 import 'l10n/app_localizations.dart';
 
@@ -38,6 +41,14 @@ Future<void> main() async {
     await NotificationService.instance.initialize();
   } catch (e) {
     debugPrint('Bildirim altyapısı başlatılamadı: ${e.runtimeType}');
+  }
+
+  // Saatlik adım okuması için arka plan altyapısı (görev yalnızca adım izni
+  // verildikten sonra kurulur; burada yalnızca giriş noktası tanıtılır).
+  try {
+    await Workmanager().initialize(stepCallbackDispatcher);
+  } catch (e) {
+    debugPrint('Arka plan altyapısı başlatılamadı: ${e.runtimeType}');
   }
 
   final prefs = await SharedPreferences.getInstance();
@@ -65,7 +76,8 @@ Future<void> main() async {
         biometricAuthenticatorProvider.overrideWithValue(LocalAuthBiometric()),
         screenSecurityProvider.overrideWithValue(MethodChannelScreenSecurity()),
       ],
-      child: const MyApp(),
+      // Açılış adım okuması: saatlik rutinden bağımsız ikinci okuma yolu.
+      child: const StepsLifecycleHook(child: MyApp()),
     ),
   );
 }
@@ -91,6 +103,12 @@ Future<void> _eraseEverything() async {
     await NotificationService.instance.cancelAll();
   } catch (e) {
     debugPrint('Bildirimler iptal edilemedi: ${e.runtimeType}');
+  }
+  // Saatlik adım görevi de durur: silinen veriye yeni okuma yazılmasın.
+  try {
+    await WorkmanagerStepScheduler().cancel();
+  } catch (e) {
+    debugPrint('Adım görevi iptal edilemedi: ${e.runtimeType}');
   }
   await eraseDatabaseStorage();
 }

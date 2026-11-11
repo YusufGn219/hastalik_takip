@@ -20,8 +20,11 @@ import '../data/repositories/measurement_repository.dart';
 import '../data/repositories/medication_repository.dart';
 import '../data/repositories/profile_repository.dart';
 import '../data/repositories/settings_repository.dart';
+import '../data/repositories/step_sample_repository.dart';
 import '../data/repositories/support.dart';
 import '../data/repositories/symptom_entry_repository.dart';
+import '../data/steps/android_step_source.dart';
+import '../data/steps/step_background.dart';
 import '../data/repositories/symptom_repository.dart';
 import '../domain/services/analytics_service.dart';
 import '../domain/services/body_measurement_service.dart';
@@ -33,6 +36,9 @@ import '../domain/services/episode_service.dart';
 import '../domain/services/medication_service.dart';
 import '../domain/services/reading_service.dart';
 import '../domain/services/reminder_service.dart';
+import '../domain/services/step_service.dart';
+import '../domain/services/step_tracking.dart';
+import '../domain/step_source.dart';
 import '../domain/services/timeline_service.dart';
 import '../features/analytics/analytics_overview.dart';
 import '../features/readings/readings_view.dart';
@@ -160,6 +166,37 @@ final readingsViewProvider = FutureProvider.autoDispose
         unit: await service.preferredUnit(type),
       );
     });
+
+// ------------------------------------------------------------------ adım sayacı
+
+/// Telefonun adım sayacı; testlerde sahtesiyle geçersiz kılınır.
+final stepSourceProvider = Provider<StepSource>((ref) => const AndroidStepSource());
+
+/// Saatlik arka plan görevinin zamanlayıcısı; testlerde sahtesiyle geçersiz kılınır.
+final stepSchedulerProvider = Provider<StepScheduler>((ref) => WorkmanagerStepScheduler());
+
+final stepSampleRepositoryProvider = Provider<StepSampleRepository>(
+  (ref) => DriftStepSampleRepository(
+    ref.watch(databaseProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+final stepServiceProvider = Provider<StepService>(
+  (ref) => StepService(
+    source: ref.watch(stepSourceProvider),
+    samples: ref.watch(stepSampleRepositoryProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+/// Adım takibinin iki okuma yolu (açılış ve saatlik rutin).
+final stepTrackingProvider = Provider<StepTracking>(
+  (ref) => StepTracking(
+    service: ref.watch(stepServiceProvider),
+    scheduler: ref.watch(stepSchedulerProvider),
+  ),
+);
 
 final dailyFieldRepositoryProvider = Provider<DailyFieldRepository>(
   (ref) => DriftDailyFieldRepository(

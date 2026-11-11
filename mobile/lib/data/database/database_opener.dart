@@ -14,6 +14,10 @@ abstract class DatabaseKeyStore {
   /// Kayıtlı anahtarı (64 onaltılı karakter = 32 bayt) döndürür; yoksa
   /// üretip kaydeder.
   Future<String> readOrCreateKey();
+
+  /// Kayıtlı anahtarı döndürür; YOKSA üretmez, null döner. Arka plan görevi
+  /// bunu kullanır: kullanıcı verisini sildiyse yeni bir boş veritabanı doğmasın.
+  Future<String?> readExistingKey();
 }
 
 class SecureStorageKeyStore implements DatabaseKeyStore {
@@ -33,6 +37,12 @@ class SecureStorageKeyStore implements DatabaseKeyStore {
         bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
     await _storage.write(key: _keyName, value: key);
     return key;
+  }
+
+  @override
+  Future<String?> readExistingKey() async {
+    final existing = await _storage.read(key: _keyName);
+    return existing != null && existing.length == 64 ? existing : null;
   }
 
   /// Anahtarı Keystore'dan siler ("tüm veriyi sil" son çaresi). Anahtar gidince
@@ -69,6 +79,10 @@ AppDatabase openEncryptedDatabase(File file, String hexKey) {
         );
       }
       raw.execute("PRAGMA key = \"x'$hexKey'\";");
+      // Aynı dosyayı iki bağlantı açabilir (uygulama ve arka plan adım görevi).
+      // Biri yazarken öbürü hata vermek yerine kısa süre beklesin. Doğrulama
+      // sorgusundan ÖNCE ayarlanmalı: o sorgu da kilitle karşılaşabilir.
+      raw.execute('PRAGMA busy_timeout = 5000;');
       // Anahtar yanlışsa (ya da dosya şifresizse) bu satır hata verir.
       try {
         raw.select('SELECT count(*) FROM sqlite_master;');
@@ -87,6 +101,21 @@ Future<AppDatabase> openAppDatabase({DatabaseKeyStore? keyStore}) async {
   final dir = await getApplicationDocumentsDirectory();
   final file = File(p.join(dir.path, databaseFileName));
   final key = await (keyStore ?? SecureStorageKeyStore()).readOrCreateKey();
+  return openEncryptedDatabase(file, key);
+}
+
+/// Arka plan görevleri için açılış: yalnızca HALİHAZIRDA var olan veritabanını
+/// açar. Dosya ya da anahtar yoksa (kullanıcı verisini sildi, ilk kurulum henüz
+/// olmadı) null döner; yeni anahtar ya da boş veritabanı OLUŞTURMAZ.
+Future<AppDatabase?> openExistingAppDatabase({
+  DatabaseKeyStore? keyStore,
+  Directory? directory,
+}) async {
+  final dir = directory ?? await getApplicationDocumentsDirectory();
+  final file = File(p.join(dir.path, databaseFileName));
+  if (!await file.exists()) return null;
+  final key = await (keyStore ?? SecureStorageKeyStore()).readExistingKey();
+  if (key == null) return null;
   return openEncryptedDatabase(file, key);
 }
 

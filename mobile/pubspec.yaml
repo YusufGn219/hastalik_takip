@@ -57,6 +57,7 @@ dependencies:
   # Telefonun adım sayacını okuyan yerel eklenti (packages/vitapuls_steps).
   vitapuls_steps:
     path: packages/vitapuls_steps
+  workmanager: ^0.10.10
 
 # Yerel veritabanı SQLCipher ile şifrelenir. sqlcipher_flutter_libs paketi artık
 # kullanılmıyor (0.7.0+eol); sqlite3 3.x derleme kancası (hook) ile SQLCipher seçilir.
