@@ -23,6 +23,7 @@ part 'app_database.g.dart';
     Measurements,
     DailyFields,
     StepSamples,
+    DrugCatalogEntries,
     Tags,
     TagEntries,
     CyclePeriods,
@@ -56,8 +57,10 @@ class AppDatabase extends _$AppDatabase {
   ///  * 7: adım sayacı okumaları. Yeni `step_samples` tablosu (sayacın ham
   ///    değeri + zaman); saatlik/günlük adım bunlardan hesaplanır. Var olan
   ///    tablolara dokunulmaz.
+  ///  * 8: ilaç kataloğu. Yeni `drug_catalog` tablosu (salt-okunur başvuru
+  ///    verisi; içerik uygulamadan yüklenir). Var olan tablolara dokunulmaz.
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -105,6 +108,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 7) {
             await m.createTable(stepSamples);
             await customStatement(_stepSampleTimeIndex);
+          }
+          if (from < 8) {
+            await m.createTable(drugCatalogEntries);
           }
         },
         beforeOpen: (details) async {

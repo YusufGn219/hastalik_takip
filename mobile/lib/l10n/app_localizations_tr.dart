@@ -87,6 +87,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get medLogNewName => 'İlaç adı';
 
   @override
+  String get medLogCatalogLoading => 'Katalog hazırlanıyor…';
+
+  @override
+  String get medLogCatalogNone =>
+      'Katalogda bulunamadı; yazdığınız ad eklenir.';
+
+  @override
   String get medLogCategoryLabel => 'Kategori (isteğe bağlı)';
 
   @override

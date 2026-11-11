@@ -40,6 +40,8 @@
   "medLogAddError": "İlaç eklenemedi. Tekrar deneyin.",
   "medLogNewTitle": "Yeni İlaç Ekle",
   "medLogNewName": "İlaç adı",
+  "medLogCatalogLoading": "Katalog hazırlanıyor…",
+  "medLogCatalogNone": "Katalogda bulunamadı; yazdığınız ad eklenir.",
   "medLogCategoryLabel": "Kategori (isteğe bağlı)",
   "medLogNoCategory": "Kategorisiz",
   "medLogNewCategory": "Yeni kategori oluştur…",

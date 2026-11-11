@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -5,8 +7,11 @@ import 'package:mobile/app/providers.dart';
 import 'package:mobile/data/database/app_database.dart';
 import 'package:mobile/data/database/enums.dart';
 import 'package:mobile/data/database/seed_loader.dart';
+import 'package:mobile/data/repositories/drug_catalog_repository.dart';
 import 'package:mobile/data/repositories/medication_log_repository.dart';
 import 'package:mobile/data/repositories/medication_repository.dart';
+import 'package:mobile/data/repositories/settings_repository.dart';
+import 'package:mobile/domain/services/drug_catalog_service.dart';
 import 'package:mobile/domain/services/medication_service.dart';
 import 'package:mobile/features/medication/screens/medication_log_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
@@ -56,6 +61,25 @@ class _BrokenMedicationService extends MedicationService {
             );
 }
 
+/// Katalog servisi yerine geçer: aramayı [handler] yanıtlar, sorguları kaydeder.
+class _FakeCatalog extends DrugCatalogService {
+  _FakeCatalog(AppDatabase db)
+      : super(
+          catalog: DriftDrugCatalogRepository(db),
+          settings: DriftSettingsRepository(db),
+          loadAsset: (_) async => throw StateError('kullanılmaz'),
+        );
+
+  Future<List<DrugSuggestion>> Function(String query) handler = (_) async => const [];
+  final List<String> queries = [];
+
+  @override
+  Future<List<DrugSuggestion>> search(String query, {int limit = 30}) {
+    queries.add(query);
+    return handler(query);
+  }
+}
+
 Widget _app(List<Override> overrides) => ProviderScope(
       overrides: overrides,
       child: MaterialApp(
@@ -75,8 +99,12 @@ void _phoneSize(WidgetTester tester) {
 
 void main() {
   late AppDatabase db;
+  late _FakeCatalog catalog;
 
-  setUp(() => db = createTestDb());
+  setUp(() {
+    db = createTestDb();
+    catalog = _FakeCatalog(db);
+  });
   tearDown(() => db.close());
 
   final parolId = SeedLoader.medicationId('parol');
@@ -84,6 +112,7 @@ void main() {
   List<Override> overrides([List<Override>? extra]) => [
         databaseProvider.overrideWithValue(db),
         clockProvider.overrideWithValue(_now),
+        drugCatalogServiceProvider.overrideWithValue(catalog),
         ...?extra,
       ];
 
@@ -326,6 +355,169 @@ void main() {
       expect(find.text('Parol zaten var, seçildi.'), findsOneWidget);
       await tapSave(tester);
       expect((await allLogs(tester)).single.medicationId, parolId);
+    });
+
+    group('katalog önerileri', () {
+      const parol = DrugSuggestion(name: 'PAROL 500 MG TABLET', activeIngredient: 'parasetamol', atc: 'N02BE01');
+      const sut = DrugSuggestion(name: 'PAROL 120 MG/5 ML ORAL SÜSPANSİYON', activeIngredient: '', atc: '');
+
+      Finder nameField() =>
+          find.descendant(of: find.byType(AlertDialog), matching: find.byType(TextField)).first;
+
+      Future<void> openDialog(WidgetTester tester) async {
+        await openApp(tester);
+        await tester.tap(find.text('Yeni ilaç ekle'));
+        await tester.pumpAndSettle();
+      }
+
+      Future<void> typeName(WidgetTester tester, String text) async {
+        await tester.enterText(nameField(), text);
+        await tester.pump(const Duration(milliseconds: 300)); // bekleme süresi
+        await tester.pump(); // arama sonucu
+      }
+
+      testWidgets('yazınca öneriler çıkar: ad ve etkin madde; etkin maddesi boşsa alt satır yok', (tester) async {
+        catalog.handler = (_) async => [parol, sut];
+        await openDialog(tester);
+        await typeName(tester, 'parol');
+
+        expect(catalog.queries, ['parol']);
+        expect(find.byKey(const Key('katalog_oneriler')), findsOneWidget);
+        expect(find.text('PAROL 500 MG TABLET'), findsOneWidget);
+        expect(find.text('parasetamol'), findsOneWidget);
+        expect(find.text('PAROL 120 MG/5 ML ORAL SÜSPANSİYON'), findsOneWidget);
+        expect(find.byKey(const Key('katalog_oneri_1')), findsOneWidget);
+      });
+
+      testWidgets('öneriye dokununca ad alana yazılır, liste kapanır ve yeniden aranmaz; Ekle ile eklenir', (tester) async {
+        catalog.handler = (_) async => [parol];
+        await openDialog(tester);
+        await typeName(tester, 'parol');
+
+        await tester.tap(find.byKey(const Key('katalog_oneri_0')));
+        await tester.pump(const Duration(milliseconds: 400));
+        expect(tester.widget<TextField>(nameField()).controller!.text, 'PAROL 500 MG TABLET');
+        expect(find.byKey(const Key('katalog_oneriler')), findsNothing);
+        expect(catalog.queries, ['parol'], reason: 'seçim yeni arama başlatmaz');
+
+        await tester.tap(find.text('Ekle'));
+        await tester.pumpAndSettle();
+        final added = (await allMedications(tester)).where((m) => m.name == 'PAROL 500 MG TABLET').single;
+        expect(added.isCatalog, isFalse, reason: 'kullanıcının kendi ilacı olarak eklenir');
+        expect(find.text('PAROL 500 MG TABLET eklendi.'), findsOneWidget);
+      });
+
+      testWidgets('100 karakteri aşan katalog adı kırpılarak yazılır', (tester) async {
+        final long = '${'A' * 99} BBBBBBBB';
+        catalog.handler = (_) async => [DrugSuggestion(name: long, activeIngredient: '', atc: '')];
+        await openDialog(tester);
+        await typeName(tester, 'aaa');
+        await tester.tap(find.byKey(const Key('katalog_oneri_0')));
+        await tester.pump(const Duration(milliseconds: 400));
+        final text = tester.widget<TextField>(nameField()).controller!.text;
+        expect(text.length, lessThanOrEqualTo(100));
+        expect(text, 'A' * 99);
+
+        await tester.tap(find.text('Ekle'));
+        await tester.pumpAndSettle();
+        expect((await allMedications(tester)).any((m) => m.name == 'A' * 99), isTrue);
+      });
+
+      testWidgets('katalogdan seçilen ad zaten varsa yeni satır açılmaz, mevcut seçilir', (tester) async {
+        catalog.handler = (_) async => [const DrugSuggestion(name: 'PAROL', activeIngredient: 'parasetamol', atc: '')];
+        await openDialog(tester);
+        await typeName(tester, 'parol');
+        await tester.tap(find.byKey(const Key('katalog_oneri_0')));
+        await tester.pump(const Duration(milliseconds: 400));
+        await tester.tap(find.text('Ekle'));
+        await tester.pumpAndSettle();
+        expect(await allMedications(tester), hasLength(10));
+        expect(find.text('Parol zaten var, seçildi.'), findsOneWidget);
+      });
+
+      testWidgets('sonuç yoksa "bulunamadı" notu çıkar ve yazılan ad yine eklenebilir', (tester) async {
+        await openDialog(tester);
+        await typeName(tester, 'kulak damlası');
+        expect(find.byKey(const Key('katalog_yok')), findsOneWidget);
+        expect(find.text('Katalogda bulunamadı; yazdığınız ad eklenir.'), findsOneWidget);
+
+        await tester.tap(find.text('Ekle'));
+        await tester.pumpAndSettle();
+        expect((await allMedications(tester)).where((m) => m.name == 'kulak damlası'), hasLength(1));
+      });
+
+      testWidgets('katalog hata verirse sessizce öneri yok; ad yine eklenebilir', (tester) async {
+        catalog.handler = (_) async => throw StateError('katalog yüklenemedi');
+        await openDialog(tester);
+        await typeName(tester, 'kulak damlası');
+        expect(tester.takeException(), isNull);
+        expect(find.byKey(const Key('katalog_oneriler')), findsNothing);
+        expect(find.byKey(const Key('katalog_yok')), findsOneWidget,
+            reason: 'hata sonuç yok gibi davranır; ad yine elle yazılıp eklenebilir');
+
+        await tester.tap(find.text('Ekle'));
+        await tester.pumpAndSettle();
+        expect((await allMedications(tester)).any((m) => m.name == 'kulak damlası'), isTrue);
+      });
+
+      testWidgets('tek harfte aranmaz; yazı silinince öneriler kalkar', (tester) async {
+        catalog.handler = (_) async => [parol];
+        await openDialog(tester);
+        await typeName(tester, 'p');
+        expect(catalog.queries, isEmpty);
+        expect(find.byKey(const Key('katalog_oneriler')), findsNothing);
+
+        await typeName(tester, 'parol');
+        expect(find.byKey(const Key('katalog_oneriler')), findsOneWidget);
+        await typeName(tester, '');
+        expect(find.byKey(const Key('katalog_oneriler')), findsNothing);
+        expect(find.byKey(const Key('katalog_yok')), findsNothing);
+      });
+
+      testWidgets('arama beklerken yeni yazılırsa eski sorgunun geç gelen sonucu ezmez', (tester) async {
+        final slow = Completer<List<DrugSuggestion>>();
+        catalog.handler = (q) => q == 'pa' ? slow.future : Future.value([parol]);
+        await openDialog(tester);
+
+        await tester.enterText(nameField(), 'pa');
+        await tester.pump(const Duration(milliseconds: 300)); // 'pa' aranıyor, bitmedi
+        expect(find.byKey(const Key('katalog_yukleniyor')), findsOneWidget);
+
+        await typeName(tester, 'parol'); // yeni sorgu hemen biter
+        expect(find.byKey(const Key('katalog_oneri_0')), findsOneWidget);
+
+        slow.complete([sut]); // eski sorgu şimdi döner
+        await tester.pump(); // devam eden kod çalışır
+        await tester.pump(); // varsa değişiklik çizilir
+        expect(find.text('PAROL 500 MG TABLET'), findsOneWidget);
+        expect(find.text('PAROL 120 MG/5 ML ORAL SÜSPANSİYON'), findsNothing);
+      });
+
+      testWidgets('hızlı yazarken yalnız son sorgu aranır (bekleme süresi)', (tester) async {
+        catalog.handler = (_) async => [parol];
+        await openDialog(tester);
+        await tester.enterText(nameField(), 'pa');
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.enterText(nameField(), 'par');
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.enterText(nameField(), 'paro');
+        await tester.pump(const Duration(milliseconds: 300));
+        await tester.pump();
+        expect(catalog.queries, ['paro']);
+      });
+
+      testWidgets('pencere arama sürerken kapatılırsa hata ya da sızıntı olmaz', (tester) async {
+        final slow = Completer<List<DrugSuggestion>>();
+        catalog.handler = (_) => slow.future;
+        await openDialog(tester);
+        await tester.enterText(nameField(), 'parol');
+        await tester.pump(const Duration(milliseconds: 300));
+        await tester.tap(find.text('İptal'));
+        await tester.pumpAndSettle();
+        slow.complete([parol]);
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+      });
     });
 
     testWidgets('iptal edilirse ilaç eklenmez', (tester) async {

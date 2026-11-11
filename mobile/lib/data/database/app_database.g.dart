@@ -9471,6 +9471,364 @@ class StepSamplesCompanion extends UpdateCompanion<StepSample> {
   }
 }
 
+class $DrugCatalogEntriesTable extends DrugCatalogEntries
+    with TableInfo<$DrugCatalogEntriesTable, DrugCatalogEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DrugCatalogEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _activeIngredientMeta = const VerificationMeta(
+    'activeIngredient',
+  );
+  @override
+  late final GeneratedColumn<String> activeIngredient = GeneratedColumn<String>(
+    'active_ingredient',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _atcMeta = const VerificationMeta('atc');
+  @override
+  late final GeneratedColumn<String> atc = GeneratedColumn<String>(
+    'atc',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _searchKeyMeta = const VerificationMeta(
+    'searchKey',
+  );
+  @override
+  late final GeneratedColumn<String> searchKey = GeneratedColumn<String>(
+    'search_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    activeIngredient,
+    atc,
+    searchKey,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'drug_catalog';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DrugCatalogEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('active_ingredient')) {
+      context.handle(
+        _activeIngredientMeta,
+        activeIngredient.isAcceptableOrUnknown(
+          data['active_ingredient']!,
+          _activeIngredientMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_activeIngredientMeta);
+    }
+    if (data.containsKey('atc')) {
+      context.handle(
+        _atcMeta,
+        atc.isAcceptableOrUnknown(data['atc']!, _atcMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_atcMeta);
+    }
+    if (data.containsKey('search_key')) {
+      context.handle(
+        _searchKeyMeta,
+        searchKey.isAcceptableOrUnknown(data['search_key']!, _searchKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_searchKeyMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DrugCatalogEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DrugCatalogEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      activeIngredient: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}active_ingredient'],
+      )!,
+      atc: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}atc'],
+      )!,
+      searchKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}search_key'],
+      )!,
+    );
+  }
+
+  @override
+  $DrugCatalogEntriesTable createAlias(String alias) {
+    return $DrugCatalogEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class DrugCatalogEntry extends DataClass
+    implements Insertable<DrugCatalogEntry> {
+  final int id;
+
+  /// Ürün adı (ad + doz + form), kaynaktaki yazımıyla.
+  final String name;
+  final String activeIngredient;
+
+  /// ATC kodu; yoksa boş metin.
+  final String atc;
+  final String searchKey;
+  const DrugCatalogEntry({
+    required this.id,
+    required this.name,
+    required this.activeIngredient,
+    required this.atc,
+    required this.searchKey,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['active_ingredient'] = Variable<String>(activeIngredient);
+    map['atc'] = Variable<String>(atc);
+    map['search_key'] = Variable<String>(searchKey);
+    return map;
+  }
+
+  DrugCatalogEntriesCompanion toCompanion(bool nullToAbsent) {
+    return DrugCatalogEntriesCompanion(
+      id: Value(id),
+      name: Value(name),
+      activeIngredient: Value(activeIngredient),
+      atc: Value(atc),
+      searchKey: Value(searchKey),
+    );
+  }
+
+  factory DrugCatalogEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DrugCatalogEntry(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      activeIngredient: serializer.fromJson<String>(json['activeIngredient']),
+      atc: serializer.fromJson<String>(json['atc']),
+      searchKey: serializer.fromJson<String>(json['searchKey']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'activeIngredient': serializer.toJson<String>(activeIngredient),
+      'atc': serializer.toJson<String>(atc),
+      'searchKey': serializer.toJson<String>(searchKey),
+    };
+  }
+
+  DrugCatalogEntry copyWith({
+    int? id,
+    String? name,
+    String? activeIngredient,
+    String? atc,
+    String? searchKey,
+  }) => DrugCatalogEntry(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    activeIngredient: activeIngredient ?? this.activeIngredient,
+    atc: atc ?? this.atc,
+    searchKey: searchKey ?? this.searchKey,
+  );
+  DrugCatalogEntry copyWithCompanion(DrugCatalogEntriesCompanion data) {
+    return DrugCatalogEntry(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      activeIngredient: data.activeIngredient.present
+          ? data.activeIngredient.value
+          : this.activeIngredient,
+      atc: data.atc.present ? data.atc.value : this.atc,
+      searchKey: data.searchKey.present ? data.searchKey.value : this.searchKey,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DrugCatalogEntry(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('activeIngredient: $activeIngredient, ')
+          ..write('atc: $atc, ')
+          ..write('searchKey: $searchKey')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, activeIngredient, atc, searchKey);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DrugCatalogEntry &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.activeIngredient == this.activeIngredient &&
+          other.atc == this.atc &&
+          other.searchKey == this.searchKey);
+}
+
+class DrugCatalogEntriesCompanion extends UpdateCompanion<DrugCatalogEntry> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String> activeIngredient;
+  final Value<String> atc;
+  final Value<String> searchKey;
+  const DrugCatalogEntriesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.activeIngredient = const Value.absent(),
+    this.atc = const Value.absent(),
+    this.searchKey = const Value.absent(),
+  });
+  DrugCatalogEntriesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required String activeIngredient,
+    required String atc,
+    required String searchKey,
+  }) : name = Value(name),
+       activeIngredient = Value(activeIngredient),
+       atc = Value(atc),
+       searchKey = Value(searchKey);
+  static Insertable<DrugCatalogEntry> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? activeIngredient,
+    Expression<String>? atc,
+    Expression<String>? searchKey,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (activeIngredient != null) 'active_ingredient': activeIngredient,
+      if (atc != null) 'atc': atc,
+      if (searchKey != null) 'search_key': searchKey,
+    });
+  }
+
+  DrugCatalogEntriesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<String>? activeIngredient,
+    Value<String>? atc,
+    Value<String>? searchKey,
+  }) {
+    return DrugCatalogEntriesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      activeIngredient: activeIngredient ?? this.activeIngredient,
+      atc: atc ?? this.atc,
+      searchKey: searchKey ?? this.searchKey,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (activeIngredient.present) {
+      map['active_ingredient'] = Variable<String>(activeIngredient.value);
+    }
+    if (atc.present) {
+      map['atc'] = Variable<String>(atc.value);
+    }
+    if (searchKey.present) {
+      map['search_key'] = Variable<String>(searchKey.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DrugCatalogEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('activeIngredient: $activeIngredient, ')
+          ..write('atc: $atc, ')
+          ..write('searchKey: $searchKey')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $TagsTable extends Tags with TableInfo<$TagsTable, Tag> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -11899,6 +12257,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MeasurementsTable measurements = $MeasurementsTable(this);
   late final $DailyFieldsTable dailyFields = $DailyFieldsTable(this);
   late final $StepSamplesTable stepSamples = $StepSamplesTable(this);
+  late final $DrugCatalogEntriesTable drugCatalogEntries =
+      $DrugCatalogEntriesTable(this);
   late final $TagsTable tags = $TagsTable(this);
   late final $TagEntriesTable tagEntries = $TagEntriesTable(this);
   late final $CyclePeriodsTable cyclePeriods = $CyclePeriodsTable(this);
@@ -11925,6 +12285,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     measurements,
     dailyFields,
     stepSamples,
+    drugCatalogEntries,
     tags,
     tagEntries,
     cyclePeriods,
@@ -18849,6 +19210,215 @@ typedef $$StepSamplesTableProcessedTableManager =
       StepSample,
       PrefetchHooks Function()
     >;
+typedef $$DrugCatalogEntriesTableCreateCompanionBuilder =
+    DrugCatalogEntriesCompanion Function({
+      Value<int> id,
+      required String name,
+      required String activeIngredient,
+      required String atc,
+      required String searchKey,
+    });
+typedef $$DrugCatalogEntriesTableUpdateCompanionBuilder =
+    DrugCatalogEntriesCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<String> activeIngredient,
+      Value<String> atc,
+      Value<String> searchKey,
+    });
+
+class $$DrugCatalogEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $DrugCatalogEntriesTable> {
+  $$DrugCatalogEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get activeIngredient => $composableBuilder(
+    column: $table.activeIngredient,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get atc => $composableBuilder(
+    column: $table.atc,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get searchKey => $composableBuilder(
+    column: $table.searchKey,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DrugCatalogEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $DrugCatalogEntriesTable> {
+  $$DrugCatalogEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get activeIngredient => $composableBuilder(
+    column: $table.activeIngredient,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get atc => $composableBuilder(
+    column: $table.atc,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get searchKey => $composableBuilder(
+    column: $table.searchKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DrugCatalogEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DrugCatalogEntriesTable> {
+  $$DrugCatalogEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get activeIngredient => $composableBuilder(
+    column: $table.activeIngredient,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get atc =>
+      $composableBuilder(column: $table.atc, builder: (column) => column);
+
+  GeneratedColumn<String> get searchKey =>
+      $composableBuilder(column: $table.searchKey, builder: (column) => column);
+}
+
+class $$DrugCatalogEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DrugCatalogEntriesTable,
+          DrugCatalogEntry,
+          $$DrugCatalogEntriesTableFilterComposer,
+          $$DrugCatalogEntriesTableOrderingComposer,
+          $$DrugCatalogEntriesTableAnnotationComposer,
+          $$DrugCatalogEntriesTableCreateCompanionBuilder,
+          $$DrugCatalogEntriesTableUpdateCompanionBuilder,
+          (
+            DrugCatalogEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $DrugCatalogEntriesTable,
+              DrugCatalogEntry
+            >,
+          ),
+          DrugCatalogEntry,
+          PrefetchHooks Function()
+        > {
+  $$DrugCatalogEntriesTableTableManager(
+    _$AppDatabase db,
+    $DrugCatalogEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DrugCatalogEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DrugCatalogEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DrugCatalogEntriesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> activeIngredient = const Value.absent(),
+                Value<String> atc = const Value.absent(),
+                Value<String> searchKey = const Value.absent(),
+              }) => DrugCatalogEntriesCompanion(
+                id: id,
+                name: name,
+                activeIngredient: activeIngredient,
+                atc: atc,
+                searchKey: searchKey,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required String activeIngredient,
+                required String atc,
+                required String searchKey,
+              }) => DrugCatalogEntriesCompanion.insert(
+                id: id,
+                name: name,
+                activeIngredient: activeIngredient,
+                atc: atc,
+                searchKey: searchKey,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DrugCatalogEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DrugCatalogEntriesTable,
+      DrugCatalogEntry,
+      $$DrugCatalogEntriesTableFilterComposer,
+      $$DrugCatalogEntriesTableOrderingComposer,
+      $$DrugCatalogEntriesTableAnnotationComposer,
+      $$DrugCatalogEntriesTableCreateCompanionBuilder,
+      $$DrugCatalogEntriesTableUpdateCompanionBuilder,
+      (
+        DrugCatalogEntry,
+        BaseReferences<
+          _$AppDatabase,
+          $DrugCatalogEntriesTable,
+          DrugCatalogEntry
+        >,
+      ),
+      DrugCatalogEntry,
+      PrefetchHooks Function()
+    >;
 typedef $$TagsTableCreateCompanionBuilder =
     TagsCompanion Function({
       required String id,
@@ -20531,6 +21101,8 @@ class $AppDatabaseManager {
       $$DailyFieldsTableTableManager(_db, _db.dailyFields);
   $$StepSamplesTableTableManager get stepSamples =>
       $$StepSamplesTableTableManager(_db, _db.stepSamples);
+  $$DrugCatalogEntriesTableTableManager get drugCatalogEntries =>
+      $$DrugCatalogEntriesTableTableManager(_db, _db.drugCatalogEntries);
   $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
   $$TagEntriesTableTableManager get tagEntries =>
       $$TagEntriesTableTableManager(_db, _db.tagEntries);

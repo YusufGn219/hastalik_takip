@@ -2,6 +2,8 @@
 // Döneme bağlı değildir; döneme ilaç eklemek Dönemler ekranındaki "İlaç Ekle"
 // penceresiyle yapılır.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +12,8 @@ import '../../../app/providers.dart';
 import '../../../core/utils/turkish_text.dart';
 import '../../../data/database/app_database.dart';
 import '../../../data/database/enums.dart';
+import '../../../domain/drug_search.dart';
+import '../../../domain/services/drug_catalog_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../domain/errors.dart';
 import '../../episode/episode_format.dart';
@@ -102,7 +106,10 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
   Future<void> _showAddMedicationDialog() async {
     final result = await showDialog<_NewMedication>(
       context: context,
-      builder: (ctx) => _AddMedicationDialog(categories: _categories),
+      builder: (ctx) => _AddMedicationDialog(
+        categories: _categories,
+        search: (q) => ref.read(drugCatalogServiceProvider).search(q),
+      ),
     );
     if (result == null || !mounted) return;
     await _addMedication(result);
@@ -424,9 +431,12 @@ class _NewMedication {
 /// "Yeni ilaç ekle" penceresi. Ad (kırpılmış, boş değil) ve isteğe bağlı
 /// kategoriyi döndürür; iptalde null. Denetleyicileri kendisi serbest bırakır.
 class _AddMedicationDialog extends StatefulWidget {
-  const _AddMedicationDialog({required this.categories});
+  const _AddMedicationDialog({required this.categories, required this.search});
 
   final List<MedicationCategory> categories;
+
+  /// Katalogda arar (ilk kullanımda katalog yüklenir); hata fırlatabilir.
+  final Future<List<DrugSuggestion>> Function(String query) search;
 
   @override
   State<_AddMedicationDialog> createState() => _AddMedicationDialogState();
@@ -440,13 +450,70 @@ class _AddMedicationDialogState extends State<_AddMedicationDialog> {
   final TextEditingController _newCategoryController = TextEditingController();
   String? _categoryChoice; // null = kategorisiz, kategori kimliği ya da işaret
 
+  // Katalog önerileri: yazmayı bırakınca (kısa bekleme) aranır; eski sorgunun
+  // geç gelen sonucu yeni yazılanı ezmez.
+  static const _searchDelay = Duration(milliseconds: 250);
+  static const _maxShownSuggestions = 6;
+  Timer? _searchTimer;
+  List<DrugSuggestion> _suggestions = const [];
+  bool _searching = false;
+  bool _searchedNone = false; // aranıp hiçbir şey bulunamadı
+  String _lastQuery = '';
+
   bool get _creatingCategory => _categoryChoice == _newCategoryMarker;
 
   @override
   void dispose() {
+    _searchTimer?.cancel();
     _nameController.dispose();
     _newCategoryController.dispose();
     super.dispose();
+  }
+
+  void _onNameChanged(String text) {
+    _searchTimer?.cancel();
+    _lastQuery = text;
+    if (drugSearchTokens(text).join().length < DrugCatalogService.minQueryLength) {
+      setState(() {
+        _suggestions = const [];
+        _searching = false;
+        _searchedNone = false;
+      });
+      return;
+    }
+    _searchTimer = Timer(_searchDelay, () => _runSearch(text));
+  }
+
+  Future<void> _runSearch(String query) async {
+    if (!mounted) return;
+    setState(() => _searching = true);
+    List<DrugSuggestion> found;
+    try {
+      found = await widget.search(query);
+    } catch (_) {
+      found = const []; // katalog yüklenemese de ad elle yazılıp eklenebilir
+    }
+    if (!mounted || query != _lastQuery) return; // arada yeni yazıldı
+    setState(() {
+      _suggestions = found;
+      _searching = false;
+      _searchedNone = found.isEmpty;
+    });
+  }
+
+  void _pick(DrugSuggestion s) {
+    _searchTimer?.cancel();
+    final name = medicationNameFromCatalog(s.name);
+    _nameController.value = TextEditingValue(
+      text: name,
+      selection: TextSelection.collapsed(offset: name.length),
+    );
+    setState(() {
+      _lastQuery = name; // seçimden sonra yeniden arama yapma
+      _suggestions = const [];
+      _searching = false;
+      _searchedNone = false;
+    });
   }
 
   void _submit() {
@@ -479,12 +546,55 @@ class _AddMedicationDialogState extends State<_AddMedicationDialog> {
               textCapitalization: TextCapitalization.sentences,
               // Veritabanı alanı en çok 100 karakter alır.
               inputFormatters: [LengthLimitingTextInputFormatter(100)],
+              onChanged: _onNameChanged,
               onSubmitted: (_) => _submit(),
               decoration: InputDecoration(
                 labelText: l10n.medLogNewName,
                 border: const OutlineInputBorder(),
               ),
             ),
+            if (_searching)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    l10n.medLogCatalogLoading,
+                    key: const Key('katalog_yukleniyor'),
+                  ),
+                ),
+              )
+            else if (_suggestions.isNotEmpty)
+              // Düz sütun: AlertDialog içeriği iç boyut hesabı yapar, kaydırmalı
+              // ListView orada kullanılamaz. Dış SingleChildScrollView kaydırır.
+              Column(
+                key: const Key('katalog_oneriler'),
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (var i = 0; i < _suggestions.length && i < _maxShownSuggestions; i++)
+                    ListTile(
+                      key: Key('katalog_oneri_$i'),
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(_suggestions[i].name),
+                      subtitle: _suggestions[i].activeIngredient.isEmpty
+                          ? null
+                          : Text(_suggestions[i].activeIngredient),
+                      onTap: () => _pick(_suggestions[i]),
+                    ),
+                ],
+              )
+            else if (_searchedNone)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    l10n.medLogCatalogNone,
+                    key: const Key('katalog_yok'),
+                  ),
+                ),
+              ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String?>(
               initialValue: _categoryChoice,

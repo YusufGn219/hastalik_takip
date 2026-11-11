@@ -16,6 +16,7 @@ import '../data/repositories/dose_skip_repository.dart';
 import '../data/repositories/episode_repository.dart';
 import '../data/repositories/medication_log_repository.dart';
 import '../data/repositories/daily_field_repository.dart';
+import '../data/repositories/drug_catalog_repository.dart';
 import '../data/repositories/measurement_repository.dart';
 import '../data/repositories/medication_repository.dart';
 import '../data/repositories/profile_repository.dart';
@@ -37,6 +38,7 @@ import '../domain/services/episode_service.dart';
 import '../domain/services/medication_service.dart';
 import '../domain/services/reading_service.dart';
 import '../domain/services/reminder_service.dart';
+import '../domain/services/drug_catalog_service.dart';
 import '../domain/services/step_control.dart';
 import '../domain/services/step_service.dart';
 import '../domain/services/step_tracking.dart';
@@ -198,6 +200,14 @@ final stepTrackingProvider = Provider<StepTracking>(
   (ref) => StepTracking(
     service: ref.watch(stepServiceProvider),
     scheduler: ref.watch(stepSchedulerProvider),
+  ),
+);
+
+/// İlaç kataloğu (yükleme ilk aramada yapılır).
+final drugCatalogServiceProvider = Provider<DrugCatalogService>(
+  (ref) => DrugCatalogService(
+    catalog: DriftDrugCatalogRepository(ref.watch(databaseProvider)),
+    settings: ref.watch(settingsRepositoryProvider),
   ),
 );
 

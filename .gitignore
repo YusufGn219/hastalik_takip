@@ -47,3 +47,5 @@ start_server.bat
 
 # İlaç kataloğu betiğinin çıktısı: TİTCK verisinin dağıtım izni teyit edilene kadar git'e girmez.
 scripts/catalog/out/
+# Gerçek ilaç kataloğu uygulama varlığı (yerelde bulunur, git'e girmez; örnek: drugs.sample.json).
+mobile/assets/catalog/drugs.json

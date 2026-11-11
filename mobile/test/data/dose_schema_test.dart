@@ -260,7 +260,7 @@ CREATE TABLE "medication_logs" ("id" TEXT NOT NULL, "created_at" INTEGER NOT NUL
         skippedAt: taken,
       );
       final v = await old.customSelect('PRAGMA user_version').getSingle();
-      expect(v.read<int>('user_version'), 7);
+      expect(v.read<int>('user_version'), 8);
     });
   });
 

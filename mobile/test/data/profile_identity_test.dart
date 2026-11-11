@@ -179,7 +179,7 @@ void main() {
       expect((await old.select(old.profiles).get()).length, 1);
 
       final v = await old.customSelect('PRAGMA user_version').getSingle();
-      expect(v.read<int>('user_version'), 7);
+      expect(v.read<int>('user_version'), 8);
     });
   });
 }

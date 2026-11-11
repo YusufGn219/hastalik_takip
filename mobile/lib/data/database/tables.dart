@@ -318,3 +318,25 @@ class CycleStatuses extends Table with BaseColumns {
   TextColumn get startDate => text()();
   TextColumn get endDate => text().nullable()();
 }
+
+/// İlaç kataloğu: uygulamayla gelen, salt-okunur başvuru verisi (Türkiye'de
+/// ruhsatlı ilaçlar). KULLANICI VERİSİ DEĞİLDİR: kullanıcının ilaç listesi
+/// `medications` tablosudur; katalogdan seçilen ilacın yalnız adı oradaki yeni
+/// kayda yazılır. Bu yüzden BaseColumns (UUID, silme işareti) yoktur; içerik
+/// sürüm değişince tümden yeniden yüklenir. [searchKey], arama için
+/// normalleştirilmiş (küçük harf, sade harf) ad + etkin maddedir.
+@DataClassName('DrugCatalogEntry')
+class DrugCatalogEntries extends Table {
+  @override
+  String get tableName => 'drug_catalog';
+
+  IntColumn get id => integer().autoIncrement()();
+
+  /// Ürün adı (ad + doz + form), kaynaktaki yazımıyla.
+  TextColumn get name => text()();
+  TextColumn get activeIngredient => text()();
+
+  /// ATC kodu; yoksa boş metin.
+  TextColumn get atc => text()();
+  TextColumn get searchKey => text()();
+}

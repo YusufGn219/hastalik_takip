@@ -113,7 +113,7 @@ void main() {
       final idx = await old.customSelect("SELECT name FROM sqlite_master WHERE type = 'index'").get();
       expect(idx.map((r) => r.read<String>('name')), contains('ix_step_samples_sampled_at'));
       final v = await old.customSelect('PRAGMA user_version').getSingle();
-      expect(v.read<int>('user_version'), 7);
+      expect(v.read<int>('user_version'), 8);
     });
   });
 }

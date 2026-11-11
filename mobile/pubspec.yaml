@@ -97,6 +97,7 @@ flutter:
   assets:
     - assets/icon/icon.png
     - assets/seed/
+    - assets/catalog/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

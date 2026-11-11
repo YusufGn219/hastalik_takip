@@ -244,6 +244,18 @@ abstract class AppLocalizations {
   /// **'İlaç adı'**
   String get medLogNewName;
 
+  /// No description provided for @medLogCatalogLoading.
+  ///
+  /// In tr, this message translates to:
+  /// **'Katalog hazırlanıyor…'**
+  String get medLogCatalogLoading;
+
+  /// No description provided for @medLogCatalogNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Katalogda bulunamadı; yazdığınız ad eklenir.'**
+  String get medLogCatalogNone;
+
   /// No description provided for @medLogCategoryLabel.
   ///
   /// In tr, this message translates to:
