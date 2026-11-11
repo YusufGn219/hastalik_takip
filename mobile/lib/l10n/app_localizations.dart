@@ -3255,6 +3255,72 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kaydedilemedi.'**
   String get readingErrGeneric;
+
+  /// No description provided for @stepsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adımlar'**
+  String get stepsTitle;
+
+  /// No description provided for @stepsTotal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam: {count} adım'**
+  String stepsTotal(String count);
+
+  /// No description provided for @stepsEstimated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bazı saatler tahminidir: telefon her saat okunamadığı için dağılım yaklaşıktır.'**
+  String get stepsEstimated;
+
+  /// No description provided for @settingsStepsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adım takibi'**
+  String get settingsStepsTitle;
+
+  /// No description provided for @settingsStepsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefonun adım sayacını okur. Veriler yalnız bu telefonda kalır.'**
+  String get settingsStepsHint;
+
+  /// No description provided for @settingsStepsPermissionLost.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fiziksel aktivite izni kapalı; adımlar okunamıyor.'**
+  String get settingsStepsPermissionLost;
+
+  /// No description provided for @settingsStepsOpenSettings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarları aç'**
+  String get settingsStepsOpenSettings;
+
+  /// No description provided for @settingsStepsDenied.
+  ///
+  /// In tr, this message translates to:
+  /// **'İzin verilmedi; adım takibi açılmadı.'**
+  String get settingsStepsDenied;
+
+  /// No description provided for @settingsStepsDeniedForever.
+  ///
+  /// In tr, this message translates to:
+  /// **'İzin telefon ayarlarından açılmalı.'**
+  String get settingsStepsDeniedForever;
+
+  /// No description provided for @settingsStepsFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adım takibi açılamadı.'**
+  String get settingsStepsFailed;
+
+  /// No description provided for @settingsStepsOffFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adım takibi kapatılamadı.'**
+  String get settingsStepsOffFailed;
 }
 
 class _AppLocalizationsDelegate

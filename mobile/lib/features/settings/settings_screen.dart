@@ -11,6 +11,7 @@ import '../lock/app_lock_controller.dart';
 import '../lock/app_lock_platform.dart';
 import '../lock/lock_settings_card.dart';
 import '../lock/pin_setup_screen.dart';
+import '../steps/step_settings_card.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -84,6 +85,7 @@ class SettingsScreen extends ConsumerWidget {
                 onTap: () => Navigator.of(context).pushNamed('/body'),
               ),
             ),
+            const StepSettingsCard(),
             const AppLockSettingsCard(),
             Padding(
               padding: const EdgeInsets.only(top: 12, bottom: 8),

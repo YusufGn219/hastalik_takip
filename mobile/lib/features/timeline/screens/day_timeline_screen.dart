@@ -15,6 +15,7 @@ import '../../../data/repositories/support.dart';
 import '../../../domain/local_day.dart';
 import '../../../domain/reading_catalog.dart';
 import '../../../domain/services/daily_field_service.dart';
+import '../../../domain/services/step_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../episode/episode_format.dart';
 import '../../episode/episode_overview.dart';
@@ -197,6 +198,11 @@ class _DayTimelineScreenState extends ConsumerState<DayTimelineScreen> {
             _readingsCard(data, l10n),
             const SizedBox(height: 16),
           ],
+          if (data.steps != null) ...[
+            _heading(l10n.stepsTitle),
+            _stepsCard(data.steps!, l10n),
+            const SizedBox(height: 16),
+          ],
           _heading(l10n.timelineEventsTitle),
           if (data.items.isEmpty)
             Text(
@@ -308,6 +314,33 @@ class _DayTimelineScreenState extends ConsumerState<DayTimelineScreen> {
               Text(
                 '${v.field.name}: ${_fieldValueText(v, l10n)}',
                 key: ValueKey('timeline-extra-${v.field.id}'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// O günün adımları: toplam ve (gerekiyorsa) "tahmini" notu.
+  Widget _stepsCard(DaySteps steps, AppLocalizations l10n) {
+    final locale = Localizations.localeOf(context).toString();
+    final total = NumberFormat.decimalPattern(locale).format(steps.totalRounded);
+    return Card(
+      key: const ValueKey('timeline-steps'),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.stepsTotal(total),
+              key: const ValueKey('timeline-steps-total'),
+            ),
+            if (steps.hasEstimate)
+              Text(
+                l10n.stepsEstimated,
+                key: const ValueKey('timeline-steps-estimated'),
+                style: const TextStyle(color: Colors.grey),
               ),
           ],
         ),

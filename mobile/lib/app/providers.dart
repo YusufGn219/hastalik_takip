@@ -23,6 +23,7 @@ import '../data/repositories/settings_repository.dart';
 import '../data/repositories/step_sample_repository.dart';
 import '../data/repositories/support.dart';
 import '../data/repositories/symptom_entry_repository.dart';
+import '../data/steps/android_step_permission.dart';
 import '../data/steps/android_step_source.dart';
 import '../data/steps/step_background.dart';
 import '../data/repositories/symptom_repository.dart';
@@ -36,8 +37,10 @@ import '../domain/services/episode_service.dart';
 import '../domain/services/medication_service.dart';
 import '../domain/services/reading_service.dart';
 import '../domain/services/reminder_service.dart';
+import '../domain/services/step_control.dart';
 import '../domain/services/step_service.dart';
 import '../domain/services/step_tracking.dart';
+import '../domain/step_permission.dart';
 import '../domain/step_source.dart';
 import '../domain/services/timeline_service.dart';
 import '../features/analytics/analytics_overview.dart';
@@ -198,6 +201,24 @@ final stepTrackingProvider = Provider<StepTracking>(
   ),
 );
 
+/// Fiziksel aktivite izni; testlerde sahtesiyle geçersiz kılınır.
+final stepPermissionProvider = Provider<StepPermission>((ref) => const AndroidStepPermission());
+
+/// Adım takibini açıp kapatan ve açılış okumasını bayrağa bağlayan servis.
+final stepControlProvider = Provider<StepControl>(
+  (ref) => StepControl(
+    settings: ref.watch(settingsRepositoryProvider),
+    permission: ref.watch(stepPermissionProvider),
+    tracking: ref.watch(stepTrackingProvider),
+    scheduler: ref.watch(stepSchedulerProvider),
+  ),
+);
+
+/// Ayarlar kartının durumu (açık mı, izin var mı).
+final stepControlStateProvider = FutureProvider.autoDispose<StepControlState>(
+  (ref) => ref.watch(stepControlProvider).state(),
+);
+
 final dailyFieldRepositoryProvider = Provider<DailyFieldRepository>(
   (ref) => DriftDailyFieldRepository(
     ref.watch(databaseProvider),
@@ -299,6 +320,7 @@ final timelineDayLoaderProvider = Provider<TimelineDayLoader>(
     episodes: ref.watch(episodeOverviewLoaderProvider),
     fields: ref.watch(dailyFieldServiceProvider),
     readings: ref.watch(readingServiceProvider),
+    steps: ref.watch(stepServiceProvider),
   ),
 );
 

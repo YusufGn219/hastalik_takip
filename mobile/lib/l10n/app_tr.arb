@@ -836,5 +836,17 @@
   "readingErrFuture": "Gelecekte bir an seçilemez.",
   "readingErrDate": "Geçerli bir tarih seçin.",
   "readingErrNote": "Not en çok 500 karakter olabilir.",
-  "readingErrGeneric": "Kaydedilemedi."
+  "readingErrGeneric": "Kaydedilemedi.",
+  "stepsTitle": "Adımlar",
+  "stepsTotal": "Toplam: {count} adım",
+  "@stepsTotal": { "placeholders": { "count": { "type": "String" } } },
+  "stepsEstimated": "Bazı saatler tahminidir: telefon her saat okunamadığı için dağılım yaklaşıktır.",
+  "settingsStepsTitle": "Adım takibi",
+  "settingsStepsHint": "Telefonun adım sayacını okur. Veriler yalnız bu telefonda kalır.",
+  "settingsStepsPermissionLost": "Fiziksel aktivite izni kapalı; adımlar okunamıyor.",
+  "settingsStepsOpenSettings": "Ayarları aç",
+  "settingsStepsDenied": "İzin verilmedi; adım takibi açılmadı.",
+  "settingsStepsDeniedForever": "İzin telefon ayarlarından açılmalı.",
+  "settingsStepsFailed": "Adım takibi açılamadı.",
+  "settingsStepsOffFailed": "Adım takibi kapatılamadı."
 }

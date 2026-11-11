@@ -1,4 +1,5 @@
 import 'package:mobile/domain/services/step_tracking.dart';
+import 'package:mobile/domain/step_permission.dart';
 import 'package:mobile/domain/step_source.dart';
 
 /// Ayarlanabilir sahte adım kaynağı. [next] her okumada döner; [throwOnRead]
@@ -53,5 +54,31 @@ class FakeStepScheduler implements StepScheduler {
   @override
   Future<void> openBatterySettings() async {
     batteryOpens++;
+  }
+}
+
+/// Ayarlanabilir sahte izin. [status] mevcut durum; [onRequest] izin penceresinin
+/// vereceği sonuç (null ise durum değişmez).
+class FakeStepPermission implements StepPermission {
+  FakeStepPermission({this.current = StepPermissionState.denied, this.onRequest});
+
+  StepPermissionState current;
+  StepPermissionState? onRequest;
+  int requests = 0;
+  int settingsOpens = 0;
+
+  @override
+  Future<StepPermissionState> status() async => current;
+
+  @override
+  Future<StepPermissionState> request() async {
+    requests++;
+    current = onRequest ?? current;
+    return current;
+  }
+
+  @override
+  Future<void> openSettings() async {
+    settingsOpens++;
   }
 }

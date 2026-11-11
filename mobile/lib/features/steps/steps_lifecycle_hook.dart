@@ -1,5 +1,5 @@
-// Açılış okuma yolu: uygulama açılırken ve arka plandan öne gelirken adım sayacını
-// bir kez okutur. Saatlik arka plan rutininden BAĞIMSIZDIR. Arayüzü geciktirmez
+// Açılış okuma yolu: uygulama açılırken ve arka plandan öne gelirken, adım takibi
+// AÇIKSA (Ayarlar'daki anahtar) adım sayacını bir kez okutur. Saatlik arka plan rutininden BAĞIMSIZDIR. Arayüzü geciktirmez
 // (sonuç beklenmez) ve hiçbir hata kullanıcıya yansımaz.
 
 import 'package:flutter/widgets.dart';
@@ -43,7 +43,7 @@ class _StepsLifecycleHookState extends ConsumerState<StepsLifecycleHook>
     if (_running || !mounted) return;
     _running = true;
     try {
-      await ref.read(stepTrackingProvider).onAppOpen();
+      await ref.read(stepControlProvider).onAppOpen();
     } catch (_) {
       // Adım okuması hiçbir zaman uygulamayı etkilemez.
     } finally {

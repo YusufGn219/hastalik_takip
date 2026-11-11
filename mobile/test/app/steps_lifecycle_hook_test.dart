@@ -7,12 +7,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/app/providers.dart';
+import 'package:mobile/domain/services/step_control.dart';
 import 'package:mobile/domain/services/step_service.dart';
 import 'package:mobile/domain/services/step_tracking.dart';
+import 'package:mobile/domain/step_permission.dart';
 import 'package:mobile/domain/step_source.dart';
 import 'package:mobile/features/steps/steps_lifecycle_hook.dart';
 
+import '../support/fake_settings_repository.dart';
 import '../support/fake_step_support.dart';
+
+/// Takip açık/kapalı bayrağıyla gerçek [StepControl]; izleyici/gerçek izleme içeride.
+StepControl _control(StepTracking tracking, {bool enabled = true}) => StepControl(
+      settings: FakeSettingsRepository(
+        initial: enabled ? {stepTrackingEnabledKey: '1'} : null,
+      ),
+      permission: FakeStepPermission(current: StepPermissionState.granted),
+      tracking: tracking,
+      scheduler: FakeStepScheduler(),
+    );
 
 class _SpyTracking implements StepTracking {
   int opens = 0;
@@ -37,9 +50,9 @@ void main() {
   late _SpyTracking spy;
   setUp(() => spy = _SpyTracking());
 
-  Future<void> pump(WidgetTester tester) async {
+  Future<void> pump(WidgetTester tester, {bool enabled = true}) async {
     await tester.pumpWidget(ProviderScope(
-      overrides: [stepTrackingProvider.overrideWithValue(spy)],
+      overrides: [stepControlProvider.overrideWithValue(_control(spy, enabled: enabled))],
       child: const MaterialApp(
         home: StepsLifecycleHook(child: Scaffold(body: Text('ana ekran'))),
       ),
@@ -107,6 +120,15 @@ void main() {
     expect(spy.opens, 1);
   });
 
+  testWidgets('takip kapalıysa açılışta da öne gelişte de okumaz', (tester) async {
+    await pump(tester, enabled: false);
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+    expect(spy.opens, 0);
+    expect(find.text('ana ekran'), findsOneWidget);
+  });
+
   testWidgets('gerçek StepTracking ile: izin varsa açılışta "open" okuması yazılır ve görev kurulur', (tester) async {
     // Sahteler: gerçek servis zinciri, ama sensör ve zamanlayıcı sahte.
     final source = FakeStepSource()..ok(1234);
@@ -117,7 +139,7 @@ void main() {
       scheduler: scheduler,
     );
     await tester.pumpWidget(ProviderScope(
-      overrides: [stepTrackingProvider.overrideWithValue(tracking)],
+      overrides: [stepControlProvider.overrideWithValue(_control(tracking))],
       child: const MaterialApp(home: StepsLifecycleHook(child: Scaffold(body: Text('x')))),
     ));
     await tester.pump();

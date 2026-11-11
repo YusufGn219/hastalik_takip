@@ -1765,4 +1765,43 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get readingErrGeneric => 'Kaydedilemedi.';
+
+  @override
+  String get stepsTitle => 'Adımlar';
+
+  @override
+  String stepsTotal(String count) {
+    return 'Toplam: $count adım';
+  }
+
+  @override
+  String get stepsEstimated =>
+      'Bazı saatler tahminidir: telefon her saat okunamadığı için dağılım yaklaşıktır.';
+
+  @override
+  String get settingsStepsTitle => 'Adım takibi';
+
+  @override
+  String get settingsStepsHint =>
+      'Telefonun adım sayacını okur. Veriler yalnız bu telefonda kalır.';
+
+  @override
+  String get settingsStepsPermissionLost =>
+      'Fiziksel aktivite izni kapalı; adımlar okunamıyor.';
+
+  @override
+  String get settingsStepsOpenSettings => 'Ayarları aç';
+
+  @override
+  String get settingsStepsDenied => 'İzin verilmedi; adım takibi açılmadı.';
+
+  @override
+  String get settingsStepsDeniedForever =>
+      'İzin telefon ayarlarından açılmalı.';
+
+  @override
+  String get settingsStepsFailed => 'Adım takibi açılamadı.';
+
+  @override
+  String get settingsStepsOffFailed => 'Adım takibi kapatılamadı.';
 }

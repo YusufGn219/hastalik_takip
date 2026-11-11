@@ -6,6 +6,7 @@ import '../../data/repositories/medication_repository.dart';
 import '../../data/repositories/symptom_repository.dart';
 import '../../domain/services/daily_field_service.dart';
 import '../../domain/services/reading_service.dart';
+import '../../domain/services/step_service.dart';
 import '../../domain/services/timeline_service.dart';
 import '../episode/episode_overview.dart';
 
@@ -75,6 +76,7 @@ class TimelineDay {
     this.fieldValues = const [],
     this.readings = const [],
     this.readingUnits = const {},
+    this.steps,
   });
 
   final String day;
@@ -94,11 +96,16 @@ class TimelineDay {
   /// Ölçüm türüne göre seçili gösterim birimi kodu (ör. şekerde 'mmol/L').
   final Map<String, String> readingUnits;
 
+  /// O günün adım sayacı okumalarından türetilen adımları; o güne düşen okuma
+  /// yoksa ya da takip hiç açılmadıysa null.
+  final DaySteps? steps;
+
   bool get isEmpty =>
       dailyLog == null &&
       items.isEmpty &&
       fieldValues.isEmpty &&
-      readings.isEmpty;
+      readings.isEmpty &&
+      steps == null;
 }
 
 class TimelineDayLoader {
@@ -109,12 +116,14 @@ class TimelineDayLoader {
     required EpisodeOverviewLoader episodes,
     DailyFieldService? fields,
     ReadingService? readings,
+    StepService? steps,
   })  : _timeline = timeline,
         _symptoms = symptoms,
         _medications = medications,
         _episodes = episodes,
         _fields = fields,
-        _readings = readings;
+        _readings = readings,
+        _steps = steps;
 
   final TimelineService _timeline;
   final SymptomRepository _symptoms;
@@ -122,6 +131,7 @@ class TimelineDayLoader {
   final EpisodeOverviewLoader _episodes;
   final DailyFieldService? _fields;
   final ReadingService? _readings;
+  final StepService? _steps;
 
   Future<TimelineDay> load(String day, {bool withActiveEpisodes = false}) async {
     final t = await _timeline.forDay(day);
@@ -170,6 +180,17 @@ class TimelineDayLoader {
       } catch (_) {}
     }
 
+    // Adımlar da aynı şekilde: okunamazsa çizelge yine açılır; o güne okuma
+    // düşmediyse kart hiç görünmez.
+    DaySteps? steps;
+    final stepService = _steps;
+    if (stepService != null) {
+      try {
+        final d = await stepService.forDay(day);
+        if (d.hasData) steps = d;
+      } catch (_) {}
+    }
+
     return TimelineDay(
       day: day,
       dailyLog: t.dailyLog,
@@ -179,6 +200,7 @@ class TimelineDayLoader {
       fieldValues: fieldValues,
       readings: readings,
       readingUnits: readingUnits,
+      steps: steps,
     );
   }
 }
