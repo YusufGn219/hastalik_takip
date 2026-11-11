@@ -84,15 +84,15 @@ class DailyFieldService {
       min: 0,
       max: 10,
     ),
-    DailyFieldPreset(
-      key: MeasurementTypes.steps,
-      name: 'Adım sayısı',
-      kind: DailyFieldKinds.number,
-      unit: 'adım',
-      min: 0,
-      max: 100000,
-    ),
   ];
+
+  /// Artık sunulmayan hazır alanlar. "Adım sayısı" elle girilmiyor: adımlar
+  /// telefonun sayacından okunur (Ayarlar > Adım takibi). Eski kurulumlarda satırı
+  /// ve girilmiş değerleri durur (silinmez, zaman çizelgesinde ve analizde
+  /// geçmiş olarak görünür), ama alan listesinde ve günlük kayıtta çıkmaz, yazılamaz.
+  static const retiredKeys = <String>{MeasurementTypes.steps};
+
+  static bool isRetired(DailyField f) => retiredKeys.contains(f.builtinKey);
 
   /// Alanın `measurements` tablosundaki tür anahtarı.
   static String measurementTypeOf(DailyField f) =>
@@ -127,12 +127,18 @@ class DailyFieldService {
     return taken.contains(foldTr(name)) ? '$name (hazır)' : name;
   }
 
-  /// Tüm alanlar (kapalılar dahil), sıraya göre.
+  /// Tüm alanlar (kapalılar ve artık sunulmayanlar dahil), sıraya göre. Geçmiş
+  /// değerleri okuyanlar (analiz) için; ekranda gösterilecek liste [listOffered].
   Future<List<DailyField>> list() => _fields.listAll();
 
-  /// Yalnız açık alanlar, sıraya göre.
-  Future<List<DailyField>> listActive() async =>
-      (await _fields.listAll()).where((f) => f.isActive).toList();
+  /// Kullanıcıya sunulan alanlar (kapalılar dahil, artık sunulmayanlar hariç).
+  Future<List<DailyField>> listOffered() async =>
+      (await _fields.listAll()).where((f) => !isRetired(f)).toList();
+
+  /// Yalnız açık ve sunulan alanlar, sıraya göre.
+  Future<List<DailyField>> listActive() async => (await _fields.listAll())
+      .where((f) => f.isActive && !isRetired(f))
+      .toList();
 
   /// Kullanıcının kendi alanını ekler (açık başlar).
   Future<DailyField> create({
@@ -199,9 +205,10 @@ class DailyFieldService {
     });
   }
 
-  /// Alanı açar ya da kapatır. Kapatmak değerleri silmez.
+  /// Alanı açar ya da kapatır. Kapatmak değerleri silmez. Artık sunulmayan alan
+  /// bulunamadı sayılır.
   Future<DailyField> setActive(String id, bool active) async {
-    _find(await _fields.listAll(), id);
+    _findOffered(await _fields.listAll(), id);
     return _fields.update(id, DailyFieldsCompanion(isActive: Value(active)));
   }
 
@@ -224,11 +231,12 @@ class DailyFieldService {
   }
 
   /// Alanın [day] günündeki değerini yazar; o güne ait eski değer yerine geçer.
-  /// Kapalı alana yazılmaz ([RuleCodes.dailyFieldInactive]).
+  /// Kapalı alana yazılmaz ([RuleCodes.dailyFieldInactive]); artık sunulmayan
+  /// alana da yazılmaz ([RuleCodes.dailyFieldNotFound]).
   Future<void> setValue(String fieldId, String day, double value) async {
     final measuredAt = _checkDay(day);
     await _tx(() async {
-      final field = _find(await _fields.listAll(), fieldId);
+      final field = _findOffered(await _fields.listAll(), fieldId);
       if (!field.isActive) {
         throw const RuleViolation(
           RuleCodes.dailyFieldInactive,
@@ -275,6 +283,15 @@ class DailyFieldService {
     for (final r in rows) {
       await _measurements.softDelete(r.id);
     }
+  }
+
+  /// Yazma yolları için: artık sunulmayan alan bulunamadı sayılır.
+  DailyField _findOffered(List<DailyField> all, String id) {
+    final f = _find(all, id);
+    if (isRetired(f)) {
+      throw RuleViolation(RuleCodes.dailyFieldNotFound, 'Alan bulunamadı: $id');
+    }
+    return f;
   }
 
   DailyField _find(List<DailyField> all, String id) {

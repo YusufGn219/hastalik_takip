@@ -14,6 +14,7 @@ import 'package:mobile/features/health/screens/daily_fields_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 import '../data/test_support.dart';
+import '../support/legacy_steps_field.dart';
 
 DateTime _now() => DateTime(2026, 11, 6, 10, 30);
 
@@ -104,7 +105,7 @@ void main() {
       tester.runAsync(service.list).then((v) => v!);
 
   group('liste ve açma/kapatma', () {
-    testWidgets('dört hazır alan kapalı gelir; hazır alanda düzenle düğmesi yok', (tester) async {
+    testWidgets('üç hazır alan kapalı gelir; hazır alanda düzenle düğmesi yok', (tester) async {
       await tester.pumpWidget(_app(overrides()));
       await _open(tester);
 
@@ -112,13 +113,24 @@ void main() {
       expect(find.text('Kafein'), findsOneWidget);
       expect(find.text('Spor'), findsOneWidget);
       expect(find.text('Ağrı düzeyi'), findsOneWidget);
-      expect(find.text('Adım sayısı'), findsOneWidget);
-      expect(find.byType(Switch), findsNWidgets(4));
+      expect(find.text('Adım sayısı'), findsNothing);
+      expect(find.byType(Switch), findsNWidgets(3));
       for (final f in await all(tester)) {
         expect(_switchOn(tester, f.id), isFalse);
         expect(find.byKey(Key('alan_duzenle_${f.id}')), findsNothing);
       }
       expect(find.text('Hazır alan · 0–20 bardak'), findsOneWidget);
+    });
+
+    testWidgets('eski kurulumdan kalan "Adım sayısı" alanı listede çıkmaz (satır silinmez)', (tester) async {
+      final legacy = (await tester.runAsync(() => seedLegacyStepsField(db)))!;
+      await tester.pumpWidget(_app(overrides()));
+      await _open(tester);
+
+      expect(find.text('Adım sayısı'), findsNothing);
+      expect(find.byKey(Key('alan_ac_${legacy.id}')), findsNothing);
+      expect(find.byType(Switch), findsNWidgets(3));
+      expect((await all(tester)).map((f) => f.id), contains(legacy.id));
     });
 
     testWidgets('anahtar alanı açar ve kapatır', (tester) async {

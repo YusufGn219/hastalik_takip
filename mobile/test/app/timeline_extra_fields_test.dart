@@ -15,6 +15,7 @@ import 'package:mobile/features/timeline/screens/day_timeline_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 import '../data/test_support.dart';
+import '../support/legacy_steps_field.dart';
 
 /// Saat: 2026-11-07 Cumartesi 12:00.
 DateTime _now() => DateTime(2026, 11, 7, 12, 0);
@@ -121,6 +122,23 @@ void main() {
 
       await openApp(tester);
       expect(find.text('Çay: 3'), findsOneWidget);
+    });
+
+    testWidgets('eski elle girilmiş "Adım sayısı" değeri çizelgede geçmiş olarak görünür', (tester) async {
+      await tester.runAsync(() => seedLegacyStepsField(db, active: true, valueOn: {
+            DateTime(2026, 11, 7, 9): 5000,
+            DateTime(2026, 11, 6, 9): 3200,
+          }));
+
+      await openApp(tester);
+      expect(find.byKey(const ValueKey('timeline-extras')), findsOneWidget);
+      expect(find.textContaining('Adım sayısı'), findsOneWidget);
+      expect(find.textContaining('adım'), findsOneWidget);
+
+      // Önceki güne geç: o günün eski girişi de görünür.
+      await tester.tap(find.byTooltip('Önceki gün'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Adım sayısı'), findsOneWidget);
     });
 
     testWidgets('günlük kayıt yokken de ek alan değeri gösterilir', (tester) async {

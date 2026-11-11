@@ -16,6 +16,7 @@ import 'package:mobile/features/health/screens/daily_log_screen.dart';
 import 'package:mobile/l10n/app_localizations.dart';
 
 import '../data/test_support.dart';
+import '../support/legacy_steps_field.dart';
 
 /// "Bugün" = '2026-11-06'.
 DateTime _now() => DateTime(2026, 11, 6, 10, 30);
@@ -156,8 +157,18 @@ void main() {
         MeasurementTypes.caffeine,
         MeasurementTypes.exercise,
         MeasurementTypes.pain,
-        MeasurementTypes.steps,
       ]);
+    });
+
+    testWidgets('eski kurulumdaki AÇIK "Adım sayısı" alanı günlük kayıtta girdi olarak çıkmaz', (tester) async {
+      final legacy = (await tester.runAsync(() => seedLegacyStepsField(db, active: true)))!;
+      await tester.pumpWidget(_app(overrides()));
+      await _open(tester);
+
+      expect(find.byKey(Key('ek_alan_${legacy.id}')), findsNothing);
+      expect(find.textContaining('Adım sayısı'), findsNothing);
+      // Uyku, su, not: yalnız üç metin alanı; ek alan girdisi yok.
+      expect(find.byType(TextField), findsNWidgets(3));
     });
 
     testWidgets('açık sayı alanı etiketi birimi taşır, ipucu aralığı gösterir; kapalı alan görünmez', (tester) async {

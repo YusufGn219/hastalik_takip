@@ -11,6 +11,7 @@ import 'package:mobile/domain/errors.dart';
 import 'package:mobile/domain/services/daily_field_service.dart';
 
 import '../data/test_support.dart';
+import '../support/legacy_steps_field.dart';
 
 /// Yazma anında hata verebilen ölçüm deposu (geri alma testi için).
 class _FailingAddRepository extends DriftMeasurementRepository {
@@ -70,8 +71,46 @@ void main() {
           {String kind = DailyFieldKinds.number, String unit = '', double? min, double? max}) =>
       service.create(name: name, kind: kind, unit: unit, min: min, max: max);
 
+  group('artık sunulmayan "Adım sayısı" alanı (eski kurulum)', () {
+    final day = DateTime(2026, 11, 7, 9);
+
+    test('satır ve değer durur; listede ve açık alanlarda çıkmaz, geçmişte görünür', () async {
+      final legacy = await seedLegacyStepsField(db, valueOn: {day: 5000});
+      await service.ensurePresets();
+
+      expect((await service.list()).map((f) => f.id), contains(legacy.id));
+      expect((await service.listOffered()).map((f) => f.id), isNot(contains(legacy.id)));
+      expect((await service.listActive()).map((f) => f.id), isNot(contains(legacy.id)));
+
+      final values = await service.valuesForDay('2026-11-07');
+      final steps = values.firstWhere((v) => v.field.id == legacy.id);
+      expect(steps.value, 5000);
+      expect(await liveRows(MeasurementTypes.steps), hasLength(1));
+    });
+
+    test('ensurePresets eski satırı değiştirmez ve ikinci satır eklemez', () async {
+      final legacy = await seedLegacyStepsField(db);
+      await service.ensurePresets();
+      final steps = (await service.list()).where((f) => f.builtinKey == MeasurementTypes.steps);
+      expect(steps, hasLength(1));
+      expect(steps.single.id, legacy.id);
+      expect(steps.single.isActive, isTrue, reason: 'satıra dokunulmaz, yalnız sunulmaz');
+    });
+
+    test('değer yazılamaz ve açılıp kapatılamaz (bulunamadı)', () async {
+      final legacy = await seedLegacyStepsField(db);
+      await expectLater(
+        service.setValue(legacy.id, '2026-11-08', 4000),
+        _violation(RuleCodes.dailyFieldNotFound),
+      );
+      await expectLater(service.setActive(legacy.id, false), _violation(RuleCodes.dailyFieldNotFound));
+      expect(await liveRows(MeasurementTypes.steps), isEmpty);
+      expect((await service.list()).firstWhere((f) => f.id == legacy.id).isActive, isTrue);
+    });
+  });
+
   group('hazır alanlar', () {
-    test('kafein, spor, ağrı düzeyi ve adım sayısı kapalı olarak eklenir; tekrar çağırmak çoğaltmaz', () async {
+    test('kafein, spor ve ağrı düzeyi kapalı olarak eklenir; tekrar çağırmak çoğaltmaz; adım sayısı yok', () async {
       await service.ensurePresets();
       await service.ensurePresets();
       final all = await service.list();
@@ -79,17 +118,13 @@ void main() {
         MeasurementTypes.caffeine,
         MeasurementTypes.exercise,
         MeasurementTypes.pain,
-        MeasurementTypes.steps,
       ]);
-      final steps = all.last;
-      expect(steps.name, 'Adım sayısı');
-      expect(steps.unit, 'adım');
-      expect(steps.maxValue, 100000);
       expect(all.every((f) => !f.isActive), isTrue);
       expect(all.first.unit, 'bardak');
       expect(all.first.maxValue, 20);
       expect(await service.listActive(), isEmpty);
     });
+
 
     test('kullanıcının aynı adlı alanı varsa hazır alan çakışmaz', () async {
       await custom('KAFEİN');
