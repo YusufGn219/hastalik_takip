@@ -44,3 +44,6 @@ mobile/pubspec.lock
 .claude/
 start_server.bat
 .env.prod
+
+# İlaç kataloğu betiğinin çıktısı: TİTCK verisinin dağıtım izni teyit edilene kadar git'e girmez.
+scripts/catalog/out/
