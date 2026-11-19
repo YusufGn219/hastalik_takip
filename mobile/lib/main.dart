@@ -16,6 +16,7 @@ import 'features/backup/backup_export_screen.dart';
 import 'features/backup/backup_restore_screen.dart';
 import 'features/episode/screens/episode_list_screen.dart';
 import 'features/health/screens/daily_fields_screen.dart';
+import 'core/widgets/form_sheet.dart';
 import 'features/health/screens/daily_log_screen.dart';
 import 'features/health/screens/symptom_screen.dart';
 import 'features/home/home_screen.dart';
@@ -163,7 +164,6 @@ class MyApp extends StatelessWidget {
         '/backup': (context) => const BackupExportScreen(),
         '/restore': (context) => const BackupRestoreScreen(),
         '/timeline': (context) => const DayTimelineScreen(),
-        '/daily-log': (context) => const DailyLogScreen(),
         '/daily-fields': (context) => const DailyFieldsScreen(),
         '/symptoms': (context) => const SymptomScreen(),
         '/episodes': (context) => const EpisodeListScreen(),
@@ -171,6 +171,14 @@ class MyApp extends StatelessWidget {
         '/chronic-conditions': (context) => const ChronicConditionScreen(),
         '/recurring': (context) => const RecurringScreen(),
         '/analytics': (context) => const AnalyticsDashboardScreen(),
+      },
+      // Taslaktaki "hızlı ekle" ekranları alttan açılan sayfadır (tam sayfa değil).
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/daily-log':
+            return formSheetRoute<void>(settings, (_) => const DailyLogScreen());
+        }
+        return null;
       },
     );
   }

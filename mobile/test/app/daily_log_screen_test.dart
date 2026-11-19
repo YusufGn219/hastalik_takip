@@ -107,6 +107,20 @@ Future<void> _tapSave(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// 1-5 sayı düğmelerinden hangisinin seçili (koyu zeminli) olduğu.
+int _selectedScale(WidgetTester tester, String prefix) {
+  const selected = Color(0xFF2B4A0A);
+  final hits = <int>[];
+  for (var n = 1; n <= 5; n++) {
+    final material = tester.widget<Material>(find
+        .ancestor(of: find.byKey(Key('${prefix}_$n')), matching: find.byType(Material))
+        .first);
+    if (material.color == selected) hits.add(n);
+  }
+  expect(hits, hasLength(1), reason: '$prefix: tam bir düğme seçili olmalı');
+  return hits.single;
+}
+
 String _fieldText(WidgetTester tester, int index) =>
     tester.widget<TextField>(find.byType(TextField).at(index)).controller!.text;
 
@@ -122,15 +136,17 @@ void main() {
       ];
 
   group('DailyLogScreen / bugünün kaydını okuma', () {
-    testWidgets('kayıt yoksa alanlar boş, başlık "Günlük Kayıt"', (tester) async {
+    testWidgets('kayıt yoksa alanlar boş, başlık "Günlük kayıt"', (tester) async {
       await tester.pumpWidget(_app(overrides()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Günlük Kayıt'), findsOneWidget);
+      expect(find.text('Günlük kayıt'), findsOneWidget);
       expect(_fieldText(tester, 0), isEmpty); // uyku
       expect(_fieldText(tester, 1), isEmpty); // su
       expect(_fieldText(tester, 2), isEmpty); // notlar
-      expect(find.text('3 / 5'), findsNWidgets(2)); // ruh hali + enerji varsayılanı
+      // ruh hali + enerji varsayılanı: 3 seçili
+      expect(_selectedScale(tester, 'ruh_hali'), 3);
+      expect(_selectedScale(tester, 'enerji'), 3);
     });
 
     testWidgets('bugün için kayıt varsa önceki değerler dolu gelir',
@@ -150,12 +166,12 @@ void main() {
           ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Kaydı Güncelle'), findsOneWidget);
+      expect(find.text('Kaydı güncelle'), findsOneWidget);
       expect(_fieldText(tester, 0), '7,5'); // yerel ondalık ayracı, "7.5" değil
       expect(_fieldText(tester, 1), '2'); // 2.0 değil
       expect(_fieldText(tester, 2), 'baş ağrısı yoktu');
-      expect(find.text('4 / 5'), findsOneWidget); // ruh hali
-      expect(find.text('2 / 5'), findsOneWidget); // enerji
+      expect(_selectedScale(tester, 'ruh_hali'), 4);
+      expect(_selectedScale(tester, 'enerji'), 2);
     });
 
     testWidgets('ondalık değer yuvarlanmadan, yerel ayraçla gösterilir',
@@ -193,7 +209,7 @@ void main() {
           ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Günlük Kayıt'), findsOneWidget);
+      expect(find.text('Günlük kayıt'), findsOneWidget);
       expect(_fieldText(tester, 0), isEmpty);
       expect(_fieldText(tester, 1), isEmpty);
     });
@@ -244,7 +260,7 @@ void main() {
       expect(logs.single.energyLevel, 3);
       expect(logs.single.notes, isNull); // boş not null saklanır
       // Ekran kapandı, başarı mesajı çıktı.
-      expect(find.text('Günlük Kayıt'), findsNothing);
+      expect(find.text('Günlük kayıt'), findsNothing);
       expect(find.text('Günlük kayıt kaydedildi'), findsOneWidget);
     });
 
@@ -261,7 +277,7 @@ void main() {
       expect(find.textContaining('Su tüketimini'), findsOneWidget);
 
       expect(await allLogs(tester), isEmpty);
-      expect(find.text('Günlük Kayıt'), findsOneWidget); // ekran açık kaldı
+      expect(find.text('Günlük kayıt'), findsOneWidget); // ekran açık kaldı
     });
 
     testWidgets('doğrulama uyarısı, alan düzeltilmeye başlanınca kalkar',
@@ -365,7 +381,7 @@ void main() {
       await _tapSave(tester);
 
       expect(find.textContaining('Kayıt kaydedilemedi'), findsOneWidget);
-      expect(find.text('Günlük Kayıt'), findsOneWidget);
+      expect(find.text('Günlük kayıt'), findsOneWidget);
       expect(_fieldText(tester, 0), '7');
       expect(_fieldText(tester, 1), '2');
       // Tekrar denenebilir: düğme pasif kalmadı.
