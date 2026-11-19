@@ -1856,4 +1856,120 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get healthHubSettings => 'Ayarlar ve gizlilik';
+
+  @override
+  String get todayDosesTitle => 'Bugünkü dozlar';
+
+  @override
+  String todayDosesSummary(int taken, int total) {
+    return '$taken/$total alındı';
+  }
+
+  @override
+  String get todayDosesEmpty => 'Bugün için planlı doz yok.';
+
+  @override
+  String get todayDoseTake => 'Aldım';
+
+  @override
+  String get todayDoseSkip => 'Atla';
+
+  @override
+  String get todayDoseTaken => 'Alındı';
+
+  @override
+  String get todayDoseSkipped => 'Atlandı';
+
+  @override
+  String get todayFeelingTitle => 'Nasılsınız?';
+
+  @override
+  String get todayFeelingAction => 'Semptom ekle';
+
+  @override
+  String todayDailyFilled(int n) {
+    return '$n/4 dolu';
+  }
+
+  @override
+  String get todayDailyAdd => 'Ekle';
+
+  @override
+  String get todayFieldSleep => 'Uyku';
+
+  @override
+  String get todayFieldWater => 'Su';
+
+  @override
+  String get todayFieldMood => 'Ruh hali';
+
+  @override
+  String get todayFieldEnergy => 'Enerji';
+
+  @override
+  String todayUnitHours(String value) {
+    return '$value sa';
+  }
+
+  @override
+  String todayUnitLiters(String value) {
+    return '$value L';
+  }
+
+  @override
+  String get todayLoadError =>
+      'Bugünün bilgileri yüklenemedi. Aşağı çekerek yenileyin.';
+
+  @override
+  String get todayStepsEstimated => 'tahmini';
+
+  @override
+  String get historySegmentDay => 'Gün';
+
+  @override
+  String get historySegmentTrends => 'Eğilimler';
+
+  @override
+  String get healthGroupMedications => 'İlaçlar';
+
+  @override
+  String get healthGroupConditions => 'Hastalıklar';
+
+  @override
+  String get healthGroupMeasurements => 'Ölçümler';
+
+  @override
+  String get healthGroupMe => 'Ben';
+
+  @override
+  String get healthHubEpisodes => 'Dönemler';
+
+  @override
+  String get healthHubMedicationsHint => 'Katalogdan ara, kategori ver';
+
+  @override
+  String get healthHubRoutinesHint => 'Hatırlatıcılı günlük ilaçlar';
+
+  @override
+  String get healthHubConditionsHint =>
+      'Hastalıklarınız ve kullandığınız ilaçlar';
+
+  @override
+  String get healthHubEpisodesHint => 'Devam eden ve biten dönemler';
+
+  @override
+  String get healthHubReadingsHint => 'Tansiyon, nabız, kan şekeri';
+
+  @override
+  String get healthHubBodyHint => 'Boy ve kilo geçmişi';
+
+  @override
+  String get healthHubDailyFieldsHint =>
+      'Günlük kayıtta hangi alanlar görünsün';
+
+  @override
+  String get healthHubProfileHint => 'Ad, fotoğraf, kan grubu, alerji';
+
+  @override
+  String get healthHubSettingsHint => 'Kilit, adım takibi, yedek, veriler';
 }

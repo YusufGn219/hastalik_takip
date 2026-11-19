@@ -3423,6 +3423,216 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Ayarlar ve gizlilik'**
   String get healthHubSettings;
+
+  /// No description provided for @todayDosesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü dozlar'**
+  String get todayDosesTitle;
+
+  /// No description provided for @todayDosesSummary.
+  ///
+  /// In tr, this message translates to:
+  /// **'{taken}/{total} alındı'**
+  String todayDosesSummary(int taken, int total);
+
+  /// No description provided for @todayDosesEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün için planlı doz yok.'**
+  String get todayDosesEmpty;
+
+  /// No description provided for @todayDoseTake.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aldım'**
+  String get todayDoseTake;
+
+  /// No description provided for @todayDoseSkip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Atla'**
+  String get todayDoseSkip;
+
+  /// No description provided for @todayDoseTaken.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alındı'**
+  String get todayDoseTaken;
+
+  /// No description provided for @todayDoseSkipped.
+  ///
+  /// In tr, this message translates to:
+  /// **'Atlandı'**
+  String get todayDoseSkipped;
+
+  /// No description provided for @todayFeelingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nasılsınız?'**
+  String get todayFeelingTitle;
+
+  /// No description provided for @todayFeelingAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom ekle'**
+  String get todayFeelingAction;
+
+  /// No description provided for @todayDailyFilled.
+  ///
+  /// In tr, this message translates to:
+  /// **'{n}/4 dolu'**
+  String todayDailyFilled(int n);
+
+  /// No description provided for @todayDailyAdd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ekle'**
+  String get todayDailyAdd;
+
+  /// No description provided for @todayFieldSleep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku'**
+  String get todayFieldSleep;
+
+  /// No description provided for @todayFieldWater.
+  ///
+  /// In tr, this message translates to:
+  /// **'Su'**
+  String get todayFieldWater;
+
+  /// No description provided for @todayFieldMood.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh hali'**
+  String get todayFieldMood;
+
+  /// No description provided for @todayFieldEnergy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Enerji'**
+  String get todayFieldEnergy;
+
+  /// No description provided for @todayUnitHours.
+  ///
+  /// In tr, this message translates to:
+  /// **'{value} sa'**
+  String todayUnitHours(String value);
+
+  /// No description provided for @todayUnitLiters.
+  ///
+  /// In tr, this message translates to:
+  /// **'{value} L'**
+  String todayUnitLiters(String value);
+
+  /// No description provided for @todayLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün bilgileri yüklenemedi. Aşağı çekerek yenileyin.'**
+  String get todayLoadError;
+
+  /// No description provided for @todayStepsEstimated.
+  ///
+  /// In tr, this message translates to:
+  /// **'tahmini'**
+  String get todayStepsEstimated;
+
+  /// No description provided for @historySegmentDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gün'**
+  String get historySegmentDay;
+
+  /// No description provided for @historySegmentTrends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eğilimler'**
+  String get historySegmentTrends;
+
+  /// No description provided for @healthGroupMedications.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaçlar'**
+  String get healthGroupMedications;
+
+  /// No description provided for @healthGroupConditions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalıklar'**
+  String get healthGroupConditions;
+
+  /// No description provided for @healthGroupMeasurements.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçümler'**
+  String get healthGroupMeasurements;
+
+  /// No description provided for @healthGroupMe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ben'**
+  String get healthGroupMe;
+
+  /// No description provided for @healthHubEpisodes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dönemler'**
+  String get healthHubEpisodes;
+
+  /// No description provided for @healthHubMedicationsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Katalogdan ara, kategori ver'**
+  String get healthHubMedicationsHint;
+
+  /// No description provided for @healthHubRoutinesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatırlatıcılı günlük ilaçlar'**
+  String get healthHubRoutinesHint;
+
+  /// No description provided for @healthHubConditionsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hastalıklarınız ve kullandığınız ilaçlar'**
+  String get healthHubConditionsHint;
+
+  /// No description provided for @healthHubEpisodesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam eden ve biten dönemler'**
+  String get healthHubEpisodesHint;
+
+  /// No description provided for @healthHubReadingsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tansiyon, nabız, kan şekeri'**
+  String get healthHubReadingsHint;
+
+  /// No description provided for @healthHubBodyHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boy ve kilo geçmişi'**
+  String get healthHubBodyHint;
+
+  /// No description provided for @healthHubDailyFieldsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük kayıtta hangi alanlar görünsün'**
+  String get healthHubDailyFieldsHint;
+
+  /// No description provided for @healthHubProfileHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ad, fotoğraf, kan grubu, alerji'**
+  String get healthHubProfileHint;
+
+  /// No description provided for @healthHubSettingsHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilit, adım takibi, yedek, veriler'**
+  String get healthHubSettingsHint;
 }
 
 class _AppLocalizationsDelegate

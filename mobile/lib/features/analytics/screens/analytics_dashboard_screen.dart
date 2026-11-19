@@ -21,7 +21,11 @@ import '../smoothing.dart';
 const analyticsPeriods = [7, 30, 90];
 
 class AnalyticsDashboardScreen extends ConsumerStatefulWidget {
-  const AnalyticsDashboardScreen({super.key});
+  const AnalyticsDashboardScreen({super.key, this.embedded = false});
+
+  /// Geçmiş sekmesinin içinde gösterilirken üst başlık çubuğu yer kaplamaz
+  /// (yalnız sekmeler kalır); kendi sayfası olarak açılınca başlık görünür.
+  final bool embedded;
 
   @override
   ConsumerState<AnalyticsDashboardScreen> createState() =>
@@ -90,7 +94,8 @@ class _AnalyticsDashboardScreenState
       length: 5,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(l10n.analyticsTitle),
+          toolbarHeight: widget.embedded ? 0 : null,
+          title: widget.embedded ? null : Text(l10n.analyticsTitle),
           bottom: TabBar(
             indicatorColor: AppColors.primary400,
             labelColor: AppColors.primary400,

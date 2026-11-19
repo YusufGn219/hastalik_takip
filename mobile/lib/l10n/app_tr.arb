@@ -866,5 +866,62 @@
   "healthHubBody": "Boy ve kilo",
   "healthHubDailyFields": "Günlük alanlarım",
   "healthHubProfile": "Profil ve sağlık kartı",
-  "healthHubSettings": "Ayarlar ve gizlilik"
+  "healthHubSettings": "Ayarlar ve gizlilik",
+
+  "todayDosesTitle": "Bugünkü dozlar",
+  "todayDosesSummary": "{taken}/{total} alındı",
+  "@todayDosesSummary": {
+    "placeholders": {
+      "taken": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "todayDosesEmpty": "Bugün için planlı doz yok.",
+  "todayDoseTake": "Aldım",
+  "todayDoseSkip": "Atla",
+  "todayDoseTaken": "Alındı",
+  "todayDoseSkipped": "Atlandı",
+  "todayFeelingTitle": "Nasılsınız?",
+  "todayFeelingAction": "Semptom ekle",
+  "todayDailyFilled": "{n}/4 dolu",
+  "@todayDailyFilled": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "todayDailyAdd": "Ekle",
+  "todayFieldSleep": "Uyku",
+  "todayFieldWater": "Su",
+  "todayFieldMood": "Ruh hali",
+  "todayFieldEnergy": "Enerji",
+  "todayUnitHours": "{value} sa",
+  "@todayUnitHours": {
+    "placeholders": {
+      "value": { "type": "String" }
+    }
+  },
+  "todayUnitLiters": "{value} L",
+  "@todayUnitLiters": {
+    "placeholders": {
+      "value": { "type": "String" }
+    }
+  },
+  "todayLoadError": "Bugünün bilgileri yüklenemedi. Aşağı çekerek yenileyin.",
+  "todayStepsEstimated": "tahmini",
+  "historySegmentDay": "Gün",
+  "historySegmentTrends": "Eğilimler",
+  "healthGroupMedications": "İlaçlar",
+  "healthGroupConditions": "Hastalıklar",
+  "healthGroupMeasurements": "Ölçümler",
+  "healthGroupMe": "Ben",
+  "healthHubEpisodes": "Dönemler",
+  "healthHubMedicationsHint": "Katalogdan ara, kategori ver",
+  "healthHubRoutinesHint": "Hatırlatıcılı günlük ilaçlar",
+  "healthHubConditionsHint": "Hastalıklarınız ve kullandığınız ilaçlar",
+  "healthHubEpisodesHint": "Devam eden ve biten dönemler",
+  "healthHubReadingsHint": "Tansiyon, nabız, kan şekeri",
+  "healthHubBodyHint": "Boy ve kilo geçmişi",
+  "healthHubDailyFieldsHint": "Günlük kayıtta hangi alanlar görünsün",
+  "healthHubProfileHint": "Ad, fotoğraf, kan grubu, alerji",
+  "healthHubSettingsHint": "Kilit, adım takibi, yedek, veriler"
 }

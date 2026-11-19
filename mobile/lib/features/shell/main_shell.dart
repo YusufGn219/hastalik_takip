@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../home/home_screen.dart';
-import '../timeline/screens/day_timeline_screen.dart';
 import 'health_hub_screen.dart';
+import 'history_screen.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -22,17 +22,28 @@ class _MainShellState extends State<MainShell> {
   /// Sekmeler ilk açılışta kurulur (açılışta Geçmiş'in veri okuması beklemesin).
   final _visited = <bool>[true, false, false];
 
-  static const _tabs = <Widget>[
-    HomeScreen(),
-    DayTimelineScreen(),
-    HealthHubScreen(),
+  /// Bugün sekmesine "yeniden oku" sinyali: "+" ile bir şey eklenince ya da
+  /// sekmeye dönülünce.
+  final _todayRefresh = ValueNotifier<int>(0);
+
+  late final List<Widget> _tabs = <Widget>[
+    HomeScreen(refresh: _todayRefresh),
+    const HistoryScreen(),
+    const HealthHubScreen(),
   ];
+
+  @override
+  void dispose() {
+    _todayRefresh.dispose();
+    super.dispose();
+  }
 
   void _select(int index) {
     setState(() {
       _index = index;
       _visited[index] = true;
     });
+    if (index == 0) _todayRefresh.value++;
   }
 
   Future<void> _openAddSheet() async {
@@ -43,6 +54,7 @@ class _MainShellState extends State<MainShell> {
     );
     if (route == null || !mounted) return;
     await Navigator.of(context).pushNamed(route);
+    if (mounted) _todayRefresh.value++;
   }
 
   @override

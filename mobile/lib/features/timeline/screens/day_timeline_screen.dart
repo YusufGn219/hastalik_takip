@@ -30,7 +30,10 @@ String shiftDay(String day, int delta) {
 }
 
 class DayTimelineScreen extends ConsumerStatefulWidget {
-  const DayTimelineScreen({super.key});
+  const DayTimelineScreen({super.key, this.embedded = false});
+
+  /// Geçmiş sekmesinin içinde gösterilirken kendi başlık çubuğu olmaz.
+  final bool embedded;
 
   @override
   ConsumerState<DayTimelineScreen> createState() => _DayTimelineScreenState();
@@ -112,7 +115,7 @@ class _DayTimelineScreenState extends ConsumerState<DayTimelineScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.timelineTitle)),
+      appBar: widget.embedded ? null : AppBar(title: Text(l10n.timelineTitle)),
       body: Column(
         children: [
           _dayBar(l10n),
