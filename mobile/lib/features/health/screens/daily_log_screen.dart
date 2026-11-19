@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../app/providers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/pinned_action_bar.dart';
 import '../../../data/repositories/support.dart';
 import '../../../l10n/app_localizations.dart';
 import '../extra_fields_controller.dart';
@@ -241,6 +242,49 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
           ),
         ],
       ),
+      // Kaydet düğmesi ve hata kutusu altta sabit: kayarken hep görünür.
+      bottomNavigationBar: _isFetchingExisting
+          ? null
+          : PinnedActionBar(
+              message: _errorMessage == null
+                  ? null
+                  : Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: AppColors.episodeBg,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: AppColors.episode.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline,
+                              color: AppColors.episode, size: 16),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(
+                                  color: AppColors.episode, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              child: ElevatedButton(
+                onPressed: (_isLoading || _loadFailed) ? null : _saveLog,
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Text('Kaydet'),
+              ),
+            ),
       body: _isFetchingExisting
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -524,50 +568,6 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
             ),
 
             const SizedBox(height: 12),
-
-            // Hata mesajı
-            if (_errorMessage != null)
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.episodeBg,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                      color: AppColors.episode.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.error_outline,
-                        color: AppColors.episode, size: 16),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        _errorMessage!,
-                        style: const TextStyle(
-                            color: AppColors.episode, fontSize: 13),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-            // Kaydet butonu
-            ElevatedButton(
-              onPressed: (_isLoading || _loadFailed) ? null : _saveLog,
-              child: _isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : const Text('Kaydet'),
-            ),
-
-            const SizedBox(height: 16),
           ],
         ),
       ),

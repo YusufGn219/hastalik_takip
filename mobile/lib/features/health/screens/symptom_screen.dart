@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/providers.dart';
 import '../../../core/utils/turkish_text.dart';
+import '../../../core/widgets/pinned_action_bar.dart';
 import '../../../data/database/app_database.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -248,7 +249,24 @@ class _SymptomScreenState extends ConsumerState<SymptomScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Semptom Ekle')),
-      // Kaydırılabilir: klavye açıkken içerik taşmaz, Kaydet'e ulaşılır.
+      // Kaydet düğmesi ve iletisi altta sabit: klavye açıkken de, kayarken de görünür.
+      bottomNavigationBar: PinnedActionBar(
+        message: _message.isEmpty
+            ? null
+            : Text(
+                _message,
+                style: TextStyle(
+                  color: _messageIsError ? Colors.red : Colors.green,
+                ),
+              ),
+        child: ElevatedButton(
+          onPressed: (_isLoading || _loadFailed) ? null : _submitEntry,
+          child: _isLoading
+              ? const CircularProgressIndicator()
+              : const Text('Kaydet'),
+        ),
+      ),
+      // Kaydırılabilir: klavye açıkken içerik taşmaz.
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -314,26 +332,7 @@ class _SymptomScreenState extends ConsumerState<SymptomScreen> {
               ),
               maxLines: 3,
             ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: (_isLoading || _loadFailed) ? null : _submitEntry,
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text('Kaydet'),
-              ),
-            ),
-            if (_message.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text(
-                  _message,
-                  style: TextStyle(
-                    color: _messageIsError ? Colors.red : Colors.green,
-                  ),
-                ),
-              ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

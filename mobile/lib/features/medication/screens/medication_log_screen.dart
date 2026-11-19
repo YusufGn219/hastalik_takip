@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/utils/turkish_text.dart';
+import '../../../core/widgets/pinned_action_bar.dart';
 import '../../../data/database/app_database.dart';
 import '../../../data/database/enums.dart';
 import '../../../domain/drug_search.dart';
@@ -277,6 +278,28 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
     final shownMessage = _loadFailed ? l10n.medLogLoadError : _message;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.medLogTitle)),
+      // Kaydet düğmesi ve iletisi altta sabit.
+      bottomNavigationBar: PinnedActionBar(
+        message: shownMessage.isEmpty
+            ? null
+            : Text(
+                shownMessage,
+                style: TextStyle(
+                  color: _isSuccess && !_loadFailed ? Colors.green : Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+        child: ElevatedButton(
+          onPressed: (_isSaving || _loadFailed) ? null : _save,
+          child: _isSaving
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l10n.medLogSave),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -387,29 +410,7 @@ class _MedicationLogScreenState extends ConsumerState<MedicationLogScreen> {
                 border: const OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 24),
-            if (shownMessage.isNotEmpty)
-              Text(
-                shownMessage,
-                style: TextStyle(
-                  color: _isSuccess && !_loadFailed ? Colors.green : Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: (_isSaving || _loadFailed) ? null : _save,
-                child: _isSaving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(l10n.medLogSave),
-              ),
-            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
