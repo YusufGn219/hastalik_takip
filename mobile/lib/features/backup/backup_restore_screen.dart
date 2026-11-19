@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 
+import '../../core/widgets/pinned_action_bar.dart';
 import '../../data/backup/backup_service.dart';
 import '../../l10n/l10n.dart';
 import '../lock/app_lock_controller.dart';
@@ -191,6 +192,18 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.restoreTitle)),
+      // Geri yükle düğmesi ve sonuç iletisi altta sabit.
+      bottomNavigationBar: PinnedActionBar(
+        message: _resultError == null
+            ? null
+            : Text(_resultError!,
+                key: const Key('geri_yukle_sonuc'), style: TextStyle(color: scheme.error)),
+        child: ElevatedButton(
+          key: const Key('geri_yukle_baslat'),
+          onPressed: _working ? null : _restore,
+          child: Text(_working ? l10n.restoreWorking : l10n.restoreAction),
+        ),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -257,16 +270,7 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
                 _resultError = null;
               }),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              key: const Key('geri_yukle_baslat'),
-              onPressed: _working ? null : _restore,
-              child: Text(_working ? l10n.restoreWorking : l10n.restoreAction),
-            ),
-            if (_resultError != null) ...[
-              const SizedBox(height: 16),
-              Text(_resultError!, key: const Key('geri_yukle_sonuc'), style: TextStyle(color: scheme.error)),
-            ],
+            const SizedBox(height: 16),
           ],
         ),
       ),

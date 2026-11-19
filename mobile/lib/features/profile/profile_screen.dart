@@ -13,6 +13,7 @@ import '../../app/providers.dart';
 import '../../data/database/app_database.dart';
 import '../../data/database/enums.dart';
 import '../../data/repositories/profile_repository.dart';
+import '../../core/widgets/pinned_action_bar.dart';
 import '../../data/repositories/support.dart';
 import '../../l10n/l10n.dart';
 import 'profile_avatar.dart';
@@ -277,6 +278,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final scheme = Theme.of(context).colorScheme;
 
     Widget body;
+    Widget? bottomBar;
     if (_loading) {
       body = const Center(child: CircularProgressIndicator());
     } else if (_loadFailed) {
@@ -458,21 +460,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               if (_phoneError != null) setState(() => _phoneError = null);
             },
           ),
-          if (_error != null) ...[
-            const SizedBox(height: 16),
-            Text(
-              _error!,
-              key: const Key('profil_hata'),
-              style: TextStyle(color: scheme.error),
-            ),
-          ],
-          const SizedBox(height: 20),
-          ElevatedButton(
-            key: const Key('profil_kaydet'),
-            onPressed: _saving ? null : _save,
-            child: Text(l10n.profileSave),
-          ),
+          const SizedBox(height: 16),
         ],
+      );
+      // Kaydet düğmesi ve hata iletisi altta sabit.
+      bottomBar = PinnedActionBar(
+        message: _error == null
+            ? null
+            : Text(
+                _error!,
+                key: const Key('profil_hata'),
+                style: TextStyle(color: scheme.error),
+              ),
+        child: ElevatedButton(
+          key: const Key('profil_kaydet'),
+          onPressed: _saving ? null : _save,
+          child: Text(l10n.profileSave),
+        ),
       );
     }
 
@@ -489,6 +493,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         dirty: _dirty,
         child: Scaffold(
           appBar: AppBar(title: Text(l10n.profileTitle)),
+          bottomNavigationBar: bottomBar,
           body: SafeArea(child: body),
         ),
       ),

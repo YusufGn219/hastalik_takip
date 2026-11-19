@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/widgets/pinned_action_bar.dart';
 import '../../data/backup/backup_service.dart';
 import '../../l10n/l10n.dart';
 import 'backup_exporter.dart';
@@ -91,6 +92,23 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.backupTitle)),
+      // Yedek al düğmesi ve sonuç iletisi altta sabit.
+      bottomNavigationBar: PinnedActionBar(
+        message: switch (_status) {
+          _Status.done => Text(l10n.backupDone,
+              key: const Key('yedek_sonuc'), style: TextStyle(color: scheme.primary)),
+          _Status.cancelled =>
+            Text(l10n.backupCancelled, key: const Key('yedek_sonuc')),
+          _Status.failed => Text(l10n.backupFailed,
+              key: const Key('yedek_sonuc'), style: TextStyle(color: scheme.error)),
+          _ => null,
+        },
+        child: ElevatedButton(
+          key: const Key('yedek_al'),
+          onPressed: working ? null : _export,
+          child: Text(working ? l10n.backupWorking : l10n.backupAction),
+        ),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -152,18 +170,7 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                 _status = _Status.idle;
               }),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              key: const Key('yedek_al'),
-              onPressed: working ? null : _export,
-              child: Text(working ? l10n.backupWorking : l10n.backupAction),
-            ),
             const SizedBox(height: 16),
-            if (_status == _Status.done)
-              Text(l10n.backupDone, key: const Key('yedek_sonuc'), style: TextStyle(color: scheme.primary)),
-            if (_status == _Status.cancelled) Text(l10n.backupCancelled, key: const Key('yedek_sonuc')),
-            if (_status == _Status.failed)
-              Text(l10n.backupFailed, key: const Key('yedek_sonuc'), style: TextStyle(color: scheme.error)),
           ],
         ),
       ),
