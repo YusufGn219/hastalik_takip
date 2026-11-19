@@ -1811,4 +1811,49 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsStepsOffFailed => 'Adım takibi kapatılamadı.';
+
+  @override
+  String get shellTabToday => 'Bugün';
+
+  @override
+  String get shellTabHistory => 'Geçmiş';
+
+  @override
+  String get shellTabHealth => 'Sağlık';
+
+  @override
+  String get shellAddTooltip => 'Ekle';
+
+  @override
+  String get shellAddTitle => 'Ne eklemek istersiniz?';
+
+  @override
+  String get shellAddMedication => 'İlaç aldım';
+
+  @override
+  String get shellAddSymptom => 'Semptom';
+
+  @override
+  String get shellAddDaily => 'Günlük kayıt';
+
+  @override
+  String get shellAddReading => 'Ölçüm';
+
+  @override
+  String get healthHubTitle => 'Sağlık';
+
+  @override
+  String get healthHubMedications => 'İlaç listem';
+
+  @override
+  String get healthHubBody => 'Boy ve kilo';
+
+  @override
+  String get healthHubDailyFields => 'Günlük alanlarım';
+
+  @override
+  String get healthHubProfile => 'Profil ve sağlık kartı';
+
+  @override
+  String get healthHubSettings => 'Ayarlar ve gizlilik';
 }

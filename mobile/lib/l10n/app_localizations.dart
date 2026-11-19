@@ -3333,6 +3333,96 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Adım takibi kapatılamadı.'**
   String get settingsStepsOffFailed;
+
+  /// No description provided for @shellTabToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün'**
+  String get shellTabToday;
+
+  /// No description provided for @shellTabHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş'**
+  String get shellTabHistory;
+
+  /// No description provided for @shellTabHealth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağlık'**
+  String get shellTabHealth;
+
+  /// No description provided for @shellAddTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ekle'**
+  String get shellAddTooltip;
+
+  /// No description provided for @shellAddTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne eklemek istersiniz?'**
+  String get shellAddTitle;
+
+  /// No description provided for @shellAddMedication.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç aldım'**
+  String get shellAddMedication;
+
+  /// No description provided for @shellAddSymptom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Semptom'**
+  String get shellAddSymptom;
+
+  /// No description provided for @shellAddDaily.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük kayıt'**
+  String get shellAddDaily;
+
+  /// No description provided for @shellAddReading.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ölçüm'**
+  String get shellAddReading;
+
+  /// No description provided for @healthHubTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağlık'**
+  String get healthHubTitle;
+
+  /// No description provided for @healthHubMedications.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç listem'**
+  String get healthHubMedications;
+
+  /// No description provided for @healthHubBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boy ve kilo'**
+  String get healthHubBody;
+
+  /// No description provided for @healthHubDailyFields.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük alanlarım'**
+  String get healthHubDailyFields;
+
+  /// No description provided for @healthHubProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil ve sağlık kartı'**
+  String get healthHubProfile;
+
+  /// No description provided for @healthHubSettings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarlar ve gizlilik'**
+  String get healthHubSettings;
 }
 
 class _AppLocalizationsDelegate

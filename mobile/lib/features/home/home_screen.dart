@@ -26,7 +26,8 @@ class HomeScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          // Altta boşluk: yüzen "+" düğmesi son satırı örtmesin.
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 16),

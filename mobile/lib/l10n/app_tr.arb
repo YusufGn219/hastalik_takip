@@ -850,5 +850,21 @@
   "settingsStepsDenied": "İzin verilmedi; adım takibi açılmadı.",
   "settingsStepsDeniedForever": "İzin telefon ayarlarından açılmalı.",
   "settingsStepsFailed": "Adım takibi açılamadı.",
-  "settingsStepsOffFailed": "Adım takibi kapatılamadı."
+  "settingsStepsOffFailed": "Adım takibi kapatılamadı.",
+
+  "shellTabToday": "Bugün",
+  "shellTabHistory": "Geçmiş",
+  "shellTabHealth": "Sağlık",
+  "shellAddTooltip": "Ekle",
+  "shellAddTitle": "Ne eklemek istersiniz?",
+  "shellAddMedication": "İlaç aldım",
+  "shellAddSymptom": "Semptom",
+  "shellAddDaily": "Günlük kayıt",
+  "shellAddReading": "Ölçüm",
+  "healthHubTitle": "Sağlık",
+  "healthHubMedications": "İlaç listem",
+  "healthHubBody": "Boy ve kilo",
+  "healthHubDailyFields": "Günlük alanlarım",
+  "healthHubProfile": "Profil ve sağlık kartı",
+  "healthHubSettings": "Ayarlar ve gizlilik"
 }

@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
 import '../../data/repositories/settings_repository.dart';
-import '../home/home_screen.dart';
+import '../shell/main_shell.dart';
 import 'onboarding_screen.dart';
 
 /// Ayarlar tablosundaki anahtar; değer `'true'` ise tanıtım görülmüştür.
@@ -59,6 +59,6 @@ class _StartScreenState extends ConsumerState<StartScreen> {
   Widget build(BuildContext context) {
     final done = _done;
     if (done == null) return const Scaffold();
-    return done ? const HomeScreen() : OnboardingScreen(onDone: _finish);
+    return done ? const MainShell() : OnboardingScreen(onDone: _finish);
   }
 }
