@@ -31,6 +31,29 @@ void main() {
     expect(tester.getBottomLeft(find.text('Kaydet')).dy, greaterThan(screen.height - 100));
   });
 
+  testWidgets('klavye açılınca düğme klavyenin üstünde kalır', (tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(MaterialApp(
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          viewInsets: const EdgeInsets.only(bottom: 400),
+        ),
+        child: child!,
+      ),
+      home: Scaffold(
+        bottomNavigationBar: PinnedActionBar(
+          child: ElevatedButton(onPressed: () {}, child: const Text('Kaydet')),
+        ),
+        body: const SizedBox.expand(),
+      ),
+    ));
+
+    // Klavye ekranın alt 400 px'ini kaplıyor: düğme bunun üstünde olmalı.
+    expect(tester.getBottomLeft(find.text('Kaydet')).dy, lessThan(1600 - 400));
+  });
+
   testWidgets('ileti düğmenin hemen üstünde durur; yoksa yer kaplamaz', (tester) async {
     await tester.pumpWidget(_app(message: const Text('Hata var')));
     expect(find.text('Hata var'), findsOneWidget);

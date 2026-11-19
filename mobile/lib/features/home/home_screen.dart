@@ -290,6 +290,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _feelingSection(AppLocalizations l10n) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -300,7 +301,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             minimumSize: const Size(0, 48),
             foregroundColor: AppColors.symptom,
             side: BorderSide(color: AppColors.symptom.withValues(alpha: 0.4)),
-            backgroundColor: AppColors.symptomBg,
+            // Koyu temada açık pembe zemin göz alıyordu: şeffaf ton kullanılır.
+            backgroundColor: isDark
+                ? AppColors.symptom.withValues(alpha: 0.14)
+                : AppColors.symptomBg,
           ),
           onPressed: () => _open('/symptoms'),
           icon: const Icon(Icons.healing_outlined),
@@ -338,6 +342,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _dailyTile(int index, String label, String? value, AppLocalizations l10n) {
     final done = value != null;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Koyu temada dolu kutu açık yeşil zemin yerine şeffaf yeşil ton, metin açık.
+    final doneLabel = isDark ? const Color(0xFFB5D98A) : const Color(0xFF3F6A10);
+    final doneValue = isDark ? const Color(0xFFDDF0C4) : const Color(0xFF2B4A0A);
     return InkWell(
       key: Key('bugun_gunluk_$index'),
       borderRadius: BorderRadius.circular(14),
@@ -345,7 +353,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Container(
         height: 68,
         decoration: BoxDecoration(
-          color: done ? AppColors.dailyBg : Theme.of(context).cardColor,
+          color: done
+              ? (isDark ? AppColors.daily.withValues(alpha: 0.18) : AppColors.dailyBg)
+              : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: done
@@ -359,14 +369,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Text(label,
                 style: TextStyle(
                     fontSize: 12,
-                    color: done ? const Color(0xFF3F6A10) : null)),
+                    color: done ? doneLabel : null)),
             const SizedBox(height: 2),
             Text(
               value ?? l10n.todayDailyAdd,
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: done ? FontWeight.w600 : FontWeight.w500,
-                color: done ? const Color(0xFF2B4A0A) : null,
+                color: done ? doneValue : null,
               ),
             ),
           ],
