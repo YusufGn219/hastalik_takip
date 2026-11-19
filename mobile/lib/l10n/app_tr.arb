@@ -926,5 +926,29 @@
   "healthHubSettingsHint": "Kilit, adım takibi, yedek, veriler",
   "settingsGroupSecurity": "Güvenlik",
   "settingsGroupAuto": "Otomatik veri",
-  "settingsGroupApp": "Uygulama"
+  "settingsGroupApp": "Uygulama",
+
+  "onboardingWelcomeBody": "İlaçlarınızı, belirtilerinizi ve günlük halinizi tek yerden, birkaç dokunuşla kaydedin.",
+  "onboardingPoint1": "Verileriniz yalnız telefonunuzda, şifreli saklanır",
+  "onboardingPoint2": "Hesap açmak ya da internet gerekmez",
+  "onboardingPoint3": "İsterseniz PIN veya parmak iziyle kilitlersiniz",
+  "onboardingDisclaimer": "Vitapuls tıbbi tavsiye vermez; yalnızca kayıt tutmanıza yardım eder.",
+  "onboardingLetsStart": "Başlayalım",
+
+  "backupScreenTitle": "Yedekleme",
+  "backupScreenIntro": "Verileriniz yalnız bu telefondadır. Telefon değiştirirseniz ya da kaybederseniz yedek dosyası sizi kurtarır.",
+  "backupPassphraseTitle": "Yedek şifresi",
+  "backupPassphraseNote": "Parolayı unutursanız yedek açılamaz; biz de kurtaramayız.",
+  "backupCreateAction": "Yedek dosyası oluştur",
+  "backupRestoreAction": "Yedekten geri yükle",
+  "backupReplaceNote": "Geri yükleme, telefondaki mevcut verilerin yerine geçer.",
+  "settingsBackupRowTitle": "Yedekleme",
+  "settingsBackupRowHint": "Şifreli dosya olarak dışa aktar",
+  "settingsProfileRowTitle": "Profil ve sağlık kartı",
+  "settingsProfileRowHint": "Ad, kan grubu, alerjiler",
+  "settingsFieldsRowTitle": "Günlük alanlarım",
+  "settingsFieldsRowHint": "Hangi alanlar görünsün",
+  "settingsNotificationsRowTitle": "Bildirimler",
+  "settingsNotificationsRowHint": "İlaç hatırlatmaları",
+  "settingsFooter": "Vitapuls · Veriler yalnız bu telefonda, şifreli"
 }

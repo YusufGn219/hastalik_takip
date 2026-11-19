@@ -1,10 +1,10 @@
-// "Yedek al" ekranı: parolayı iki kez alır, yedeği şifreleyip kullanıcının seçtiği
-// yere kaydettirir. Parola hiçbir yere kaydedilmez ve günlüğe yazılmaz.
+// "Yedekleme" ekranı (taslaktaki "Yedek" panosu): parolayı iki kez alır, yedeği
+// şifreleyip kullanıcının seçtiği yere kaydettirir; "Yedekten geri yükle" düğmesi
+// geri yükleme ekranını açar. Parola hiçbir yere kaydedilmez ve günlüğe yazılmaz.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/widgets/pinned_action_bar.dart';
 import '../../data/backup/backup_service.dart';
 import '../../l10n/l10n.dart';
 import 'backup_exporter.dart';
@@ -79,8 +79,10 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final text = Theme.of(context).textTheme;
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final muted = scheme.onSurface.withValues(alpha: 0.6);
     final working = _status == _Status.working;
 
     final toggle = IconButton(
@@ -90,87 +92,127 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
       onPressed: () => setState(() => _show = !_show),
     );
 
+    final Widget? result = switch (_status) {
+      _Status.done => Text(l10n.backupDone,
+          key: const Key('yedek_sonuc'), style: TextStyle(color: scheme.primary)),
+      _Status.cancelled => Text(l10n.backupCancelled, key: const Key('yedek_sonuc')),
+      _Status.failed => Text(l10n.backupFailed,
+          key: const Key('yedek_sonuc'), style: TextStyle(color: scheme.error)),
+      _ => null,
+    };
+
+    // Taslaktaki sarı uyarı: açık temada krem zemin, koyu temada şeffaf sarı.
+    final amberBg = isDark ? const Color(0x29EF9F27) : const Color(0xFFFAEEDA);
+    final amberFg = isDark ? const Color(0xFFFAC775) : const Color(0xFF633806);
+    final amberIcon = isDark ? const Color(0xFFFAC775) : const Color(0xFF854F0B);
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.backupTitle)),
-      // Yedek al düğmesi ve sonuç iletisi altta sabit.
-      bottomNavigationBar: PinnedActionBar(
-        message: switch (_status) {
-          _Status.done => Text(l10n.backupDone,
-              key: const Key('yedek_sonuc'), style: TextStyle(color: scheme.primary)),
-          _Status.cancelled =>
-            Text(l10n.backupCancelled, key: const Key('yedek_sonuc')),
-          _Status.failed => Text(l10n.backupFailed,
-              key: const Key('yedek_sonuc'), style: TextStyle(color: scheme.error)),
-          _ => null,
-        },
-        child: ElevatedButton(
-          key: const Key('yedek_al'),
-          onPressed: working ? null : _export,
-          child: Text(working ? l10n.backupWorking : l10n.backupAction),
-        ),
-      ),
+      appBar: AppBar(title: Text(l10n.backupScreenTitle)),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
           children: [
-            Text(l10n.backupIntro, style: text.bodyMedium),
-            const SizedBox(height: 16),
+            Text(l10n.backupScreenIntro,
+                style: TextStyle(fontSize: 14, color: muted, height: 1.4)),
+            const SizedBox(height: 12),
             Card(
-              color: scheme.errorContainer,
+              margin: EdgeInsets.zero,
               child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
+                padding: const EdgeInsets.all(14),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.warning_amber_rounded, color: scheme.onErrorContainer),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        l10n.backupWarning,
-                        key: const Key('yedek_uyari'),
-                        style: TextStyle(color: scheme.onErrorContainer),
+                    Text(l10n.backupPassphraseTitle,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 10),
+                    TextField(
+                      key: const Key('yedek_parola'),
+                      controller: _pass,
+                      enabled: !working,
+                      obscureText: !_show,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: InputDecoration(
+                        labelText: l10n.backupPassphrase,
+                        errorText: _passError,
+                        suffixIcon: toggle,
                       ),
+                      onChanged: (_) => setState(() {
+                        _passError = null;
+                        _status = _Status.idle;
+                      }),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      key: const Key('yedek_parola_tekrar'),
+                      controller: _confirm,
+                      enabled: !working,
+                      obscureText: !_show,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: InputDecoration(
+                        labelText: l10n.backupPassphraseConfirm,
+                        errorText: _confirmError,
+                      ),
+                      onChanged: (_) => setState(() {
+                        _confirmError = null;
+                        _status = _Status.idle;
+                      }),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      l10n.backupPassphraseNote,
+                      key: const Key('yedek_uyari'),
+                      style: TextStyle(fontSize: 12, color: muted, height: 1.4),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              key: const Key('yedek_parola'),
-              controller: _pass,
-              enabled: !working,
-              obscureText: !_show,
-              autocorrect: false,
-              enableSuggestions: false,
-              decoration: InputDecoration(
-                labelText: l10n.backupPassphrase,
-                errorText: _passError,
-                suffixIcon: toggle,
-              ),
-              onChanged: (_) => setState(() {
-                _passError = null;
-                _status = _Status.idle;
-              }),
+            const SizedBox(height: 12),
+            if (result != null) ...[result, const SizedBox(height: 12)],
+            ElevatedButton(
+              key: const Key('yedek_al'),
+              onPressed: working ? null : _export,
+              child: Text(working ? l10n.backupWorking : l10n.backupCreateAction),
             ),
             const SizedBox(height: 12),
-            TextField(
-              key: const Key('yedek_parola_tekrar'),
-              controller: _confirm,
-              enabled: !working,
-              obscureText: !_show,
-              autocorrect: false,
-              enableSuggestions: false,
-              decoration: InputDecoration(
-                labelText: l10n.backupPassphraseConfirm,
-                errorText: _confirmError,
+            OutlinedButton(
+              key: const Key('yedek_geri_yukle'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 52),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                side: BorderSide(
+                    color: isDark ? const Color(0xFFAFA9EC) : const Color(0xFF534AB7),
+                    width: 1.5),
+                foregroundColor:
+                    isDark ? const Color(0xFFAFA9EC) : const Color(0xFF534AB7),
+                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
-              onChanged: (_) => setState(() {
-                _confirmError = null;
-                _status = _Status.idle;
-              }),
+              onPressed: working ? null : () => Navigator.of(context).pushNamed('/restore'),
+              child: Text(l10n.backupRestoreAction),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: amberBg,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, size: 20, color: amberIcon),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n.backupReplaceNote,
+                      key: const Key('yedek_degisim_notu'),
+                      style: TextStyle(fontSize: 13, color: amberFg, height: 1.4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/providers.dart';
 import '../../core/utils/turkish_text.dart' show upperTr;
 import '../../l10n/l10n.dart';
-import '../profile/profile_avatar.dart';
 import '../lock/app_lock_controller.dart';
 import '../lock/app_lock_platform.dart';
 import '../lock/lock_settings_card.dart';
@@ -86,45 +85,44 @@ class SettingsScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Bölümler taslaktaki sırayla: Güvenlik (kilit + yedek), Otomatik veri,
-            // Uygulama (profil, boy-kilo), Veri (tümünü sil).
+            // Bölümler taslaktaki sırayla (Ayarlar panosu): Güvenlik (kilit,
+            // yedekleme), Otomatik veri (adım takibi), Uygulama (profil, günlük
+            // alanlar, bildirimler). "Tüm verimi sil" taslakta yok ama işlevi
+            // korunur: en altta "Veriler" bölümünde. Yedekten geri yükleme artık
+            // Yedekleme ekranındaki düğmeden açılır; Boy ve kilo Sağlık
+            // sekmesinden.
             _header(text, l10n.settingsGroupSecurity, first: true),
             const AppLockSettingsCard(),
             Card(
               margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                key: const Key('ayar_yedek_al'),
-                leading: const Icon(Icons.upload_file_outlined),
-                title: Text(l10n.settingsBackupExportTitle),
-                subtitle: Text(l10n.settingsBackupExportHint),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.of(context).pushNamed('/backup'),
-              ),
-            ),
-            Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                key: const Key('ayar_yedek_geri'),
-                leading: const Icon(Icons.download_for_offline_outlined),
-                title: Text(l10n.settingsRestoreTitle),
-                subtitle: Text(l10n.settingsRestoreHint),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.of(context).pushNamed('/restore'),
+              child: _SettingsRow(
+                rowKey: const Key('ayar_yedek_al'),
+                title: l10n.settingsBackupRowTitle,
+                hint: l10n.settingsBackupRowHint,
+                route: '/backup',
               ),
             ),
             _header(text, l10n.settingsGroupAuto),
             const StepSettingsCard(),
             _header(text, l10n.settingsGroupApp),
-            const _ProfileCard(),
-            Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                key: const Key('ayar_boy_kilo'),
-                leading: const Icon(Icons.monitor_weight_outlined),
-                title: Text(l10n.settingsBodyTitle),
-                subtitle: Text(l10n.settingsBodyHint),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.of(context).pushNamed('/body'),
+            const Card(
+              margin: EdgeInsets.only(bottom: 12),
+              child: Column(
+                children: [
+                  _ProfileRow(),
+                  Divider(height: 1),
+                  _SettingsRowFromL10n(
+                    rowKey: Key('ayar_gunluk_alanlar'),
+                    kind: _RowKind.fields,
+                    route: '/daily-fields',
+                  ),
+                  Divider(height: 1),
+                  _SettingsRowFromL10n(
+                    rowKey: Key('ayar_bildirimler'),
+                    kind: _RowKind.notifications,
+                    route: '/recurring',
+                  ),
+                ],
               ),
             ),
             _header(text, l10n.settingsDataSection),
@@ -141,6 +139,14 @@ class SettingsScreen extends ConsumerWidget {
                 onTap: () => _wipeAll(context, ref),
               ),
             ),
+            const SizedBox(height: 8),
+            Center(
+              child: Text(
+                l10n.settingsFooter,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
           ],
         ),
       ),
@@ -148,26 +154,72 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-/// Ayarların en üstündeki profil kartı: fotoğraf, ad ve soyad; dokununca Profil
-/// ekranı açılır. Profil okunamazsa kart yine açılır, ad yerine ipucu görünür.
-class _ProfileCard extends ConsumerWidget {
-  const _ProfileCard();
+/// Taslaktaki ayar satırı: başlık, altında açıklama, sağda ok. Simgesiz.
+class _SettingsRow extends StatelessWidget {
+  const _SettingsRow({
+    required this.rowKey,
+    required this.title,
+    required this.hint,
+    required this.route,
+  });
+
+  final Key rowKey;
+  final String title;
+  final String hint;
+  final String route;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      key: rowKey,
+      minVerticalPadding: 10,
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+      subtitle: Text(hint),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => Navigator.of(context).pushNamed(route),
+    );
+  }
+}
+
+enum _RowKind { fields, notifications }
+
+/// Çeviriden başlık/açıklama alan `_SettingsRow` (const listede kullanılabilsin diye).
+class _SettingsRowFromL10n extends StatelessWidget {
+  const _SettingsRowFromL10n({required this.rowKey, required this.kind, required this.route});
+
+  final Key rowKey;
+  final _RowKind kind;
+  final String route;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final (title, hint) = switch (kind) {
+      _RowKind.fields => (l10n.settingsFieldsRowTitle, l10n.settingsFieldsRowHint),
+      _RowKind.notifications => (
+          l10n.settingsNotificationsRowTitle,
+          l10n.settingsNotificationsRowHint,
+        ),
+    };
+    return _SettingsRow(rowKey: rowKey, title: title, hint: hint, route: route);
+  }
+}
+
+/// "Profil ve sağlık kartı" satırı; profilde ad varsa açıklama yerine ad görünür.
+/// Profil okunamazsa satır yine açılır, açıklama görünür.
+class _ProfileRow extends ConsumerWidget {
+  const _ProfileRow();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final profile = ref.watch(profileProvider).valueOrNull;
     final name = profile == null ? '' : '${profile.firstName} ${profile.lastName}'.trim();
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        key: const Key('ayar_profil'),
-        leading: ProfileAvatar(photo: profile?.photo, radius: 24),
-        title: Text(name.isEmpty ? l10n.settingsProfileTitle : name),
-        subtitle: name.isEmpty ? Text(l10n.settingsProfileEmpty) : Text(l10n.settingsProfileTitle),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => Navigator.of(context).pushNamed('/profile'),
-      ),
+    return _SettingsRow(
+      rowKey: const Key('ayar_profil'),
+      title: l10n.settingsProfileRowTitle,
+      hint: name.isEmpty ? l10n.settingsProfileRowHint : name,
+      route: '/profile',
     );
   }
 }

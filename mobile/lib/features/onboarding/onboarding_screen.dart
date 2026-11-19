@@ -1,193 +1,156 @@
-// İlk açılışta bir kez gösterilen dört sayfalık tanıtım. Hesap ya da giriş yok;
-// bitince (ya da "Geç" ile) `onDone` çağrılır, sonrasını `StartScreen` yönetir.
+// İlk açılışta bir kez gösterilen karşılama sayfası (taslaktaki "Karşılama"
+// panosu). Hesap ya da giriş yok; "Başlayalım" ile `onDone` çağrılır, sonrasını
+// `StartScreen` yönetir. Taslakta nokta göstergesi "1/2" idi ama ikinci sayfa
+// tasarlanmamıştı; var olmayan sayfa için gösterge çizilmez.
 
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key, required this.onDone});
 
-  /// Tanıtım bitince ya da geçilince çağrılır.
+  /// Karşılama bitince çağrılır.
   final VoidCallback onDone;
-
-  @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  List<_OnboardingPage> _pages(AppLocalizations l10n) => [
-        _OnboardingPage(
-          icon: Icons.assignment_outlined,
-          title: l10n.onboardingTitle1,
-          body: l10n.onboardingBody1,
-          color: AppColors.primary400,
-          background: AppColors.primary50,
-        ),
-        _OnboardingPage(
-          icon: Icons.sick_outlined,
-          title: l10n.onboardingTitle2,
-          body: l10n.onboardingBody2,
-          color: AppColors.symptom,
-          background: AppColors.symptomBg,
-        ),
-        _OnboardingPage(
-          icon: Icons.timeline,
-          title: l10n.onboardingTitle3,
-          body: l10n.onboardingBody3,
-          color: AppColors.episode,
-          background: AppColors.episodeBg,
-        ),
-        _OnboardingPage(
-          icon: Icons.bar_chart_outlined,
-          title: l10n.onboardingTitle4,
-          body: l10n.onboardingBody4,
-          color: AppColors.daily,
-          background: AppColors.dailyBg,
-        ),
-      ];
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final pages = _pages(l10n);
-    final isLast = _currentPage == pages.length - 1;
+    final scheme = Theme.of(context).colorScheme;
+    final muted = scheme.onSurface.withValues(alpha: 0.6);
+    final points = [
+      l10n.onboardingPoint1,
+      l10n.onboardingPoint2,
+      l10n.onboardingPoint3,
+    ];
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 8, right: 16),
-                child: TextButton(
-                  onPressed: widget.onDone,
-                  child: Text(
-                    l10n.onboardingSkip,
-                    style: const TextStyle(
-                      color: AppColors.primary400,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) => setState(() => _currentPage = index),
-                itemCount: pages.length,
-                itemBuilder: (context, index) {
-                  final page = pages[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: [
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          width: 120,
-                          height: 120,
+                          key: const Key('karsilama_logo'),
+                          width: 96,
+                          height: 96,
                           decoration: BoxDecoration(
-                            color: page.background,
-                            shape: BoxShape.circle,
+                            color: AppColors.primary600,
+                            borderRadius: BorderRadius.circular(28),
                           ),
-                          child: Icon(page.icon, size: 60, color: page.color),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 52,
+                              height: 52,
+                              child: CustomPaint(painter: _PulsePainter()),
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 22),
                         Text(
-                          page.title,
+                          l10n.appTitle,
                           style: const TextStyle(
-                            fontSize: 26,
+                            fontSize: 28,
                             fontWeight: FontWeight.w700,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          page.body,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.5),
-                            height: 1.5,
+                        const SizedBox(height: 14),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 290),
+                          child: Text(
+                            l10n.onboardingWelcomeBody,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, color: muted, height: 1.5),
                           ),
-                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 28),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 300),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              for (final p in points)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(top: 1),
+                                        child: Icon(Icons.check,
+                                            size: 20, color: Color(0xFF1D9E75)),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(p,
+                                            style: const TextStyle(
+                                                fontSize: 14, height: 1.4)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  );
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                pages.length,
-                (index) => AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentPage == index ? 24 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _currentPage == index
-                        ? AppColors.primary400
-                        : Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 32),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: SizedBox(
+              SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: isLast
-                      ? widget.onDone
-                      : () => _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          ),
-                  child: Text(isLast ? l10n.onboardingStart : l10n.onboardingNext),
+                  key: const Key('karsilama_basla'),
+                  onPressed: onDone,
+                  child: Text(l10n.onboardingLetsStart),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                l10n.onboardingDisclaimer,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: muted, height: 1.4),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _OnboardingPage {
-  const _OnboardingPage({
-    required this.icon,
-    required this.title,
-    required this.body,
-    required this.color,
-    required this.background,
-  });
+/// Taslaktaki nabız çizgisi: `M3 12h4l2-5 4 10 2-5h6` (24 birimlik çizim alanı).
+class _PulsePainter extends CustomPainter {
+  const _PulsePainter();
 
-  final IconData icon;
-  final String title;
-  final String body;
-  final Color color;
-  final Color background;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final s = size.width / 24;
+    final path = Path()
+      ..moveTo(3 * s, 12 * s)
+      ..lineTo(7 * s, 12 * s)
+      ..lineTo(9 * s, 7 * s)
+      ..lineTo(13 * s, 17 * s)
+      ..lineTo(15 * s, 12 * s)
+      ..lineTo(21 * s, 12 * s);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2 * s
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

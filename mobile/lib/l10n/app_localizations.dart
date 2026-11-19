@@ -3651,6 +3651,138 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Uygulama'**
   String get settingsGroupApp;
+
+  /// No description provided for @onboardingWelcomeBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaçlarınızı, belirtilerinizi ve günlük halinizi tek yerden, birkaç dokunuşla kaydedin.'**
+  String get onboardingWelcomeBody;
+
+  /// No description provided for @onboardingPoint1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verileriniz yalnız telefonunuzda, şifreli saklanır'**
+  String get onboardingPoint1;
+
+  /// No description provided for @onboardingPoint2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap açmak ya da internet gerekmez'**
+  String get onboardingPoint2;
+
+  /// No description provided for @onboardingPoint3.
+  ///
+  /// In tr, this message translates to:
+  /// **'İsterseniz PIN veya parmak iziyle kilitlersiniz'**
+  String get onboardingPoint3;
+
+  /// No description provided for @onboardingDisclaimer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vitapuls tıbbi tavsiye vermez; yalnızca kayıt tutmanıza yardım eder.'**
+  String get onboardingDisclaimer;
+
+  /// No description provided for @onboardingLetsStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlayalım'**
+  String get onboardingLetsStart;
+
+  /// No description provided for @backupScreenTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedekleme'**
+  String get backupScreenTitle;
+
+  /// No description provided for @backupScreenIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verileriniz yalnız bu telefondadır. Telefon değiştirirseniz ya da kaybederseniz yedek dosyası sizi kurtarır.'**
+  String get backupScreenIntro;
+
+  /// No description provided for @backupPassphraseTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek şifresi'**
+  String get backupPassphraseTitle;
+
+  /// No description provided for @backupPassphraseNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parolayı unutursanız yedek açılamaz; biz de kurtaramayız.'**
+  String get backupPassphraseNote;
+
+  /// No description provided for @backupCreateAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek dosyası oluştur'**
+  String get backupCreateAction;
+
+  /// No description provided for @backupRestoreAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedekten geri yükle'**
+  String get backupRestoreAction;
+
+  /// No description provided for @backupReplaceNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri yükleme, telefondaki mevcut verilerin yerine geçer.'**
+  String get backupReplaceNote;
+
+  /// No description provided for @settingsBackupRowTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedekleme'**
+  String get settingsBackupRowTitle;
+
+  /// No description provided for @settingsBackupRowHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifreli dosya olarak dışa aktar'**
+  String get settingsBackupRowHint;
+
+  /// No description provided for @settingsProfileRowTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil ve sağlık kartı'**
+  String get settingsProfileRowTitle;
+
+  /// No description provided for @settingsProfileRowHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ad, kan grubu, alerjiler'**
+  String get settingsProfileRowHint;
+
+  /// No description provided for @settingsFieldsRowTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük alanlarım'**
+  String get settingsFieldsRowTitle;
+
+  /// No description provided for @settingsFieldsRowHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hangi alanlar görünsün'**
+  String get settingsFieldsRowHint;
+
+  /// No description provided for @settingsNotificationsRowTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimler'**
+  String get settingsNotificationsRowTitle;
+
+  /// No description provided for @settingsNotificationsRowHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlaç hatırlatmaları'**
+  String get settingsNotificationsRowHint;
+
+  /// No description provided for @settingsFooter.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vitapuls · Veriler yalnız bu telefonda, şifreli'**
+  String get settingsFooter;
 }
 
 class _AppLocalizationsDelegate

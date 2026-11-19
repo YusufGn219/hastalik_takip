@@ -1981,4 +1981,78 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsGroupApp => 'Uygulama';
+
+  @override
+  String get onboardingWelcomeBody =>
+      'İlaçlarınızı, belirtilerinizi ve günlük halinizi tek yerden, birkaç dokunuşla kaydedin.';
+
+  @override
+  String get onboardingPoint1 =>
+      'Verileriniz yalnız telefonunuzda, şifreli saklanır';
+
+  @override
+  String get onboardingPoint2 => 'Hesap açmak ya da internet gerekmez';
+
+  @override
+  String get onboardingPoint3 =>
+      'İsterseniz PIN veya parmak iziyle kilitlersiniz';
+
+  @override
+  String get onboardingDisclaimer =>
+      'Vitapuls tıbbi tavsiye vermez; yalnızca kayıt tutmanıza yardım eder.';
+
+  @override
+  String get onboardingLetsStart => 'Başlayalım';
+
+  @override
+  String get backupScreenTitle => 'Yedekleme';
+
+  @override
+  String get backupScreenIntro =>
+      'Verileriniz yalnız bu telefondadır. Telefon değiştirirseniz ya da kaybederseniz yedek dosyası sizi kurtarır.';
+
+  @override
+  String get backupPassphraseTitle => 'Yedek şifresi';
+
+  @override
+  String get backupPassphraseNote =>
+      'Parolayı unutursanız yedek açılamaz; biz de kurtaramayız.';
+
+  @override
+  String get backupCreateAction => 'Yedek dosyası oluştur';
+
+  @override
+  String get backupRestoreAction => 'Yedekten geri yükle';
+
+  @override
+  String get backupReplaceNote =>
+      'Geri yükleme, telefondaki mevcut verilerin yerine geçer.';
+
+  @override
+  String get settingsBackupRowTitle => 'Yedekleme';
+
+  @override
+  String get settingsBackupRowHint => 'Şifreli dosya olarak dışa aktar';
+
+  @override
+  String get settingsProfileRowTitle => 'Profil ve sağlık kartı';
+
+  @override
+  String get settingsProfileRowHint => 'Ad, kan grubu, alerjiler';
+
+  @override
+  String get settingsFieldsRowTitle => 'Günlük alanlarım';
+
+  @override
+  String get settingsFieldsRowHint => 'Hangi alanlar görünsün';
+
+  @override
+  String get settingsNotificationsRowTitle => 'Bildirimler';
+
+  @override
+  String get settingsNotificationsRowHint => 'İlaç hatırlatmaları';
+
+  @override
+  String get settingsFooter =>
+      'Vitapuls · Veriler yalnız bu telefonda, şifreli';
 }

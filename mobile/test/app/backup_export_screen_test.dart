@@ -76,7 +76,49 @@ void main() {
     await tester.pumpWidget(_app(_FakeExporter()));
 
     expect(find.byKey(const Key('yedek_uyari')), findsOneWidget);
-    expect(find.textContaining('kurtarma yolu yoktur'), findsOneWidget);
+    expect(find.textContaining('biz de kurtaramayız'), findsOneWidget);
+  });
+
+  testWidgets('taslaktaki metinler: başlık, açıklama, düğmeler ve sarı uyarı',
+      (tester) async {
+    await tester.pumpWidget(_app(_FakeExporter()));
+
+    expect(find.text('Yedekleme'), findsOneWidget);
+    expect(find.textContaining('Telefon değiştirirseniz'), findsOneWidget);
+    expect(find.text('Yedek şifresi'), findsOneWidget);
+    expect(find.text('Yedek dosyası oluştur'), findsOneWidget);
+    expect(find.text('Yedekten geri yükle'), findsOneWidget);
+    expect(
+      find.text('Geri yükleme, telefondaki mevcut verilerin yerine geçer.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('"Yedekten geri yükle" düğmesi geri yükleme rotasını açar', (tester) async {
+    final pushed = <String?>[];
+    await tester.pumpWidget(ProviderScope(
+      overrides: [backupExporterProvider.overrideWithValue(_FakeExporter())],
+      child: MaterialApp(
+        theme: AppTheme.light(),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const BackupExportScreen(),
+        onGenerateRoute: (s) {
+          pushed.add(s.name);
+          return MaterialPageRoute(
+            settings: s,
+            builder: (_) => const Scaffold(body: Text('geri yükleme ekranı')),
+          );
+        },
+      ),
+    ));
+
+    await tester.ensureVisible(find.byKey(const Key('yedek_geri_yukle')));
+    await tester.tap(find.byKey(const Key('yedek_geri_yukle')));
+    await tester.pumpAndSettle();
+
+    expect(pushed.last, '/restore');
+    expect(find.text('geri yükleme ekranı'), findsOneWidget);
   });
 
   testWidgets('parola varsayılan gizli; göz düğmesi gösterir ve gizler', (tester) async {

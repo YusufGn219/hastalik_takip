@@ -97,6 +97,8 @@ Future<void> _mount(WidgetTester tester, _Env env,
         '/body': (context) => const Scaffold(body: Text('boy kilo ekranı')),
         '/backup': (context) => const Scaffold(body: Text('yedek ekranı')),
         '/restore': (context) => const Scaffold(body: Text('geri yükleme ekranı')),
+        '/daily-fields': (context) => const Scaffold(body: Text('günlük alanlar ekranı')),
+        '/recurring': (context) => const Scaffold(body: Text('rutin ekranı')),
       },
     ),
   ));
@@ -160,14 +162,29 @@ void main() {
     expect(find.text('yedek ekranı'), findsOneWidget);
   });
 
-  testWidgets('"Yedekten geri yükle" satırı geri yükleme ekranını açar', (tester) async {
+  testWidgets('Yedekten geri yükleme artık Yedekleme ekranından açılır; ayrı satır yok',
+      (tester) async {
     final env = (await tester.runAsync(() => _env()))!;
     await _mount(tester, env);
     await _openSettings(tester);
 
-    await _tap(tester, find.byKey(const Key('ayar_yedek_geri')));
+    expect(find.byKey(const Key('ayar_yedek_geri')), findsNothing);
+    expect(find.text('Yedekleme'), findsOneWidget);
+  });
 
-    expect(find.text('geri yükleme ekranı'), findsOneWidget);
+  testWidgets('"Günlük alanlarım" ve "Bildirimler" satırları ilgili ekranları açar',
+      (tester) async {
+    final env = (await tester.runAsync(() => _env()))!;
+    await _mount(tester, env);
+    await _openSettings(tester);
+
+    await _tap(tester, find.byKey(const Key('ayar_gunluk_alanlar')));
+    expect(find.text('günlük alanlar ekranı'), findsOneWidget);
+    Navigator.of(tester.element(find.text('günlük alanlar ekranı'))).pop();
+    await tester.pumpAndSettle();
+
+    await _tap(tester, find.byKey(const Key('ayar_bildirimler')));
+    expect(find.text('rutin ekranı'), findsOneWidget);
   });
 
   group('Tüm verimi sil', () {
@@ -256,13 +273,13 @@ void main() {
     });
   });
 
-  testWidgets('"Boy ve kilo" satırı ölçüm ekranını açar', (tester) async {
+  testWidgets('"Boy ve kilo" Ayarlar\'da değil, Sağlık sekmesinde (taslaktaki gibi)',
+      (tester) async {
     final env = (await tester.runAsync(() => _env()))!;
     await _mount(tester, env);
     await _openSettings(tester);
 
-    await _tap(tester, find.byKey(const Key('ayar_boy_kilo')));
-    expect(find.text('boy kilo ekranı'), findsOneWidget);
+    expect(find.byKey(const Key('ayar_boy_kilo')), findsNothing);
   });
 
   group('profil kartı', () {
@@ -271,7 +288,7 @@ void main() {
       await _mount(tester, env);
       await _openSettings(tester);
 
-      expect(find.text('Adınızı ve temel bilgilerinizi ekleyin'), findsOneWidget);
+      expect(find.text('Ad, kan grubu, alerjiler'), findsOneWidget);
       await _tap(tester, find.byKey(const Key('ayar_profil')));
       expect(find.byType(ProfileScreen), findsOneWidget);
     });
@@ -298,7 +315,7 @@ void main() {
       await _openSettings(tester);
 
       expect(find.text('Ada Lovelace'), findsOneWidget);
-      expect(find.text('Adınızı ve temel bilgilerinizi ekleyin'), findsNothing);
+      expect(find.text('Ad, kan grubu, alerjiler'), findsNothing);
     });
 
     testWidgets('yalnız ad girilmişse yalnız ad görünür', (tester) async {
@@ -317,7 +334,7 @@ void main() {
       await _openSettings(tester);
 
       expect(find.byKey(const Key('ayar_profil')), findsOneWidget);
-      expect(find.text('Adınızı ve temel bilgilerinizi ekleyin'), findsOneWidget);
+      expect(find.text('Ad, kan grubu, alerjiler'), findsOneWidget);
     });
   });
 }

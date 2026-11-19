@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../l10n/l10n.dart';
 import 'app_lock_controller.dart';
 import 'app_lock_platform.dart';
@@ -106,42 +107,69 @@ class _LockScreenState extends ConsumerState<LockScreen> {
       message = l10n.lockEnterPin;
     }
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final accent = isDark ? AppColors.primary200 : AppColors.primary600;
+    // Taslaktaki "Kilit" panosu: üstte 64 px yuvarlak kilit simgesi, başlık, alt
+    // yazı, noktalar, tuş takımı ve altta "Parmak iziyle aç" metin düğmesi.
     return Scaffold(
       key: const Key('kilit_ekrani'),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(28, 72, 28, 24),
+          child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.lock_outline, size: 48, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(height: 12),
-                Text(l10n.lockTitle, style: text.titleLarge),
-                const SizedBox(height: 24),
-                PinDots(filled: _entered.length, slots: lock.pinLength, error: _wrong || blocked),
-                const SizedBox(height: 12),
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.primary900 : AppColors.primary50,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.lock_outline, size: 30, color: accent),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  l10n.lockTitle,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 4),
                 Text(
                   message,
                   key: const Key('kilit_mesaj'),
                   textAlign: TextAlign.center,
-                  style: text.bodyMedium?.copyWith(color: (_wrong || blocked) ? Theme.of(context).colorScheme.error : null),
+                  style: text.bodyMedium?.copyWith(
+                    color: (_wrong || blocked)
+                        ? theme.colorScheme.error
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
                 ),
                 const SizedBox(height: 24),
+                PinDots(filled: _entered.length, slots: lock.pinLength, error: _wrong || blocked),
+                const SizedBox(height: 28),
                 PinPad(
                   enabled: !blocked,
                   backspaceLabel: l10n.lockBackspace,
                   onDigit: _digit,
                   onBackspace: _backspace,
-                  bottomLeft: lock.biometric
-                      ? IconButton(
-                          key: const Key('kilit_biyometrik'),
-                          onPressed: _biometric,
-                          icon: Semantics(label: l10n.lockBiometricButton, child: const Icon(Icons.fingerprint, size: 32)),
-                        )
-                      : null,
                 ),
-                const SizedBox(height: 8),
+                if (lock.biometric)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 22),
+                    child: TextButton.icon(
+                      key: const Key('kilit_biyometrik'),
+                      style: TextButton.styleFrom(minimumSize: const Size(0, 48)),
+                      onPressed: _biometric,
+                      icon: Icon(Icons.fingerprint, size: 22, color: accent),
+                      label: Text(
+                        l10n.lockBiometricButton,
+                        style: TextStyle(
+                            color: accent, fontSize: 15, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
                 TextButton(
                   key: const Key('kilit_unuttum'),
                   onPressed: _forgot,

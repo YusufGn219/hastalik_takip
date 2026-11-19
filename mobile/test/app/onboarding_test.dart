@@ -22,71 +22,54 @@ Widget _app(FakeSettingsRepository settings) => ProviderScope(
     );
 
 void main() {
-  testWidgets('ilk açılışta tanıtım gelir, ana ekran gelmez', (tester) async {
+  testWidgets('ilk açılışta karşılama gelir, ana ekran gelmez', (tester) async {
     final settings = FakeSettingsRepository();
     await tester.pumpWidget(_app(settings));
     await tester.pumpAndSettle();
 
     expect(find.byType(OnboardingScreen), findsOneWidget);
     expect(find.byType(HomeScreen), findsNothing);
-    expect(find.text('Sağlığınızı takip edin'), findsOneWidget);
-    expect(find.text('Geç'), findsOneWidget);
-    expect(find.text('İleri'), findsOneWidget);
-    // Tanıtım henüz bitmedi: "görüldü" yazılmaz.
+    expect(find.text('Başlayalım'), findsOneWidget);
+    // Karşılama henüz bitmedi: "görüldü" yazılmaz.
     expect(settings.values[onboardingDoneKey], isNull);
   });
 
-  testWidgets('dört sayfa sırayla gezilir; "dönem" denir, "atak" denmez',
+  testWidgets('karşılama taslaktaki metinleri gösterir; "dönem" denir, "atak" denmez',
       (tester) async {
     await tester.pumpWidget(_app(FakeSettingsRepository()));
     await tester.pumpAndSettle();
 
-    final titles = [
-      'Sağlığınızı takip edin',
-      'Semptomlarınızı kaydedin',
-      'Dönemleri yönetin',
-      'Eğilimlerinizi görün',
-    ];
-    for (var i = 0; i < titles.length; i++) {
-      expect(find.text(titles[i]), findsOneWidget);
-      expect(find.textContaining('Atak'), findsNothing);
-      expect(find.textContaining('atak'), findsNothing);
-      if (i < titles.length - 1) {
-        await tester.tap(find.text('İleri'));
-        await tester.pumpAndSettle();
-      }
-    }
-    // Son sayfada "İleri" yerine "Başla" var.
+    expect(find.text('Vitapuls'), findsOneWidget);
+    expect(
+      find.text('İlaçlarınızı, belirtilerinizi ve günlük halinizi tek yerden, '
+          'birkaç dokunuşla kaydedin.'),
+      findsOneWidget,
+    );
+    expect(find.text('Verileriniz yalnız telefonunuzda, şifreli saklanır'), findsOneWidget);
+    expect(find.text('Hesap açmak ya da internet gerekmez'), findsOneWidget);
+    expect(find.text('İsterseniz PIN veya parmak iziyle kilitlersiniz'), findsOneWidget);
+    expect(
+      find.text('Vitapuls tıbbi tavsiye vermez; yalnızca kayıt tutmanıza yardım eder.'),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('karsilama_logo')), findsOneWidget);
+    expect(find.textContaining('Atak'), findsNothing);
+    expect(find.textContaining('atak'), findsNothing);
+    // Eski sayfa gezintisi yok: İleri / Geç düğmeleri kalktı.
     expect(find.text('İleri'), findsNothing);
-    expect(find.text('Başla'), findsOneWidget);
-    expect(find.textContaining('Tıbbi tavsiye değildir'), findsOneWidget);
+    expect(find.text('Geç'), findsNothing);
   });
 
-  testWidgets('"Başla" ile ana ekrana geçilir ve görüldü kaydedilir',
+  testWidgets('"Başlayalım" ile ana ekrana geçilir ve görüldü kaydedilir',
       (tester) async {
     final settings = FakeSettingsRepository();
     await tester.pumpWidget(_app(settings));
     await tester.pumpAndSettle();
-    for (var i = 0; i < 3; i++) {
-      await tester.tap(find.text('İleri'));
-      await tester.pumpAndSettle();
-    }
-    await tester.tap(find.text('Başla'));
+    await tester.tap(find.text('Başlayalım'));
     await tester.pumpAndSettle();
 
     expect(find.byType(HomeScreen), findsOneWidget);
     expect(find.byType(OnboardingScreen), findsNothing);
-    expect(settings.values[onboardingDoneKey], 'true');
-  });
-
-  testWidgets('"Geç" ilk sayfadan da ana ekrana götürür', (tester) async {
-    final settings = FakeSettingsRepository();
-    await tester.pumpWidget(_app(settings));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Geç'));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(HomeScreen), findsOneWidget);
     expect(settings.values[onboardingDoneKey], 'true');
   });
 
@@ -109,7 +92,7 @@ void main() {
     expect(find.byType(OnboardingScreen), findsOneWidget);
   });
 
-  testWidgets('ayar okunamazsa kullanıcı tanıtımda kalmaz, ana ekran açılır',
+  testWidgets('ayar okunamazsa kullanıcı karşılamada kalmaz, ana ekran açılır',
       (tester) async {
     await tester.pumpWidget(_app(FakeSettingsRepository(failReads: true)));
     await tester.pumpAndSettle();
@@ -121,7 +104,7 @@ void main() {
     final settings = FakeSettingsRepository(failWrites: true);
     await tester.pumpWidget(_app(settings));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Geç'));
+    await tester.tap(find.text('Başlayalım'));
     await tester.pumpAndSettle();
 
     expect(find.byType(HomeScreen), findsOneWidget);
