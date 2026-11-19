@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/utils/turkish_text.dart';
+import '../../../core/widgets/pinned_action_bar.dart';
 import '../../../data/database/app_database.dart';
 import '../../../domain/errors.dart';
 import '../../../domain/services/dose_service.dart';
@@ -194,13 +195,20 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen>
     await _refreshStatus();
   }
 
+  /// Uyarı kartının zemini: açık temada açık turuncu, koyu temada şeffaf turuncu
+  /// (açık zemin koyu temada yazıyı okunmaz yapıyordu).
+  Color _bannerColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? Colors.orange.withValues(alpha: 0.16)
+          : Colors.orange.shade50;
+
   Widget? _permissionBanner(AppLocalizations l10n) {
     final s = _status;
     if (s == null || _groups.isEmpty) return null;
     if (!s.notificationsEnabled) {
       return Card(
         key: const ValueKey('reminder-off-banner'),
-        color: Colors.orange.shade50,
+        color: _bannerColor(context),
         margin: const EdgeInsets.only(bottom: 16),
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -232,7 +240,7 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen>
     if (!s.exactAllowed) {
       return Card(
         key: const ValueKey('reminder-inexact-banner'),
-        color: Colors.orange.shade50,
+        color: _bannerColor(context),
         margin: const EdgeInsets.only(bottom: 16),
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -487,15 +495,18 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.routineTitle),
-        actions: [
-          IconButton(
-            tooltip: l10n.routineAddTooltip,
-            icon: const Icon(Icons.add),
+      appBar: AppBar(title: Text(l10n.routineTitle)),
+      // Rutin ekle: altta sabit tek birincil düğme.
+      bottomNavigationBar: PinnedActionBar(
+        child: Tooltip(
+          message: l10n.routineAddTooltip,
+          child: ElevatedButton.icon(
+            key: const Key('rutin_ekle'),
             onPressed: (_isLoading || _loadFailed) ? null : _showAddDialog,
+            icon: const Icon(Icons.add),
+            label: Text(l10n.routineAddTooltip),
           ),
-        ],
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

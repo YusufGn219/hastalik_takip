@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/providers.dart';
+import '../../core/widgets/pinned_action_bar.dart';
 import '../../data/database/app_database.dart';
 import '../../domain/reading_catalog.dart';
 import '../../l10n/l10n.dart';
@@ -105,17 +106,20 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.readingsTitle)),
-      floatingActionButton: view == null
+      // Ölçüm ekle: altta sabit tek birincil düğme.
+      bottomNavigationBar: view == null
           ? null
-          : FloatingActionButton.extended(
-              key: const Key('olcum_ekle'),
-              onPressed: () => _openSheet(view),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.readingAdd),
+          : PinnedActionBar(
+              child: ElevatedButton.icon(
+                key: const Key('olcum_ekle'),
+                onPressed: () => _openSheet(view),
+                icon: const Icon(Icons.add),
+                label: Text(l10n.readingAdd),
+              ),
             ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
           children: [
             Wrap(
               spacing: 8,
@@ -194,22 +198,26 @@ class _ReadingsScreenState extends ConsumerState<ReadingsScreen> {
         if (d.items.isEmpty)
           Text(l10n.readingEmpty, key: const Key('olcum_bos'), style: text.bodyMedium)
         else ...[
-          Card(
-            key: const Key('olcum_son'),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.readingLatest, style: text.titleSmall),
-                  const SizedBox(height: 4),
-                  Text(
-                    valueText(d.items.first),
-                    key: const Key('olcum_son_deger'),
-                    style: text.headlineSmall,
-                  ),
-                  Text(whenText(d.items.first), style: text.bodySmall),
-                ],
+          // Tam genişlik (içerik dar olunca kart büzülmesin).
+          SizedBox(
+            width: double.infinity,
+            child: Card(
+              key: const Key('olcum_son'),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.readingLatest, style: text.titleSmall),
+                    const SizedBox(height: 4),
+                    Text(
+                      valueText(d.items.first),
+                      key: const Key('olcum_son_deger'),
+                      style: text.headlineSmall,
+                    ),
+                    Text(whenText(d.items.first), style: text.bodySmall),
+                  ],
+                ),
               ),
             ),
           ),

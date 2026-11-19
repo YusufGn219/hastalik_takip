@@ -1972,4 +1972,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get healthHubSettingsHint => 'Kilit, adım takibi, yedek, veriler';
+
+  @override
+  String get settingsGroupSecurity => 'Güvenlik';
+
+  @override
+  String get settingsGroupAuto => 'Otomatik veri';
+
+  @override
+  String get settingsGroupApp => 'Uygulama';
 }

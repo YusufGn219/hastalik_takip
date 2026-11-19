@@ -120,7 +120,8 @@ void main() {
         find.textContaining('Kronik hastalıklar okunamadı'),
         findsOneWidget,
       );
-      final add = tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.add));
+      // Ekleme düğmesi artık altta sabit "Hastalık ekle" düğmesi.
+      final add = tester.widget<ElevatedButton>(find.byKey(const Key('hastalik_ekle')));
       expect(add.onPressed, isNull);
     });
   });

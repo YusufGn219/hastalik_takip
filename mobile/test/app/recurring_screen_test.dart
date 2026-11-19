@@ -215,8 +215,9 @@ void main() {
         medicationServiceProvider.overrideWithValue(_BrokenService(db)),
       ]);
       expect(find.textContaining('Rutinler okunamadı'), findsOneWidget);
+      // Ekleme düğmesi artık altta sabit "Rutin ekle" düğmesi.
       expect(
-        tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.add)).onPressed,
+        tester.widget<ElevatedButton>(find.byKey(const Key('rutin_ekle'))).onPressed,
         isNull,
       );
     });

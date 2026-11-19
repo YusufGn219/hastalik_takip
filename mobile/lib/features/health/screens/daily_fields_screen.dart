@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
+import '../../../core/widgets/pinned_action_bar.dart';
 import '../../../data/database/app_database.dart';
 import '../../../data/database/enums.dart';
 import '../../../domain/errors.dart';
@@ -20,16 +21,18 @@ class DailyFieldsScreen extends ConsumerWidget {
     final fields = ref.watch(dailyFieldsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.fieldsScreenTitle),
-        actions: [
-          IconButton(
+      appBar: AppBar(title: Text(l10n.fieldsScreenTitle)),
+      // Alan ekle: altta sabit tek birincil düğme.
+      bottomNavigationBar: PinnedActionBar(
+        child: Tooltip(
+          message: l10n.fieldsAdd,
+          child: ElevatedButton.icon(
             key: const Key('alan_ekle'),
-            tooltip: l10n.fieldsAdd,
-            icon: const Icon(Icons.add),
             onPressed: () => _openDialog(context, ref, null),
+            icon: const Icon(Icons.add),
+            label: Text(l10n.fieldsAdd),
           ),
-        ],
+        ),
       ),
       body: fields.when(
         loading: () => const Center(child: CircularProgressIndicator()),

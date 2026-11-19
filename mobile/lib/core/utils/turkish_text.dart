@@ -21,6 +21,10 @@ String foldTr(String s) {
       .replaceAll('û', 'u');
 }
 
+/// Türkçe büyük harfe çevirir: 'i' → 'İ', 'ı' → 'I' (Dart'ın `toUpperCase()`
+/// yöntemi 'i'yi 'I' yapar, "Güvenlik" "GÜVENLIK" olurdu).
+String upperTr(String s) => s.replaceAll('i', 'İ').replaceAll('ı', 'I').toUpperCase();
+
 const _alphabet = 'abcçdefgğhıijklmnoöprsştuüvwxyz';
 
 /// Harfler Türkçe alfabe sırasında, harf olmayanlar (boşluk, rakam) harflerden

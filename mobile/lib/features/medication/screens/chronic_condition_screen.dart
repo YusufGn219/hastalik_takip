@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/utils/turkish_text.dart';
+import '../../../core/widgets/pinned_action_bar.dart';
 import '../../../data/database/app_database.dart';
 import '../../../domain/errors.dart';
 import '../../../domain/services/medication_service.dart';
@@ -128,15 +129,18 @@ class _ChronicConditionScreenState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.condTitle),
-        actions: [
-          IconButton(
-            tooltip: l10n.condAddTooltip,
-            icon: const Icon(Icons.add),
+      appBar: AppBar(title: Text(l10n.condTitle)),
+      // Hastalık ekle: altta sabit tek birincil düğme.
+      bottomNavigationBar: PinnedActionBar(
+        child: Tooltip(
+          message: l10n.condAddTooltip,
+          child: ElevatedButton.icon(
+            key: const Key('hastalik_ekle'),
             onPressed: (_isLoading || _loadFailed) ? null : () => _showEditor(),
+            icon: const Icon(Icons.add),
+            label: Text(l10n.condAddTooltip),
           ),
-        ],
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

@@ -136,7 +136,12 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.primary50,
+        // Seçili çip belirgin: daha koyu zemin, kalın yazı (varsayılan gri idi).
+        selectedColor: AppColors.primary100,
+        checkmarkColor: AppColors.primary800,
         labelStyle: const TextStyle(color: AppColors.primary800, fontSize: 12),
+        secondaryLabelStyle: const TextStyle(
+            color: AppColors.primary800, fontSize: 12, fontWeight: FontWeight.w600),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         side: BorderSide.none,
       ),
@@ -258,8 +263,14 @@ class AppTheme {
         overlayColor: Color(0x1AAFA9EC),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.primary800,
+        // Seçilmeyen çip sönük, seçili çip parlak (varsayılan: seçili gri, seçilmeyen
+        // mor görünüyordu, yani ters).
+        backgroundColor: AppColors.primary900,
+        selectedColor: AppColors.primary600,
+        checkmarkColor: Colors.white,
         labelStyle: const TextStyle(color: AppColors.primary100, fontSize: 12),
+        secondaryLabelStyle: const TextStyle(
+            color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         side: BorderSide.none,
       ),

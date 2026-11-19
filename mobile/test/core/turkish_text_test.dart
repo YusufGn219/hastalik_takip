@@ -2,6 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/core/utils/turkish_text.dart';
 
 void main() {
+  group('upperTr', () {
+    test('Türkçe i/ı kuralıyla büyültür', () {
+      expect(upperTr('Güvenlik'), 'GÜVENLİK'); // i → İ (Dart varsayılanı I derdi)
+      expect(upperTr('Otomatik veri'), 'OTOMATİK VERİ');
+      expect(upperTr('ışık'), 'IŞIK'); // ı → I
+      expect(upperTr('Hastalıklar'), 'HASTALIKLAR');
+    });
+  });
+
   group('foldTr', () {
     test('Türkçe I/İ kuralıyla küçültür', () {
       expect(foldTr('IŞIK'), 'ışık'); // I → ı (Dart varsayılanı i derdi)

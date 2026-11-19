@@ -151,7 +151,10 @@ void main() {
     await _mount(tester, env);
     await _openSettings(tester);
 
-    expect(find.text('Yedek'), findsOneWidget);
+    // Yedek satırları artık "Güvenlik" bölümünün altında (taslaktaki gibi).
+    expect(find.text('GÜVENLİK'), findsOneWidget);
+    expect(find.text('OTOMATİK VERİ'), findsOneWidget);
+    expect(find.text('UYGULAMA'), findsOneWidget);
     await _tap(tester, find.byKey(const Key('ayar_yedek_al')));
 
     expect(find.text('yedek ekranı'), findsOneWidget);

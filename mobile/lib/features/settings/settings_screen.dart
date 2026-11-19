@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
+import '../../core/utils/turkish_text.dart' show upperTr;
 import '../../l10n/l10n.dart';
 import '../profile/profile_avatar.dart';
 import '../lock/app_lock_controller.dart';
@@ -62,6 +63,18 @@ class SettingsScreen extends ConsumerWidget {
     await restart();
   }
 
+  /// Bölüm başlığı: küçük, büyük harfli (taslaktaki gibi).
+  Widget _header(TextTheme text, String label, {bool first = false}) => Padding(
+        padding: EdgeInsets.only(top: first ? 0 : 16, bottom: 8, left: 2),
+        child: Text(
+          upperTr(label),
+          style: text.labelMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.4,
+          ),
+        ),
+      );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
@@ -73,24 +86,10 @@ class SettingsScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const _ProfileCard(),
-            Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                key: const Key('ayar_boy_kilo'),
-                leading: const Icon(Icons.monitor_weight_outlined),
-                title: Text(l10n.settingsBodyTitle),
-                subtitle: Text(l10n.settingsBodyHint),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.of(context).pushNamed('/body'),
-              ),
-            ),
-            const StepSettingsCard(),
+            // Bölümler taslaktaki sırayla: Güvenlik (kilit + yedek), Otomatik veri,
+            // Uygulama (profil, boy-kilo), Veri (tümünü sil).
+            _header(text, l10n.settingsGroupSecurity, first: true),
             const AppLockSettingsCard(),
-            Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 8),
-              child: Text(l10n.settingsBackupSection, style: text.titleSmall),
-            ),
             Card(
               margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
@@ -113,10 +112,22 @@ class SettingsScreen extends ConsumerWidget {
                 onTap: () => Navigator.of(context).pushNamed('/restore'),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 8),
-              child: Text(l10n.settingsDataSection, style: text.titleSmall),
+            _header(text, l10n.settingsGroupAuto),
+            const StepSettingsCard(),
+            _header(text, l10n.settingsGroupApp),
+            const _ProfileCard(),
+            Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                key: const Key('ayar_boy_kilo'),
+                leading: const Icon(Icons.monitor_weight_outlined),
+                title: Text(l10n.settingsBodyTitle),
+                subtitle: Text(l10n.settingsBodyHint),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).pushNamed('/body'),
+              ),
             ),
+            _header(text, l10n.settingsDataSection),
             Card(
               margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(

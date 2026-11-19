@@ -3633,6 +3633,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kilit, adım takibi, yedek, veriler'**
   String get healthHubSettingsHint;
+
+  /// No description provided for @settingsGroupSecurity.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güvenlik'**
+  String get settingsGroupSecurity;
+
+  /// No description provided for @settingsGroupAuto.
+  ///
+  /// In tr, this message translates to:
+  /// **'Otomatik veri'**
+  String get settingsGroupAuto;
+
+  /// No description provided for @settingsGroupApp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulama'**
+  String get settingsGroupApp;
 }
 
 class _AppLocalizationsDelegate

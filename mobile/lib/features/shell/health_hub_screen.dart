@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/turkish_text.dart' show upperTr;
 import '../../l10n/app_localizations.dart';
 
 class HealthHubScreen extends StatelessWidget {
@@ -16,7 +17,7 @@ class HealthHubScreen extends StatelessWidget {
     Widget header(String text) => Padding(
           padding: const EdgeInsets.fromLTRB(2, 16, 0, 6),
           child: Text(
-            text.toUpperCase(),
+            upperTr(text),
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.4,

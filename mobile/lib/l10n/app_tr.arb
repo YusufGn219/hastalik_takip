@@ -923,5 +923,8 @@
   "healthHubBodyHint": "Boy ve kilo geçmişi",
   "healthHubDailyFieldsHint": "Günlük kayıtta hangi alanlar görünsün",
   "healthHubProfileHint": "Ad, fotoğraf, kan grubu, alerji",
-  "healthHubSettingsHint": "Kilit, adım takibi, yedek, veriler"
+  "healthHubSettingsHint": "Kilit, adım takibi, yedek, veriler",
+  "settingsGroupSecurity": "Güvenlik",
+  "settingsGroupAuto": "Otomatik veri",
+  "settingsGroupApp": "Uygulama"
 }
